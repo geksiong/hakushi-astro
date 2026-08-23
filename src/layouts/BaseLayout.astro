@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+import { THEME_INIT_SCRIPT } from '../lib/theme-init.mjs';
+import CommandPalette from '../components/CommandPalette';
+import MobileNav from '../components/MobileNav';
+import { getSearchDocs } from '../lib/search-data';
+import { getArticleIndex } from '../lib/articles';
+import { COLLECTIONS } from '../lib/collections';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { title = 'Hakushi', description = 'Notes & Knowledge Graph Engine' } = Astro.props;
+
+const searchDocs = await getSearchDocs();
+const articles = await getArticleIndex();
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;600&family=Fira+Code:wght@400;500&display=swap"
+		/>
+		<script is:inline set:html={THEME_INIT_SCRIPT} />
+	</head>
+	<body class="min-h-screen flex flex-col antialiased">
+		<slot />
+
+		<MobileNav client:load collections={COLLECTIONS} articles={articles} />
+		<CommandPalette client:load docs={searchDocs} />
+	</body>
+</html>

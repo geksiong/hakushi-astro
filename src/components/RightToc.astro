@@ -1,0 +1,124 @@
+---
+import { List, Share2, ChevronUp } from '@lucide/astro';
+import GraphBrowser from './GraphBrowser';
+import type { GraphJSON } from '../lib/graph-data';
+
+interface Props {
+	headings: { depth: number; text: string; slug: string }[];
+	slug: string;
+	subgraph: GraphJSON;
+}
+
+const { headings = [], slug, subgraph } = Astro.props;
+const toc = headings.filter((h) => h.depth <= 4);
+---
+
+<aside
+	class="w-64 shrink-0 hidden lg:block space-y-6 sticky top-20 self-start text-xs max-h-[calc(100vh-6rem)] overflow-y-auto pr-2"
+>
+	<!-- Table of Contents Section -->
+	<div class="space-y-3 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-2xs">
+		<div class="flex items-center justify-between pb-2 border-b border-[var(--border)]">
+			<span class="font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1.5">
+				<List class="w-3.5 h-3.5 text-[var(--primary)]" />
+				On This Page
+			</span>
+			<span class="font-mono text-[var(--text-muted)] text-[10px]">{toc.length} sections</span>
+		</div>
+
+		{
+			toc.length === 0 ? (
+				<p class="text-[var(--text-muted)] italic text-center py-2">No headings found.</p>
+			) : (
+				<nav class="space-y-1">
+					{toc.map((item) => (
+						<a
+							href={`#${item.slug}`}
+							data-toc-link={item.slug}
+							class:list={[
+								'w-full text-left py-1 px-2 rounded-md transition-colors truncate block',
+								item.depth === 1 ? 'pl-0 font-semibold' : item.depth === 2 ? 'pl-2 font-medium' : 'pl-4 text-[11px] text-[var(--text-muted)]',
+							]}
+						>
+							{item.text}
+						</a>
+					))}
+				</nav>
+			)
+		}
+	</div>
+
+	<!-- Article Local Knowledge Graph Subset -->
+	<div class="space-y-3 p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-2xs">
+		<div class="flex items-center justify-between pb-2 border-b border-[var(--border)]">
+			<span class="font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-1.5">
+				<Share2 class="w-3.5 h-3.5 text-[var(--accent)]" />
+				Article Graph
+			</span>
+			<button id="toggle-local-graph" class="text-[var(--text-muted)] hover:text-[var(--text-main)]">
+				<ChevronUp class="w-3.5 h-3.5 transition-transform" />
+			</button>
+		</div>
+
+		<div id="local-graph-body" class="space-y-2">
+			<GraphBrowser client:idle graph={subgraph} focus={slug} isSubGraph />
+			<p class="text-[10px] text-[var(--text-muted)] text-center italic">
+				Showing direct links &amp; tag clusters for this article.
+			</p>
+		</div>
+	</div>
+</aside>
+
+<script>
+	const toggle = document.getElementById('toggle-local-graph');
+	const body = document.getElementById('local-graph-body');
+	toggle?.addEventListener('click', () => {
+		if (!body || !toggle) return;
+		const hidden = body.style.display === 'none';
+		body.style.display = hidden ? '' : 'none';
+		toggle.querySelector('svg')?.classList.toggle('rotate-180', !hidden);
+	});
+
+	// Active section highlighting
+	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+	const byId = new Map(links.map((l) => [l.dataset.tocLink!, l]));
+	let activeId = '';
+
+	const setActive = (id: string) => {
+		if (id === activeId) return;
+		activeId = id;
+		for (const [id2, link] of byId) {
+			const selected = id2 === id;
+			link.classList.toggle('bg-[var(--primary)]/10', selected);
+			link.classList.toggle('text-[var(--primary)]', selected);
+			link.classList.toggle('font-semibold', selected);
+			link.classList.toggle('border-l-2', selected);
+			link.classList.toggle('border-[var(--primary)]', selected);
+		}
+	};
+
+	const observer = new IntersectionObserver(
+		(entries) => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) setActive(entry.target.id);
+			}
+		},
+		{ rootMargin: '-80px 0px -60% 0px' }
+	);
+
+	links.forEach((link) => {
+		const el = document.getElementById(link.dataset.tocLink!);
+		if (el) observer.observe(el);
+	});
+
+	// Smooth scroll on click
+	links.forEach((link) => {
+		link.addEventListener('click', (e) => {
+			const el = document.getElementById(link.dataset.tocLink!);
+			if (!el) return;
+			e.preventDefault();
+			el.scrollIntoView({ behavior: 'smooth' });
+			setActive(link.dataset.tocLink!);
+		});
+	});
+</script>

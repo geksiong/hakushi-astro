@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+---
+
+<BaseLayout title="Not Found · Hakushi">
+	<Header view="reader" />
+	<main class="flex-1 flex items-center justify-center p-12 text-center text-[var(--text-muted)] font-mono">
+		<div>
+			<p class="text-4xl font-bold text-[var(--primary)] mb-3 font-heading">404</p>
+			<p>No note found at this path. Open the menu to browse notes instead.</p>
+			<a href="/" class="inline-block mt-6 px-4 py-2 rounded-lg bg-[var(--primary)] text-white font-medium hover:bg-[var(--primary-hover)] transition-colors no-underline text-xs">
+				Back to Hakushi
+			</a>
+		</div>
+	</main>
+</BaseLayout>

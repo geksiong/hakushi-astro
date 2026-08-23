@@ -1,0 +1,65 @@
+---
+// Wikilink alias routes: short [[refs]] like /quantum-computing must resolve
+// to the matching article, mirroring the reference app's exact-or-suffix slug
+// matching. Aliases are derived from the [[wikilinks]] actually present in
+// article bodies, plus each article's own id segments.
+import { getCollection } from 'astro:content';
+import { COLLECTIONS } from '../lib/collections';
+import { getArticleIndex, resolveArticleRef } from '../lib/articles';
+import ArticlePage from '../components/ArticlePage.astro';
+
+export async function getStaticPaths() {
+	const WIKILINK = /\[\[([^\]|\n]+)(?:\|[^\]\n]*)?\]\]/g;
+	const IDS = COLLECTIONS.map((c) => c.id);
+
+	const normalizeTarget = (raw: string): string =>
+		raw
+			.trim()
+			.toLowerCase()
+			.replace(/^\/+/, '')
+			.replace(/\.(md|mdx)$/, '')
+			.split('#')[0];
+
+	const groups = await Promise.all(IDS.map((id) => getCollection(id as 'docs')));
+	const entries = groups.flat();
+	const index = await getArticleIndex();
+
+	const byAlias = new Map<string, any>();
+
+	const claim = (alias: string, entry: any) => {
+		if (alias && !byAlias.has(alias)) byAlias.set(alias, entry);
+	};
+
+	const findBySlug = (slug: string): any | undefined =>
+		entries.find((e) => e.id === slug);
+
+	for (const entry of entries) {
+		if (!entry.body) continue;
+		for (const match of entry.body.matchAll(WIKILINK)) {
+			const target = normalizeTarget(match[1]);
+			if (!target) continue;
+			const resolved = resolveArticleRef(index, target);
+			if (!resolved) continue;
+			const resolvedEntry =
+				resolved.slug === entry.id ? entry : (findBySlug(resolved.slug) ?? entry);
+			claim(target.toLowerCase(), resolvedEntry);
+		}
+	}
+
+	// Also expose each article's own id and last segment.
+	for (const entry of entries) {
+		claim(entry.id.toLowerCase(), entry);
+		const last = entry.id.toLowerCase().split('/').pop();
+		claim(last ?? '', entry);
+	}
+
+	return Array.from(byAlias.entries()).map(([slug, entry]) => ({
+		params: { slug },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+---
+
+<ArticlePage entry={entry} />

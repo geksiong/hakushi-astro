@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import GraphBrowser from '../components/GraphBrowser';
+import { getCachedGraph } from '../lib/graph-data';
+
+const graph = await getCachedGraph();
+---
+
+<BaseLayout title="Knowledge Graph · Hakushi" description="Interactive knowledge graph of every article, category, tag and wikilink.">
+	<Header view="graph" />
+	<main class="flex-1 p-4 max-w-7xl w-full mx-auto">
+		<GraphBrowser client:load graph={graph} />
+	</main>
+</BaseLayout>

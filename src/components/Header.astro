@@ -1,0 +1,106 @@
+---
+import { Sparkles, Search, BookOpen, Share2, Palette, Menu } from '@lucide/astro';
+import ThemeMenu from './ThemeMenu';
+
+interface Props {
+	view?: 'reader' | 'graph';
+}
+
+const { view } = Astro.props;
+---
+
+<header
+	class="sticky top-0 z-30 w-full bg-[var(--bg-surface)]/90 backdrop-blur-md border-b border-[var(--border)] px-4 py-3 transition-colors duration-200"
+>
+	<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+		<!-- Left: Mobile Menu Toggle + Brand Logo & Title -->
+		<div class="flex items-center gap-3">
+			<button
+				id="open-sidebar"
+				type="button"
+				aria-label="Open navigation menu"
+				class="lg:hidden p-2 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] text-[var(--text-main)] hover:bg-[var(--bg-surface)] transition-colors"
+			>
+				<Menu class="w-5 h-5" />
+			</button>
+			<a href="/" class="flex items-center gap-3">
+				<div
+					class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-white font-bold shadow-sm"
+				>
+					<Sparkles class="w-5 h-5 animate-pulse" />
+				</div>
+				<div>
+					<div class="flex items-center gap-2">
+						<span class="font-extrabold text-base tracking-tight text-[var(--text-main)] font-heading">
+							Hakushi
+						</span>
+						<span
+							class="px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-mono text-[10px] font-bold"
+						>
+							v2.5
+						</span>
+					</div>
+					<p class="text-[11px] text-[var(--text-muted)] hidden sm:block">
+						Notes &amp; Knowledge Graph Engine
+					</p>
+				</div>
+			</a>
+		</div>
+
+		<!-- Middle: Navigation Mode View Switcher -->
+		<div
+			class="hidden md:flex items-center p-1 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border)] text-xs font-medium"
+		>
+			<a
+				href="/"
+				class:list={[
+					'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors',
+					view === 'reader'
+						? 'bg-[var(--bg-surface)] text-[var(--primary)] font-semibold shadow-2xs'
+						: 'text-[var(--text-muted)] hover:text-[var(--text-main)]',
+				]}
+			>
+				<BookOpen class="w-4 h-4" />
+				<span>Reader</span>
+			</a>
+
+			<a
+				href="/graph"
+				class:list={[
+					'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors',
+					view === 'graph'
+						? 'bg-[var(--bg-surface)] text-[var(--primary)] font-semibold shadow-2xs'
+						: 'text-[var(--text-muted)] hover:text-[var(--text-main)]',
+				]}
+			>
+				<Share2 class="w-4 h-4" />
+				<span>Knowledge Graph</span>
+			</a>
+		</div>
+
+		<!-- Right: Search, Theme Customizer -->
+		<div class="flex items-center gap-2">
+			<button
+				id="open-search"
+				type="button"
+				class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] transition-colors text-xs"
+			>
+				<Search class="w-3.5 h-3.5 text-[var(--primary)]" />
+				<span class="hidden sm:inline">Search notes...</span>
+				<kbd class="hidden sm:inline px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] font-mono text-[10px]">⌘K</kbd>
+			</button>
+
+			<ThemeMenu client:load />
+		</div>
+	</div>
+</header>
+
+<script>
+	document.getElementById('open-search')?.addEventListener('click', () => {
+		window.dispatchEvent(new CustomEvent('open-command-palette'));
+	});
+
+	document.getElementById('open-sidebar')?.addEventListener('click', () => {
+		window.dispatchEvent(new CustomEvent('open-sidebar'));
+	});
+</script>

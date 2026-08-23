@@ -1,0 +1,33 @@
+---
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar';
+import RightToc from '../components/RightToc.astro';
+import type { CollectionEntry } from 'astro:content';
+import { getArticleIndex } from '../lib/articles';
+import { COLLECTIONS } from '../lib/collections';
+import type { GraphJSON } from '../lib/graph-data';
+
+interface Props {
+	entry: CollectionEntry<'docs' | 'blog' | 'research' | 'specs' | 'wiki'>;
+	headings: { depth: number; text: string; slug: string }[];
+	subgraph: GraphJSON;
+}
+
+const { entry, headings, subgraph } = Astro.props;
+const articles = await getArticleIndex();
+---
+
+<div
+	class="flex-1 max-w-7xl w-full mx-auto flex items-start bg-[var(--bg-main)] transition-colors duration-200"
+>
+	<!-- Left Navigation Sidebar -->
+	<Sidebar client:load collections={COLLECTIONS} articles={articles} currentSlug={entry.id} />
+
+	<!-- Central Article Viewer -->
+	<main class="flex-1 min-w-0 pb-16">
+		<slot />
+	</main>
+
+	<!-- Right Table of Contents Sidebar -->
+	<RightToc headings={headings} slug={entry.id} subgraph={subgraph} />
+</div>

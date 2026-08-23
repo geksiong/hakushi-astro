@@ -1,0 +1,155 @@
+---
+import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, CornerDownRight, List } from '@lucide/astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollectionConfig } from '../lib/collections';
+import type { ReadingTime, Backlink } from '../lib/articles';
+
+interface Props {
+	entry: CollectionEntry<'docs' | 'blog' | 'research' | 'specs' | 'wiki'>;
+	Content: any;
+	headings: { depth: number; text: string; slug: string }[];
+	readingTime: ReadingTime;
+	backlinks: Backlink[];
+}
+
+const { entry, Content, headings, readingTime, backlinks } = Astro.props;
+const data = entry.data;
+const colConfig = getCollectionConfig(entry.collection);
+const colName = colConfig?.name ?? entry.collection;
+const toc = headings.filter((h) => h.depth <= 4);
+---
+
+<article class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+	<!-- Breadcrumb Path -->
+	<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+		<span class="capitalize">{colName}</span>
+		<ChevronRight class="w-3.5 h-3.5" />
+		{
+			data.category && (
+				<>
+					<span>{data.category}</span>
+					<ChevronRight class="w-3.5 h-3.5" />
+				</>
+			)
+		}
+		<span class="text-[var(--text-main)] font-medium truncate">{data.title}</span>
+	</div>
+
+	<!-- Article Header -->
+	<header class="space-y-4 pb-6 border-b border-[var(--border)]">
+		<h1
+			class="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
+		>
+			{data.title}
+		</h1>
+
+		<!-- Metadata Chips -->
+		<div class="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)] font-medium">
+			<div class="flex items-center gap-1.5">
+				<Calendar class="w-3.5 h-3.5 text-[var(--primary)]" />
+				<span>{data.date}</span>
+			</div>
+
+			<div class="flex items-center gap-1.5">
+				<Clock class="w-3.5 h-3.5 text-[var(--accent)]" />
+				<span>{readingTime.minutes} min read ({readingTime.words} words)</span>
+			</div>
+
+			{
+				data.author && (
+					<div class="flex items-center gap-1.5">
+						<User class="w-3.5 h-3.5 text-[var(--secondary)]" />
+						<span>{data.author}</span>
+					</div>
+				)
+			}
+		</div>
+
+		<!-- Summary Banner -->
+		{
+			data.summary && (
+				<p class="p-4 rounded-lg bg-[var(--bg-sidebar)] border-l-4 border-[var(--primary)] text-sm text-[var(--text-main)] leading-relaxed italic">
+					{data.summary}
+				</p>
+			)
+		}
+
+		<!-- Tags -->
+		{
+			data.tags.length > 0 && (
+				<div class="flex flex-wrap items-center gap-2 pt-2">
+					{data.tags.map((tag) => (
+						<span class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-mono text-xs font-semibold">
+							<Tag class="w-3 h-3" />
+							#{tag}
+						</span>
+					))}
+				</div>
+			)
+		}
+	</header>
+
+	<!-- Mobile "On This Page" (the right-hand TOC card is hidden below lg) -->
+	{
+		toc.length > 0 && (
+			<details class="lg:hidden group rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-2xs">
+				<summary class="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+					<span class="font-bold text-[var(--text-main)] uppercase tracking-wider text-xs flex items-center gap-1.5">
+						<List class="w-3.5 h-3.5 text-[var(--primary)]" />
+						On This Page
+					</span>
+					<ChevronDown class="w-4 h-4 text-[var(--text-muted)] transition-transform group-open:rotate-180" />
+				</summary>
+				<nav class="space-y-1 px-4 pb-4">
+					{toc.map((item) => (
+						<a
+							href={`#${item.slug}`}
+							class:list={[
+								'block w-full text-left py-1.5 px-2 rounded-md transition-colors truncate',
+								item.depth === 1
+									? 'pl-0 font-semibold'
+									: item.depth === 2
+										? 'pl-2 font-medium'
+										: 'pl-4 text-[11px] text-[var(--text-muted)]',
+							]}
+						>
+							{item.text}
+						</a>
+					))}
+				</nav>
+			</details>
+		)
+	}
+
+	<!-- Main Formatted Article Content -->
+	<div class="md-body max-w-none space-y-4">
+		<Content />
+	</div>
+
+	<!-- Backlinks / Linked References -->
+	{
+		backlinks.length > 0 && (
+			<section class="mt-12 pt-6 border-t border-[var(--border)] space-y-3">
+				<h3 class="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+					<CornerDownRight class="w-4 h-4 text-[var(--primary)]" />
+					Linked References (Backlinks)
+				</h3>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+					{backlinks.map((bl) => (
+						<a
+							href={`/${bl.slug}`}
+							class="p-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)] transition-all text-left group shadow-2xs"
+						>
+							<p class="font-semibold text-xs text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">
+								{bl.title}
+							</p>
+							<p class="text-[11px] text-[var(--text-muted)] line-clamp-1 mt-1">
+								{bl.summary || bl.slug}
+							</p>
+						</a>
+					))}
+				</div>
+			</section>
+		)
+	}
+</article>
