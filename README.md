@@ -81,8 +81,9 @@ hakushi({
     colorScheme: 'nord',   // hakushi, obsidian, nord, amber, monokai, rose
     style: 'sans',         // sans, serif, mono, editorial
   },
+  articlesPerPage: 5,     // default articles per page when browsing a collection
   collections: [
-    { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder' },
+    { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
   ],
 })
@@ -139,6 +140,7 @@ hakushi({
   components: {
     Header: './src/components/DocsHeader.astro',
     ArticleView: './src/components/ArticleView.astro',
+    CollectionPage: './src/components/CollectionPage.astro',
   },
 })
 ```
@@ -148,8 +150,9 @@ hakushi({
 | `BaseLayout` | `title?`, `description?`, default slot |
 | `Header` | `view?: 'reader' \| 'graph'` |
 | `ArticlePage` | `entry` |
-| `ReaderShell` | `entry`, `headings`, `subgraph`, default slot |
+| `ReaderShell` | `entry?`, `currentCollection?`, `headings?`, `subgraph?`, default slot |
 | `ArticleView` | `entry`, `Content`, `headings`, `readingTime`, `backlinks` |
+| `CollectionPage` | `collection`, `articles` |
 
 Example header:
 
@@ -168,10 +171,10 @@ const { view } = Astro.props;
 Disable any injected route that the consuming site supplies itself:
 
 ```js
-hakushi({ routes: { home: false, notFound: false } })
+hakushi({ routes: { home: false, collections: false, notFound: false } })
 ```
 
-Keys are `home`, `articles`, `aliases`, `graph`, `tags`, `categories`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
+Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categories`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
 
 ## Markdown features
 

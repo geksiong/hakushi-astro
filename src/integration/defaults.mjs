@@ -44,6 +44,7 @@ export const DEFAULT_CONFIG = {
 	favicon: null,
 	defaultCollection: 'docs',
 	collections: DEFAULT_COLLECTIONS,
+	articlesPerPage: 5,
 	theme: {
 		mode: 'dark',
 		colorScheme: 'hakushi',

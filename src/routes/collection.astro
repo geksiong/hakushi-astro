@@ -1,0 +1,19 @@
+---
+import config from 'virtual:hakushi/config';
+import { getArticleIndex } from '../lib/articles';
+import { CollectionPage } from 'virtual:hakushi/components';
+
+export async function getStaticPaths() {
+	const config = (await import('virtual:hakushi/config')).default;
+	return config.collections.map((c: any) => ({
+		params: { collection: c.id },
+		props: { collection: c },
+	}));
+}
+
+const { collection } = Astro.props;
+const allArticles = await getArticleIndex();
+const articles = allArticles.filter((a) => a.collection === collection.id);
+---
+
+<CollectionPage collection={collection} articles={articles} />

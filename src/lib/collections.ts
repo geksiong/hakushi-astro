@@ -6,6 +6,7 @@ export interface CollectionConfig {
 	description: string;
 	iconName?: 'BookOpen' | 'Calendar' | 'Microscope' | 'FileText' | 'Share2';
 	type?: 'folder' | 'dated';
+	articlesPerPage?: number;
 }
 
 /** Collection navigation supplied by the consuming project's integration config. */

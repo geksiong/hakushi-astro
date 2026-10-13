@@ -12,7 +12,8 @@ export async function getStaticPaths() {
 	const entries = groups.flat();
 	const index = await getArticleIndex();
 	const aliases = new Map<string, any>();
-	const claim = (alias: string, entry: any) => alias && !aliases.has(alias) && aliases.set(alias, entry);
+	const collectionIds = new Set(config.collections.map(({ id }: any) => id.toLowerCase()));
+	const claim = (alias: string, entry: any) => alias && !collectionIds.has(alias) && !aliases.has(alias) && aliases.set(alias, entry);
 
 	for (const entry of entries) {
 		for (const match of (entry.body ?? '').matchAll(wikilink)) {

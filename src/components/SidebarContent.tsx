@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
 	Folder,
 	Calendar,
@@ -9,6 +9,8 @@ import {
 	FileText,
 	Sparkles,
 	FolderOpen,
+	Microscope,
+	Share2,
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
@@ -17,9 +19,19 @@ interface SidebarContentProps {
 	collections: CollectionConfig[];
 	articles: ArticleMeta[];
 	currentSlug: string;
+	selectedCollectionId?: string;
 	/** Called after navigation links are clicked - closes the mobile drawer. */
 	onNavigate?: () => void;
 }
+
+const COLLECTION_ICONS: Record<string, any> = {
+	BookOpen,
+	Calendar,
+	Microscope,
+	FileText,
+	Share2,
+	Folder,
+};
 
 type BrowseTab = 'folder' | 'dated' | 'tags';
 
@@ -32,6 +44,7 @@ export default function SidebarContent({
 	collections,
 	articles,
 	currentSlug,
+	selectedCollectionId: initialCollectionId,
 	onNavigate,
 }: SidebarContentProps) {
 	const [browseTab, setBrowseTab] = useState<BrowseTab>(() => {
@@ -41,13 +54,30 @@ export default function SidebarContent({
 			return 'folder';
 		}
 	});
-	const [selectedCollectionId, setSelectedCollectionId] = useState<string>(() => {
+
+	const getInitialCollection = () => {
+		if (initialCollectionId) return initialCollectionId;
+		if (typeof window !== 'undefined') {
+			const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+			const firstSegment = path.split('/')[0];
+			if (collections.some((c) => c.id === firstSegment)) {
+				return firstSegment;
+			}
+		}
 		try {
 			return localStorage.getItem('hakushi_collection') || 'all';
 		} catch {
 			return 'all';
 		}
-	});
+	};
+
+	const [selectedCollectionId, setSelectedCollectionId] = useState<string>(getInitialCollection);
+
+	useEffect(() => {
+		if (initialCollectionId) {
+			setSelectedCollectionId(initialCollectionId);
+		}
+	}, [initialCollectionId]);
 	const [activeTag, setActiveTag] = useState<string | null>(() => {
 		try {
 			return localStorage.getItem('hakushi_tag') || null;
@@ -173,11 +203,16 @@ export default function SidebarContent({
 						{collections.map((col) => {
 							const count = articles.filter((n) => n.collection === col.id).length;
 							const isSelected = selectedCollectionId === col.id;
+							const IconComponent = COLLECTION_ICONS[col.iconName ?? 'Folder'] || Folder;
 
 							return (
-								<button
+								<a
 									key={col.id}
-									onClick={() => selectCollection(col.id)}
+									href={`/${col.id}`}
+									onClick={() => {
+										selectCollection(col.id);
+										onNavigate?.();
+									}}
 									title={col.description}
 									className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg font-medium transition-all ${
 										isSelected
@@ -186,11 +221,11 @@ export default function SidebarContent({
 									}`}
 								>
 									<span className="flex items-center gap-2 truncate">
-										<Folder className="w-3.5 h-3.5 text-[var(--accent)]" />
+										<IconComponent className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
 										<span className="truncate">{col.name}</span>
 									</span>
 									<span className="font-mono text-[10px] text-[var(--text-muted)]">{count}</span>
-								</button>
+								</a>
 							);
 						})}
 					</div>

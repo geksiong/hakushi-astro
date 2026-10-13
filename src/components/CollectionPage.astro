@@ -1,0 +1,28 @@
+---
+import config from 'virtual:hakushi/config';
+import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
+import CollectionBrowser from './CollectionBrowser';
+import type { ArticleMeta } from '../lib/articles';
+import type { CollectionConfig } from '../lib/collections';
+
+export interface Props {
+	collection: CollectionConfig;
+	articles: ArticleMeta[];
+}
+
+const { collection, articles } = Astro.props;
+const title = `${collection.name} · ${config.title}`;
+const articlesPerPage = (collection as any).articlesPerPage ?? (config as any).articlesPerPage ?? 5;
+---
+
+<BaseLayout title={title} description={collection.description || config.description}>
+	<Header view="reader" />
+	<ReaderShell currentCollection={collection.id}>
+		<CollectionBrowser
+			client:load
+			collection={collection}
+			articles={articles}
+			articlesPerPage={articlesPerPage}
+		/>
+	</ReaderShell>
+</BaseLayout>

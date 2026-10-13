@@ -8,6 +8,7 @@ interface SidebarProps {
 	collections: CollectionConfig[];
 	articles: ArticleMeta[];
 	currentSlug: string;
+	selectedCollectionId?: string;
 }
 
 /**
@@ -17,7 +18,12 @@ interface SidebarProps {
  * Collapsible: click the toggle to shrink to a narrow strip or expand back.
  * State is persisted to localStorage.
  */
-export default function Sidebar({ collections, articles, currentSlug }: SidebarProps) {
+export default function Sidebar({
+	collections,
+	articles,
+	currentSlug,
+	selectedCollectionId,
+}: SidebarProps) {
 	const [collapsed, setCollapsed] = useState<boolean>(() => {
 		try {
 			return localStorage.getItem('hakushi_sidebar_collapsed') === 'true';
@@ -62,7 +68,12 @@ export default function Sidebar({ collections, articles, currentSlug }: SidebarP
 			{/* Content - hidden when collapsed */}
 			{!collapsed && (
 				<div className="flex-1 flex flex-col justify-between overflow-y-auto">
-					<SidebarContent collections={collections} articles={articles} currentSlug={currentSlug} />
+					<SidebarContent
+						collections={collections}
+						articles={articles}
+						currentSlug={currentSlug}
+						selectedCollectionId={selectedCollectionId}
+					/>
 				</div>
 			)}
 		</aside>

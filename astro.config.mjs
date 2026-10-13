@@ -10,6 +10,7 @@ export default defineConfig({
 		routes: {
 			home: false,
 			articles: false,
+			collections: false,
 			aliases: false,
 			graph: false,
 			tags: false,

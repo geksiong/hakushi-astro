@@ -24,10 +24,11 @@ export async function getStaticPaths() {
 	const entries = groups.flat();
 	const index = await getArticleIndex();
 
+	const collectionIds = new Set(IDS.map((id) => id.toLowerCase()));
 	const byAlias = new Map<string, any>();
 
 	const claim = (alias: string, entry: any) => {
-		if (alias && !byAlias.has(alias)) byAlias.set(alias, entry);
+		if (alias && !collectionIds.has(alias) && !byAlias.has(alias)) byAlias.set(alias, entry);
 	};
 
 	const findBySlug = (slug: string): any | undefined =>

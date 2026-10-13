@@ -17,13 +17,17 @@ interface MobileNavProps {
  */
 export default function MobileNav({ collections, articles }: MobileNavProps) {
 	const [open, setOpen] = useState(false);
-	// Resolved after hydration to avoid an SSR/CSR markup mismatch; drives the
-	// active-item highlight inside the shared browse content.
 	const [currentSlug, setCurrentSlug] = useState('');
+	const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
-		setCurrentSlug(window.location.pathname.replace(/^\/+|\/+$/g, ''));
-	}, []);
+		const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+		setCurrentSlug(cleanPath);
+		const firstSegment = cleanPath.split('/')[0];
+		if (collections.some((c) => c.id === firstSegment)) {
+			setSelectedCollectionId(firstSegment);
+		}
+	}, [collections]);
 
 	useEffect(() => {
 		const open = () => setOpen(true);
@@ -101,6 +105,7 @@ export default function MobileNav({ collections, articles }: MobileNavProps) {
 					collections={collections}
 					articles={articles}
 					currentSlug={currentSlug}
+					selectedCollectionId={selectedCollectionId}
 					onNavigate={close}
 				/>
 			</aside>

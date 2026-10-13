@@ -26,6 +26,7 @@ const defaultComponents = {
 	ArticlePage: new URL('./src/components/ArticlePage.astro', import.meta.url),
 	ReaderShell: new URL('./src/layouts/ReaderShell.astro', import.meta.url),
 	ArticleView: new URL('./src/components/ArticleView.astro', import.meta.url),
+	CollectionPage: new URL('./src/components/CollectionPage.astro', import.meta.url),
 };
 
 function normalizeOptions(options) {
@@ -51,6 +52,7 @@ function normalizeOptions(options) {
 		...DEFAULT_CONFIG,
 		...options,
 		collections,
+		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 5,
 		theme: { ...DEFAULT_CONFIG.theme, ...options.theme },
 	};
 	delete config.components;
@@ -100,7 +102,7 @@ function virtualModules(options, config, root) {
 
 function coreIntegration(options = {}) {
 	const config = normalizeOptions(options);
-	const routes = { home: true, articles: true, aliases: true, graph: true, tags: true, categories: true, notFound: true, ...options.routes };
+	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, categories: true, notFound: true, ...options.routes };
 	return {
 		name: 'hakushi',
 		hooks: {
@@ -108,6 +110,7 @@ function coreIntegration(options = {}) {
 				const add = (enabled, pattern, file) => enabled && injectRoute({ pattern, entrypoint: new URL(file, import.meta.url) });
 				add(routes.home, '/', './src/routes/index.astro');
 				add(routes.articles, '/[collection]/[...slug]', './src/routes/article.astro');
+				add(routes.collections, '/[collection]', './src/routes/collection.astro');
 				add(routes.aliases, '/[slug]', './src/routes/alias.astro');
 				add(routes.graph, '/graph', './src/routes/graph.astro');
 				add(routes.tags, '/tags/[tag]', './src/routes/tag.astro');

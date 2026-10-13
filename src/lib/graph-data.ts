@@ -27,15 +27,8 @@ const WIKILINK = /\[\[([^\]|\n]+)(?:\|[^\]\n]*)?\]\]/g;
  * URL-safe slug shared by the graph builder and the /tags & /categories pages
  * so graph node URLs always match the generated static routes.
  */
-export function taxonomySlug(name: string): string {
-	return name
-		.trim()
-		.toLowerCase()
-		.replace(/\s+/g, '-')
-		.replace(/[^\p{L}\p{N}-]+/gu, '')
-		.replace(/-{2,}/g, '-')
-		.replace(/^-+|-+$/g, '');
-}
+import { taxonomySlug } from './slugs';
+export { taxonomySlug };
 
 function normalizeTarget(raw: string): string {
 	return raw
