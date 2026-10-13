@@ -1,4 +1,5 @@
 import { COLOR_SCHEMES, THEME_STYLES } from './theme-data.mjs';
+import config from 'virtual:hakushi/config';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 export type ColorSchemeId = keyof typeof COLOR_SCHEMES;
@@ -49,13 +50,13 @@ export function readStoredTheme(): {
 	schemeId: ColorSchemeId;
 	styleId: ThemeStyleId;
 } {
-	let mode: ThemeMode = 'dark';
-	let schemeId: ColorSchemeId = 'hakushi';
-	let styleId: ThemeStyleId = 'sans';
+	let mode: ThemeMode = config.theme.mode;
+	let schemeId = config.theme.colorScheme as ColorSchemeId;
+	let styleId = config.theme.style as ThemeStyleId;
 	try {
-		mode = (localStorage.getItem('hakushi_mode') as ThemeMode) || 'dark';
-		schemeId = (localStorage.getItem('hakushi_scheme') as ColorSchemeId) || 'hakushi';
-		styleId = (localStorage.getItem('hakushi_style') as ThemeStyleId) || 'sans';
+		mode = (localStorage.getItem('hakushi_mode') as ThemeMode) || config.theme.mode;
+		schemeId = (localStorage.getItem('hakushi_scheme') as ColorSchemeId) || schemeId;
+		styleId = (localStorage.getItem('hakushi_style') as ThemeStyleId) || styleId;
 	} catch {
 		/* ignore */
 	}

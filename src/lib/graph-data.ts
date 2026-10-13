@@ -63,7 +63,7 @@ export async function getGraphData(): Promise<GraphJSON> {
 	const groups = await Promise.all(
 		COLLECTIONS.map(async ({ id }) => ({
 			id,
-			entries: await getCollection(id as 'docs', ({ data }) => !data.draft),
+			entries: await (getCollection as any)(id, ({ data }: any) => !data.draft),
 		}))
 	);
 

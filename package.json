@@ -2,6 +2,38 @@
   "name": "hakushi",
   "type": "module",
   "version": "0.0.1",
+  "description": "A configurable Astro knowledge-base integration with multiple collections, full-text search, themes, and a knowledge graph.",
+  "keywords": ["astro", "documentation", "knowledge-base", "digital-garden", "integration"],
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.mjs"
+    },
+    "./loaders": {
+      "types": "./loaders.d.ts",
+      "default": "./loaders.mjs"
+    },
+    "./styles.css": "./src/styles/global.css"
+  },
+  "files": [
+    "index.mjs",
+    "index.d.ts",
+    "loaders.mjs",
+    "loaders.d.ts",
+    "README.md",
+    "LICENSE",
+    "src/components",
+    "src/env.d.ts",
+    "src/integration",
+    "src/layouts",
+    "src/lib",
+    "src/plugins",
+    "src/routes",
+    "src/scripts",
+    "src/styles"
+  ],
+  "sideEffects": ["**/*.css"],
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -10,14 +42,15 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^7.2.2",
     "@astrojs/react": "^6.0.4",
     "@lucide/astro": "^1.33.0",
     "@tailwindcss/vite": "^4.3.3",
     "abcjs": "^6.7.0",
-    "astro": "^7.0.2",
     "astro-mermaid": "^2.1.0",
     "d3": "^7.9.0",
     "lucide-react": "^1.33.0",
+    "lucide-static": "^1.33.0",
     "mermaid": "^11.16.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -25,14 +58,17 @@
     "rehype-mathjax": "^7.1.0",
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "lucide-static": "^1.33.0",
-    "mdast-util-from-markdown": "^2.0.3",
-    "unist-util-visit": "^5.1.0"
+    "astro": "^7.0.2",
+    "mdast-util-from-markdown": "^2.0.3"
+  },
+  "peerDependencies": {
+    "astro": "^7.0.0"
   }
 }

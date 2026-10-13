@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import config from 'virtual:hakushi/config';
+import { ArticlePage } from 'virtual:hakushi/components';
+
+const entries = await (getCollection as any)(config.defaultCollection, ({ data }: any) => !data.draft);
+entries.sort((a: any, b: any) => (b.data.date?.toISOString?.() ?? '').localeCompare(a.data.date?.toISOString?.() ?? ''));
+const entry = entries[0];
+if (!entry) throw new Error(`[hakushi] No articles found in the "${config.defaultCollection}" collection.`);
+---
+
+<ArticlePage entry={entry} />

@@ -2,13 +2,12 @@
 import Header from '../components/Header.astro';
 import Sidebar from '../components/Sidebar';
 import RightToc from '../components/RightToc.astro';
-import type { CollectionEntry } from 'astro:content';
 import { getArticleIndex } from '../lib/articles';
 import { COLLECTIONS } from '../lib/collections';
 import type { GraphJSON } from '../lib/graph-data';
 
 interface Props {
-	entry: CollectionEntry<'docs' | 'blog' | 'research' | 'specs' | 'wiki'>;
+	entry: any;
 	headings: { depth: number; text: string; slug: string }[];
 	subgraph: GraphJSON;
 }

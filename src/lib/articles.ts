@@ -1,11 +1,11 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { COLLECTIONS } from './collections';
 
 /** Every collection id, as a literal union for Astro's typed helpers. */
-export type ArticleCollectionId = 'docs' | 'blog' | 'research' | 'specs' | 'wiki';
-export type ArticleEntry = CollectionEntry<ArticleCollectionId>;
+export type ArticleCollectionId = string;
+export type ArticleEntry = any;
 
-const COLLECTION_IDS = COLLECTIONS.map((c) => c.id) as ArticleCollectionId[];
+const COLLECTION_IDS = COLLECTIONS.map((c) => c.id);
 
 const WIKILINK = /\[\[([^\]|\n]+)(?:\|[^\]\n]*)?\]\]/g;
 
@@ -64,7 +64,7 @@ export function getArticleIndex(): Promise<ArticleMeta[]> {
 	indexCache ??= (async () => {
 		const groups = await Promise.all(
 			COLLECTION_IDS.map(async (id) => {
-				const entries = await getCollection(id, ({ data }) => !data.draft);
+				const entries = await (getCollection as any)(id, ({ data }: any) => !data.draft);
 				return entries.map(toMeta);
 			})
 		);
@@ -109,7 +109,7 @@ export function getBacklinkMap(): Promise<Map<string, Backlink[]>> {
 	backlinkCache ??= (async () => {
 		const [index, groups] = await Promise.all([
 			getArticleIndex(),
-			Promise.all(COLLECTION_IDS.map((id) => getCollection(id))),
+			Promise.all(COLLECTION_IDS.map((id) => (getCollection as any)(id))),
 		]);
 		const map = new Map<string, Backlink[]>();
 

@@ -1,11 +1,12 @@
 // Raw lucide SVGs (via lucide-static), shared by the markdown plugins.
-import infoSvg from 'lucide-static/icons/info.svg?raw';
-import lightbulbSvg from 'lucide-static/icons/lightbulb.svg?raw';
-import triangleAlertSvg from 'lucide-static/icons/triangle-alert.svg?raw';
-import shieldAlertSvg from 'lucide-static/icons/shield-alert.svg?raw';
-import circleAlertSvg from 'lucide-static/icons/circle-alert.svg?raw';
-import messageSquareQuoteSvg from 'lucide-static/icons/message-square-quote.svg?raw';
-import circleCheckBigSvg from 'lucide-static/icons/circle-check-big.svg?raw';
+import { loadIcon } from './load-icon.mjs';
+const infoSvg = loadIcon('info');
+const lightbulbSvg = loadIcon('lightbulb');
+const triangleAlertSvg = loadIcon('triangle-alert');
+const shieldAlertSvg = loadIcon('shield-alert');
+const circleAlertSvg = loadIcon('circle-alert');
+const messageSquareQuoteSvg = loadIcon('message-square-quote');
+const circleCheckBigSvg = loadIcon('circle-check-big');
 
 export {
 	infoSvg,

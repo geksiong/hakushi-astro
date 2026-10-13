@@ -1,6 +1,7 @@
 ---
 import { Sparkles, Search, BookOpen, Share2, Palette, Menu } from '@lucide/astro';
 import ThemeMenu from './ThemeMenu';
+import config from 'virtual:hakushi/config';
 
 interface Props {
 	view?: 'reader' | 'graph';
@@ -32,16 +33,16 @@ const { view } = Astro.props;
 				<div>
 					<div class="flex items-center gap-2">
 						<span class="font-extrabold text-base tracking-tight text-[var(--text-main)] font-heading">
-							Hakushi
+							{config.title}
 						</span>
 						<span
 							class="px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] font-mono text-[10px] font-bold"
 						>
-							v2.5
+							{config.versionLabel}
 						</span>
 					</div>
 					<p class="text-[11px] text-[var(--text-muted)] hidden sm:block">
-						Notes &amp; Knowledge Graph Engine
+						{config.description}
 					</p>
 				</div>
 			</a>

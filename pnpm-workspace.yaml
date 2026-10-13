@@ -1,3 +1,6 @@
+packages:
+  - test/consumer
+
 allowBuilds:
   esbuild: true
   sharp: true

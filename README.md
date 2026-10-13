@@ -1,61 +1,200 @@
-# Hakushi (Astro)
+# Hakushi
 
-An Astro template for a multi-collection notes site with a reader layout, a D3 knowledge graph, and a full theming engine.
+Hakushi is an Astro integration for publishing a multi-collection knowledge base. It provides routes, a reader UI, full-text search, themes, Markdown extensions, backlinks, and an interactive knowledge graph. The consuming Astro project owns its content and can override Hakushi's configuration, CSS, components, or complete routes.
 
-## Features
+Hakushi currently requires Astro 7.
 
-- **Multiple collections** - `docs`, `blog`, `research`, `specs`, `wiki`
-  (configured in `src/lib/collections.ts`, schema in `src/content.config.ts`).
-- **Browse by folder, date, or tags** - the sidebar island (`src/components/Sidebar.tsx`)
-  provides Folders / Dated / Tags tabs with collection filtering,
-  a year-month timeline, and a tag cloud. Selections persist in localStorage.
-- **Knowledge graph generated from the collections** - articles, categories, tags and
-  explicit `[[wikilinks]]` become nodes/edges at build time (`src/lib/graph-data.ts`),
-  rendered by the D3 force-simulation browser (`src/components/GraphBrowser.tsx`)
-  at `/graph` and as per-article sub-graphs in the right sidebar.
-- **Home page = first collection** - `/` renders the most recent article of
-  `docs` ("Technical Docs").
-- **Rich markdown pipeline**
-  - `:::note` / `:::tip` / `:::warning` / `:::danger` / `:::info` / `:::quote` /
-    `:::check` callouts and `:::tab` groups (`src/plugins/rehype-enhancer.mjs`)
-  - interactive ```chart blocks hydrated with recharts (`src/scripts/charts.tsx`)
-  - KaTeX-style math via remark-math + rehype-mathjax, mermaid diagrams via astro-mermaid
-  - GitHub-dark code blocks with file-title headers and copy buttons
-  - `[[wikilinks]]` resolve to short alias routes (`/quantum-computing`, ...)
-- **Theming engine** - 6 color schemes x 4 typography presets, light/dark/auto, applied
-  before paint with no FOUC (`src/lib/theme-data.mjs`, `src/lib/theme-init.mjs`,
-  `src/components/ThemeMenu.tsx`). Theme preferences persist in localStorage.
-- **Command palette** - Cmd/Ctrl+K full-text search over every article.
-- **Lucide icons everywhere** - `@lucide/astro` in `.astro` templates, `lucide-react`
-  inside islands, raw lucide SVGs injected by the build-time plugins.
+## Install
 
-## Structure
-
-```
-src/
-├── content/            # one folder per collection
-├── content.config.ts   # collection schemas
-├── components/         # Header, Sidebar, ArticleView, GraphBrowser, CommandPalette...
-├── layouts/            # BaseLayout (head/fonts/palette) + ReaderShell (3-column reader)
-├── lib/                # theme data, article index, backlinks, graph builder
-├── pages/
-│   ├── index.astro             # home = first collection
-│   ├── [collection]/[...slug]  # canonical article routes (/blog/<slug>)
-│   ├── [slug].astro            # wikilink alias routes (/quantum-computing)
-│   └── graph.astro             # full knowledge-graph view
-├── plugins/            # remark/rehype markdown extensions
-├── scripts/            # client-side chart hydration + code copy buttons
-└── styles/global.css   # Tailwind v4 + global theme styles
+```sh
+npm install hakushi
 ```
 
-## Commands
+Add the integration to `astro.config.mjs`:
 
-| Command         | Action                                      |
-| :-------------- | :------------------------------------------ |
-| `pnpm dev`      | Start local dev server at `localhost:4321`  |
-| `pnpm build`    | Build the production site to `./dist/`      |
-| `pnpm preview`  | Preview the production build                |
+```js
+import { defineConfig } from 'astro/config';
+import hakushi from 'hakushi';
 
-> Note: when editing files under `src/plugins/` or `src/lib/theme-data.mjs`, also touch
-> `astro.config.mjs` (or delete `node_modules/.astro`) so Astro re-bundles the config
-> and invalidates the markdown render cache.
+export default defineConfig({
+  integrations: [hakushi({
+    title: 'Acme Knowledge Base',
+    description: 'Engineering notes and product documentation',
+  })],
+});
+```
+
+Define the content collections in `src/content.config.ts`:
+
+```ts
+import { createHakushiCollections } from 'hakushi/loaders';
+export const collections = createHakushiCollections();
+```
+
+Add Markdown to any default directory: `src/content/docs`, `blog`, `research`, `specs`, or `wiki`. At least `docs` must contain an article:
+
+```md
+---
+title: Getting started
+summary: The first page in this knowledge base.
+tags: [guide]
+---
+
+# Welcome
+
+Link to another note with [[another-note]].
+```
+
+Run `npm run dev`. Hakushi creates `/`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, tag/category pages, and `/404`.
+
+## Frontmatter and schema
+
+Only `title` is required. The built-in schema also accepts `summary`, `category`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
+
+Extend it with project fields:
+
+```ts
+import { createHakushiCollections, hakushiSchema } from 'hakushi/loaders';
+import { z } from 'astro/zod';
+
+export const collections = createHakushiCollections({
+  schema: hakushiSchema({
+    extend: { product: z.string().optional() },
+  }),
+});
+```
+
+The package also exports `hakushiLoader({ base, pattern })` for defining an individual collection.
+
+## Configuration
+
+```js
+hakushi({
+  title: 'Acme Docs',
+  description: 'Internal engineering knowledge',
+  versionLabel: '2026.10',
+  lang: 'en-GB',
+  favicon: '/brand/favicon.svg',
+  defaultCollection: 'handbook',
+  theme: {
+    mode: 'auto',          // light, dark, auto
+    colorScheme: 'nord',   // hakushi, obsidian, nord, amber, monokai, rose
+    style: 'sans',         // sans, serif, mono, editorial
+  },
+  collections: [
+    { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder' },
+    { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
+  ],
+})
+```
+
+When changing collections, give the loader the same IDs:
+
+```ts
+import { createHakushiCollections } from 'hakushi/loaders';
+
+const navigation = [{ id: 'handbook' }, { id: 'updates' }];
+export const collections = createHakushiCollections({ collections: navigation });
+```
+
+Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. A `dated` collection gets date-oriented navigation; `folder` is the default.
+
+## Override styles
+
+Custom styles load after Hakushi's CSS:
+
+```js
+hakushi({ customCss: ['./src/styles/hakushi-overrides.css'] })
+```
+
+Override the design tokens in that file:
+
+```css
+:root {
+  --primary: #0057b8;
+  --primary-hover: #003f87;
+  --accent: #00a6a6;
+  --secondary: #7c3aed;
+  --bg-main: #f7f8fa;
+  --bg-surface: #fff;
+  --bg-sidebar: #eef1f5;
+  --border: #d7dce3;
+  --text-main: #172033;
+  --text-muted: #667085;
+  --font-heading: system-ui, sans-serif;
+  --font-body: system-ui, sans-serif;
+  --font-code: ui-monospace, monospace;
+  --radius: 0.75rem;
+}
+```
+
+The interactive theme picker writes these tokens inline. For a permanent brand theme, hide the picker with a custom header or use a higher-specificity override.
+
+## Override components
+
+Component paths are relative to the consuming project:
+
+```js
+hakushi({
+  components: {
+    Header: './src/components/DocsHeader.astro',
+    ArticleView: './src/components/ArticleView.astro',
+  },
+})
+```
+
+| Component | Contract |
+| --- | --- |
+| `BaseLayout` | `title?`, `description?`, default slot |
+| `Header` | `view?: 'reader' \| 'graph'` |
+| `ArticlePage` | `entry` |
+| `ReaderShell` | `entry`, `headings`, `subgraph`, default slot |
+| `ArticleView` | `entry`, `Content`, `headings`, `readingTime`, `backlinks` |
+
+Example header:
+
+```astro
+---
+const { view } = Astro.props;
+---
+<header>
+  <a href="/">Acme Docs</a>
+  <a href="/graph" aria-current={view === 'graph' ? 'page' : undefined}>Graph</a>
+</header>
+```
+
+## Keep project routes
+
+Disable any injected route that the consuming site supplies itself:
+
+```js
+hakushi({ routes: { home: false, notFound: false } })
+```
+
+Keys are `home`, `articles`, `aliases`, `graph`, `tags`, `categories`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
+
+## Markdown features
+
+- `[[wikilinks]]` and `[[target|custom labels]]`
+- `:::note`, `tip`, `warning`, `danger`, `info`, `quote`, and `check` callouts
+- `:::tab` groups
+- Mermaid, chart, and ABC music notation fences
+- Math through `remark-math` and MathJax
+- Code titles such as ```` ```ts title="example.ts" ````
+
+Hakushi owns the unified Markdown processor. Take care not to replace `markdown.processor` when adding more Markdown configuration.
+
+## Package development and publishing
+
+```sh
+pnpm astro dev --background
+pnpm build
+pnpm --dir test/consumer build
+npm pack --dry-run
+```
+
+Manage the background server with `pnpm astro dev status`, `pnpm astro dev logs`, and `pnpm astro dev stop`.
+
+Before publishing, choose a unique npm name if `hakushi` is unavailable, update the README imports, set the intended version, and run `npm publish` (or `npm publish --access public` for a scoped public package).
+
+References: [Astro integrations](https://docs.astro.build/en/guides/integrations/), [routing](https://docs.astro.build/en/guides/routing/), [content collections](https://docs.astro.build/en/guides/content-collections/), and [styles](https://docs.astro.build/en/guides/styling/).

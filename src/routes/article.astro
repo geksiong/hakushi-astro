@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import config from 'virtual:hakushi/config';
+import { ArticlePage } from 'virtual:hakushi/components';
+
+export async function getStaticPaths() {
+	const config = (await import('virtual:hakushi/config')).default;
+	const paths = [];
+	for (const { id } of config.collections) {
+		const entries = await (getCollection as any)(id, ({ data }: any) => !data.draft);
+		for (const entry of entries) paths.push({ params: { collection: id, slug: entry.id }, props: { entry } });
+	}
+	return paths;
+}
+
+const { entry } = Astro.props;
+---
+
+<ArticlePage entry={entry} />

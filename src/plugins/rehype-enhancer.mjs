@@ -1,6 +1,7 @@
-import copySvg from 'lucide-static/icons/copy.svg?raw';
-import checkSvg from 'lucide-static/icons/check.svg?raw';
-import codeSvg from 'lucide-static/icons/code.svg?raw';
+import { loadIcon } from './load-icon.mjs';
+const copySvg = loadIcon('copy');
+const checkSvg = loadIcon('check');
+const codeSvg = loadIcon('code');
 import {
 	infoSvg,
 	lightbulbSvg,

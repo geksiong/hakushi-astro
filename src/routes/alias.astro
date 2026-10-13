@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import config from 'virtual:hakushi/config';
+import { getArticleIndex, resolveArticleRef } from '../lib/articles';
+import { ArticlePage } from 'virtual:hakushi/components';
+
+export async function getStaticPaths() {
+	const config = (await import('virtual:hakushi/config')).default;
+	const wikilink = /\[\[([^\]|\n]+)(?:\|[^\]\n]*)?\]\]/g;
+	const normalize = (raw: string) => raw.trim().toLowerCase().replace(/^\/+/, '').replace(/\.(md|mdx)$/, '').split('#')[0];
+	const groups = await Promise.all(config.collections.map(({ id }) => (getCollection as any)(id)));
+	const entries = groups.flat();
+	const index = await getArticleIndex();
+	const aliases = new Map<string, any>();
+	const claim = (alias: string, entry: any) => alias && !aliases.has(alias) && aliases.set(alias, entry);
+
+	for (const entry of entries) {
+		for (const match of (entry.body ?? '').matchAll(wikilink)) {
+			const target = normalize(match[1]);
+			const resolved = resolveArticleRef(index, target);
+			if (resolved) claim(target, entries.find((candidate: any) => candidate.id === resolved.slug));
+		}
+		claim(entry.id.toLowerCase(), entry);
+		claim(entry.id.toLowerCase().split('/').pop() ?? '', entry);
+	}
+	return [...aliases].filter(([, entry]) => entry).map(([slug, entry]) => ({ params: { slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+
+<ArticlePage entry={entry} />

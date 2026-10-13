@@ -1,11 +1,10 @@
 ---
 import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, CornerDownRight, List } from '@lucide/astro';
-import type { CollectionEntry } from 'astro:content';
 import { getCollectionConfig } from '../lib/collections';
 import type { ReadingTime, Backlink } from '../lib/articles';
 
 interface Props {
-	entry: CollectionEntry<'docs' | 'blog' | 'research' | 'specs' | 'wiki'>;
+	entry: any;
 	Content: any;
 	headings: { depth: number; text: string; slug: string }[];
 	readingTime: ReadingTime;

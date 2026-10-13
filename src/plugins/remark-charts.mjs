@@ -1,4 +1,5 @@
-import chartSvg from 'lucide-static/icons/chart-column-big.svg?raw';
+import { loadIcon } from './load-icon.mjs';
+const chartSvg = loadIcon('chart-column-big');
 
 const CHART_ICON = chartSvg
 	.replace('width="24"', 'width="16"')

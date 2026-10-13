@@ -1,4 +1,5 @@
-import musicSvg from 'lucide-static/icons/music-2.svg?raw';
+import { loadIcon } from './load-icon.mjs';
+const musicSvg = loadIcon('music-2');
 
 const MUSIC_ICON = musicSvg
 	.replace('width="24"', 'width="16"')

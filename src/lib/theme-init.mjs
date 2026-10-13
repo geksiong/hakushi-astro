@@ -5,14 +5,18 @@ import { COLOR_SCHEMES, THEME_STYLES } from './theme-data.mjs';
  * appearance (mode / color scheme / typography) from localStorage so there is
  * no flash of the wrong theme. Mirrors applyTheme() of the reference project.
  */
-export const THEME_INIT_SCRIPT = `
+export function createThemeInitScript(defaults = {}) {
+	const mode = defaults.mode ?? 'dark';
+	const colorScheme = defaults.colorScheme ?? 'hakushi';
+	const style = defaults.style ?? 'sans';
+	return `
 (function () {
   var SCHEMES = ${JSON.stringify(COLOR_SCHEMES)};
   var STYLES = ${JSON.stringify(THEME_STYLES)};
   try {
-    var mode = localStorage.getItem('hakushi_mode') || 'dark';
-    var schemeId = localStorage.getItem('hakushi_scheme') || 'hakushi';
-    var styleId = localStorage.getItem('hakushi_style') || 'sans';
+    var mode = localStorage.getItem('hakushi_mode') || ${JSON.stringify(mode)};
+    var schemeId = localStorage.getItem('hakushi_scheme') || ${JSON.stringify(colorScheme)};
+    var styleId = localStorage.getItem('hakushi_style') || ${JSON.stringify(style)};
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var isDark = mode === 'dark' || (mode === 'auto' && prefersDark);
     var root = document.documentElement;
@@ -41,3 +45,4 @@ export const THEME_INIT_SCRIPT = `
   } catch (e) {}
 })();
 `;
+}

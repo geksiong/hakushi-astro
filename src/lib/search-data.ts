@@ -2,8 +2,8 @@ import { getCollection } from 'astro:content';
 import { COLLECTIONS } from './collections';
 import { calculateReadingTime, type ArticleMeta } from './articles';
 
-export type ArticleCollectionId = 'docs' | 'blog' | 'research' | 'specs' | 'wiki';
-const COLLECTION_IDS = COLLECTIONS.map((c) => c.id) as ArticleCollectionId[];
+export type ArticleCollectionId = string;
+const COLLECTION_IDS = COLLECTIONS.map((c) => c.id);
 
 export interface SearchDoc extends ArticleMeta {
 	text: string;
@@ -15,7 +15,7 @@ let cache: Promise<SearchDoc[]> | undefined;
 export function getSearchDocs(): Promise<SearchDoc[]> {
 	cache ??= (async () => {
 		const groups = await Promise.all(
-			COLLECTION_IDS.map((id) => getCollection(id, ({ data }) => !data.draft))
+			COLLECTION_IDS.map((id) => (getCollection as any)(id, ({ data }: any) => !data.draft))
 		);
 		return groups.flat().map((entry) => {
 			const body = (entry.body ?? '').toLowerCase();

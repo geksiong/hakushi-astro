@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@astrojs/markdown-remark':
+        specifier: ^7.2.2
+        version: 7.2.2
       '@astrojs/react':
         specifier: ^6.0.4
         version: 6.0.4(@types/node@24.13.3)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(esbuild@0.28.1)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -20,9 +23,6 @@ importers:
       abcjs:
         specifier: ^6.7.0
         version: 6.7.0
-      astro:
-        specifier: ^7.0.2
-        version: 7.1.6(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(jiti@2.7.0)
       astro-mermaid:
         specifier: ^2.1.0
         version: 2.1.0(astro@7.1.6(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(jiti@2.7.0))(mermaid@11.16.1)
@@ -32,6 +32,9 @@ importers:
       lucide-react:
         specifier: ^1.33.0
         version: 1.33.0(react@19.2.8)
+      lucide-static:
+        specifier: ^1.33.0
+        version: 1.33.0
       mermaid:
         specifier: ^11.16.1
         version: 11.16.1
@@ -56,6 +59,9 @@ importers:
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
+      unist-util-visit:
+        specifier: ^5.1.0
+        version: 5.1.0
     devDependencies:
       '@types/d3':
         specifier: ^7.4.3
@@ -66,15 +72,21 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.4
         version: 19.2.4(@types/react@19.2.18)
-      lucide-static:
-        specifier: ^1.33.0
-        version: 1.33.0
+      astro:
+        specifier: ^7.0.2
+        version: 7.1.6(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(jiti@2.7.0)
       mdast-util-from-markdown:
         specifier: ^2.0.3
         version: 2.0.3
-      unist-util-visit:
-        specifier: ^5.1.0
-        version: 5.1.0
+
+  test/consumer:
+    dependencies:
+      astro:
+        specifier: ^7.0.0
+        version: 7.1.6(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(jiti@2.7.0)
+      hakushi:
+        specifier: workspace:*
+        version: link:../..
 
 packages:
 
@@ -2666,7 +2678,6 @@ snapshots:
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   '@astrojs/markdown-satteri@0.3.5':
     dependencies:
@@ -3529,8 +3540,7 @@ snapshots:
 
   aria-query@5.3.2: {}
 
-  array-iterate@2.0.1:
-    optional: true
+  array-iterate@2.0.1: {}
 
   astro-mermaid@2.1.0(astro@7.1.6(@astrojs/markdown-remark@7.2.2)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.3)(jiti@2.7.0))(mermaid@11.16.1):
     dependencies:
@@ -4009,8 +4019,7 @@ snapshots:
 
   escalade@3.2.0: {}
 
-  escape-string-regexp@5.0.0:
-    optional: true
+  escape-string-regexp@5.0.0: {}
 
   esm@3.2.25: {}
 
@@ -4114,7 +4123,6 @@ snapshots:
       vfile: 6.0.3
       web-namespaces: 2.0.1
       zwitch: 2.0.4
-    optional: true
 
   hast-util-to-html@9.0.5:
     dependencies:
@@ -4139,7 +4147,6 @@ snapshots:
       space-separated-tokens: 2.0.2
       web-namespaces: 2.0.1
       zwitch: 2.0.4
-    optional: true
 
   hast-util-to-text@4.0.2:
     dependencies:
@@ -4336,8 +4343,7 @@ snapshots:
       '@babel/types': 7.29.8
       source-map-js: 1.2.1
 
-  markdown-table@3.0.4:
-    optional: true
+  markdown-table@3.0.4: {}
 
   marked@16.4.2: {}
 
@@ -4353,7 +4359,6 @@ snapshots:
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
       unist-util-visit: 5.1.0
-    optional: true
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
@@ -4361,7 +4366,6 @@ snapshots:
       escape-string-regexp: 5.0.0
       unist-util-is: 6.0.1
       unist-util-visit-parents: 6.0.2
-    optional: true
 
   mdast-util-from-markdown@2.0.3:
     dependencies:
@@ -4387,7 +4391,6 @@ snapshots:
       devlop: 1.1.0
       mdast-util-find-and-replace: 3.0.2
       micromark-util-character: 2.1.1
-    optional: true
 
   mdast-util-gfm-footnote@2.1.0:
     dependencies:
@@ -4398,7 +4401,6 @@ snapshots:
       micromark-util-normalize-identifier: 2.0.1
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   mdast-util-gfm-strikethrough@2.0.0:
     dependencies:
@@ -4407,7 +4409,6 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   mdast-util-gfm-table@2.0.0:
     dependencies:
@@ -4418,7 +4419,6 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   mdast-util-gfm-task-list-item@2.0.0:
     dependencies:
@@ -4428,7 +4428,6 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   mdast-util-gfm@3.1.0:
     dependencies:
@@ -4441,7 +4440,6 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   mdast-util-math@3.0.0:
     dependencies:
@@ -4543,7 +4541,6 @@ snapshots:
       micromark-util-sanitize-uri: 2.0.1
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm-footnote@2.1.0:
     dependencies:
@@ -4555,7 +4552,6 @@ snapshots:
       micromark-util-sanitize-uri: 2.0.1
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm-strikethrough@2.1.0:
     dependencies:
@@ -4565,7 +4561,6 @@ snapshots:
       micromark-util-resolve-all: 2.0.1
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm-table@2.1.1:
     dependencies:
@@ -4574,12 +4569,10 @@ snapshots:
       micromark-util-character: 2.1.1
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm-tagfilter@2.0.0:
     dependencies:
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm-task-list-item@2.1.0:
     dependencies:
@@ -4588,7 +4581,6 @@ snapshots:
       micromark-util-character: 2.1.1
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-gfm@3.0.0:
     dependencies:
@@ -4600,7 +4592,6 @@ snapshots:
       micromark-extension-gfm-task-list-item: 2.1.0
       micromark-util-combine-extensions: 2.0.1
       micromark-util-types: 2.0.2
-    optional: true
 
   micromark-extension-math@3.1.0:
     dependencies:
@@ -4791,7 +4782,6 @@ snapshots:
       unist-util-modify-children: 4.0.0
       unist-util-visit-children: 3.0.0
       vfile: 6.0.3
-    optional: true
 
   parse5@7.3.0:
     dependencies:
@@ -4902,14 +4892,12 @@ snapshots:
       '@types/hast': 3.0.5
       hast-util-raw: 9.1.0
       vfile: 6.0.3
-    optional: true
 
   rehype-stringify@10.0.1:
     dependencies:
       '@types/hast': 3.0.5
       hast-util-to-html: 9.0.5
       unified: 11.0.5
-    optional: true
 
   remark-gfm@4.0.1:
     dependencies:
@@ -4921,7 +4909,6 @@ snapshots:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   remark-math@6.0.0:
     dependencies:
@@ -4940,7 +4927,6 @@ snapshots:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   remark-rehype@11.1.2:
     dependencies:
@@ -4949,7 +4935,6 @@ snapshots:
       mdast-util-to-hast: 13.2.1
       unified: 11.0.5
       vfile: 6.0.3
-    optional: true
 
   remark-smartypants@3.0.3:
     dependencies:
@@ -4957,14 +4942,12 @@ snapshots:
       retext-smartypants: 6.2.0
       unified: 11.0.5
       unist-util-visit: 5.1.0
-    optional: true
 
   remark-stringify@11.0.0:
     dependencies:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
-    optional: true
 
   reselect@5.2.0: {}
 
@@ -4975,7 +4958,6 @@ snapshots:
       '@types/nlcst': 2.0.3
       parse-latin: 7.0.0
       unified: 11.0.5
-    optional: true
 
   retext-smartypants@6.2.0:
     dependencies:
@@ -4988,7 +4970,6 @@ snapshots:
       '@types/nlcst': 2.0.3
       nlcst-to-string: 4.0.0
       unified: 11.0.5
-    optional: true
 
   retext@9.0.0:
     dependencies:
@@ -4996,7 +4977,6 @@ snapshots:
       retext-latin: 4.0.0
       retext-stringify: 4.0.0
       unified: 11.0.5
-    optional: true
 
   robust-predicates@3.0.3: {}
 
@@ -5193,7 +5173,6 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       array-iterate: 2.0.1
-    optional: true
 
   unist-util-position@5.0.0:
     dependencies:
@@ -5211,7 +5190,6 @@ snapshots:
   unist-util-visit-children@3.0.0:
     dependencies:
       '@types/unist': 3.0.3
-    optional: true
 
   unist-util-visit-parents@6.0.2:
     dependencies:
