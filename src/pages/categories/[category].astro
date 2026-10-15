@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { Folder, ChevronRight } from '@lucide/astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
+import ReaderShell from '../../layouts/ReaderShell.astro';
 import { COLLECTIONS, getCollectionConfig } from '../../lib/collections';
 import { taxonomySlug } from '../../lib/graph-data';
 
@@ -57,7 +58,8 @@ articles.sort((a, b) => b.date.localeCompare(a.date));
 ---
 
 <BaseLayout title={`${name} · Hakushi`} description={`Articles in the ${name} category.`}>
-	<Header />
+	<Header view="reader" />
+	<ReaderShell>
 	<main class="flex-1 w-full max-w-4xl mx-auto px-4 py-8 space-y-6">
 		<div class="space-y-2">
 			<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
@@ -101,4 +103,5 @@ articles.sort((a, b) => b.date.localeCompare(a.date));
 			}
 		</div>
 	</main>
+	</ReaderShell>
 </BaseLayout>
