@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
+import { taxonomySlug } from '../lib/slugs';
 
 interface SidebarContentProps {
 	collections: CollectionConfig[];
@@ -80,6 +81,19 @@ export default function SidebarContent({
 		}
 	}, [initialCollectionId]);
 	const [activeTag, setActiveTag] = useState<string | null>(() => {
+		// Prefer the tag from the URL when on a /tags/[tag] page so the
+		// cloud highlights the tag shown in the main view after navigation.
+		if (typeof window !== 'undefined') {
+			const match = window.location.pathname.match(/^\/tags\/([^/]+)\/?$/);
+			if (match) {
+				const slug = decodeURIComponent(match[1]);
+				const found = articles.find((n) =>
+					n.tags.some((t) => taxonomySlug(t) === slug)
+				);
+				const name = found?.tags.find((t) => taxonomySlug(t) === slug);
+				if (name) return name;
+			}
+		}
 		try {
 			return localStorage.getItem('hakushi_tag') || null;
 		} catch {
@@ -343,15 +357,23 @@ export default function SidebarContent({
 						</div>
 					)}
 
-					{/* Tab 3: Tag Cloud Index View */}
+					{/* Tab 3: Tag Cloud Index View — selecting a tag navigates to
+					    the tag page so the main view shows the filtered list. */}
 					{browseTab === 'tags' && (
 						<div className="space-y-3">
 							{activeTag && (
 								<div className="flex items-center justify-between p-2 rounded-lg bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-[var(--primary)]">
-									<span>Filtering: #{activeTag}</span>
-									<button onClick={() => selectTag(null)} className="font-bold hover:underline">
+									<span className="truncate">Filtering: #{activeTag}</span>
+									<a
+										href="/"
+										onClick={() => {
+											selectTag(null);
+											onNavigate?.();
+										}}
+										className="font-bold hover:underline shrink-0 ml-2"
+									>
 										Clear
-									</button>
+									</a>
 								</div>
 							)}
 
@@ -359,9 +381,14 @@ export default function SidebarContent({
 								{Object.entries(tagCounts).map(([tag, count]) => {
 									const isActive = activeTag === tag;
 									return (
-										<button
+										<a
 											key={tag}
-											onClick={() => selectTag(isActive ? null : tag)}
+											href={`/tags/${taxonomySlug(tag)}`}
+											onClick={() => {
+												selectTag(tag);
+												onNavigate?.();
+											}}
+											aria-current={isActive ? 'true' : undefined}
 											className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono transition-all ${
 												isActive
 													? 'bg-[var(--primary)] text-white font-bold'
@@ -370,10 +397,46 @@ export default function SidebarContent({
 										>
 											<span>#{tag}</span>
 											<span className="opacity-70 text-[10px]">({count})</span>
-										</button>
+										</a>
 									);
 								})}
 							</div>
+
+							{activeTag && (
+								<div className="space-y-1">
+									<p className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-[10px] px-1">
+										{filteredNotes.length}{' '}
+										{filteredNotes.length === 1 ? 'article' : 'articles'} tagged #
+										{activeTag}
+									</p>
+									<div className="pl-3 space-y-0.5 border-l border-[var(--border)] ml-2">
+										{filteredNotes.map((note) => {
+											const isSelected = currentSlug === note.slug;
+											return (
+												<a
+													key={note.slug}
+													href={note.url}
+													onClick={() => onNavigate?.()}
+													className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
+														isSelected
+															? 'bg-[var(--primary)]/10 text-[var(--primary)] font-semibold border-l-2 border-[var(--primary)]'
+															: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+													}`}
+												>
+													<span className="truncate pr-1">{note.title}</span>
+													<FileText className="w-3 h-3 text-[var(--text-muted)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+												</a>
+											);
+										})}
+										{filteredNotes.length === 0 && (
+											<p className="px-2 py-1.5 text-[var(--text-muted)] italic">
+												No articles match this tag
+												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
+											</p>
+										)}
+									</div>
+								</div>
+							)}
 						</div>
 					)}
 				</div>
