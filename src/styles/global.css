@@ -36,6 +36,10 @@
 
 html {
 	background-color: var(--bg-main);
+	/* Reserve space for the vertical scrollbar even on short pages so the
+	 * centered shell (and the article inside it) doesn't jump sideways when
+	 * navigating between pages with and without a scrollbar. */
+	scrollbar-gutter: stable;
 }
 
 body {
@@ -837,6 +841,34 @@ html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-icon='open'] {
 
 html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-icon='close'] {
 	display: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * Collapsed right sidebar pre-hydration - same pattern as the left sidebar:
+ * the `hakushi-right-collapsed` class is set on <html> by the head init
+ * script before first paint. Astro always server-renders the TOC sidebar
+ * expanded (w-64), so without these rules a stored collapsed state would
+ * shrink it after first paint - shifting the article's left edge and
+ * reflowing its contents. Unlayered CSS wins over Tailwind utilities here.
+ * ------------------------------------------------------------------------- */
+html.hakushi-right-collapsed aside[data-right-sidebar] {
+	width: 2.5rem;
+}
+
+html.hakushi-right-collapsed aside[data-right-sidebar] [data-right-sidebar-content] {
+	display: none;
+}
+
+html.hakushi-right-collapsed aside[data-right-sidebar] [data-right-sidebar-toggle] {
+	justify-content: center;
+}
+
+html.hakushi-right-collapsed aside[data-right-sidebar] [data-right-sidebar-icon='collapse'] {
+	display: none;
+}
+
+html.hakushi-right-collapsed aside[data-right-sidebar] [data-right-sidebar-icon='expand'] {
+	display: block;
 }
 
 /* ---------------------------------------------------------------------------

@@ -15,23 +15,24 @@ const toc = headings.filter((h) => h.depth <= 4);
 
 <aside
 	id="right-sidebar"
+	data-right-sidebar
 	class="shrink-0 hidden lg:block sticky top-20 self-start text-xs max-h-[calc(100vh-6rem)] overflow-y-auto transition-all duration-300 w-64"
 	data-collapsed="false"
 >
 	<!-- Toggle button -->
-	<div id="right-sidebar-toggle-container" class="flex items-center justify-start p-1.5 mb-2">
+	<div id="right-sidebar-toggle-container" data-right-sidebar-toggle class="flex items-center justify-start p-1.5 mb-2">
 		<button
 			id="toggle-right-sidebar"
 			title="Collapse sidebar"
 			class="p-1.5 rounded-md hover:bg-[var(--border)]/40 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 		>
-			<PanelRightClose id="icon-collapse-right" class="w-4 h-4" />
-			<PanelRightOpen id="icon-expand-right" class="w-4 h-4 hidden" />
+			<PanelRightClose id="icon-collapse-right" data-right-sidebar-icon="collapse" class="w-4 h-4" />
+			<PanelRightOpen id="icon-expand-right" data-right-sidebar-icon="expand" class="w-4 h-4 hidden" />
 		</button>
 	</div>
 
 	<!-- Content area - hidden when collapsed -->
-	<div id="right-sidebar-content" class="space-y-6">
+	<div id="right-sidebar-content" data-right-sidebar-content class="space-y-6">
 		<!-- Table of Contents Section -->
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">
@@ -97,6 +98,9 @@ const toc = headings.filter((h) => h.depth <= 4);
 	function applyCollapsed(collapsed: boolean) {
 		if (!sidebar || !content || !iconCollapse || !iconExpand || !toggleContainer || !toggleBtn) return;
 		sidebar.dataset.collapsed = String(collapsed);
+		try {
+			document.documentElement.classList.toggle('hakushi-right-collapsed', collapsed);
+		} catch { /* ignore */ }
 		if (collapsed) {
 			sidebar.classList.remove('w-64');
 			sidebar.classList.add('w-10');
@@ -118,10 +122,14 @@ const toc = headings.filter((h) => h.depth <= 4);
 		}
 	}
 
-	// Restore persisted state
+	// The head init script already applied the stored state to <html>
+	// before paint (and CSS pre-shrunk the sidebar), so just sync the
+	// script state with it instead of re-applying after first paint -
+	// re-applying here is what used to shift the article sideways.
 	try {
-		const stored = localStorage.getItem('hakushi_right_sidebar_collapsed');
-		if (stored === 'true') applyCollapsed(true);
+		if (document.documentElement.classList.contains('hakushi-right-collapsed')) {
+			applyCollapsed(true);
+		}
 	} catch { /* ignore */ }
 
 	toggleBtn?.addEventListener('click', () => {
