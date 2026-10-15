@@ -258,13 +258,22 @@ export default function SidebarContent({
 							<button
 								key={tab}
 								onClick={() => selectTab(tab)}
-								className={`py-1 rounded-md transition-colors ${
+								title={
+									tab === 'tags' && activeTag ? `Filtered by #${activeTag}` : undefined
+								}
+								className={`py-1 rounded-md transition-colors flex items-center justify-center gap-1 ${
 									browseTab === tab
 										? 'bg-[var(--primary)] text-white font-semibold'
 										: 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
 								}`}
 							>
 								{tab === 'folder' ? 'Folders' : tab === 'dated' ? 'Dated' : 'Tags'}
+								{tab === 'tags' && activeTag && (
+									<span
+										aria-label={`Tag filter active: ${activeTag}`}
+										className="inline-block w-1.5 h-1.5 rounded-full bg-current shrink-0"
+									/>
+								)}
 							</button>
 						))}
 					</div>
@@ -272,7 +281,29 @@ export default function SidebarContent({
 					{/* Tab 1: Folder Tree View */}
 					{browseTab === 'folder' && (
 						<div className="space-y-2">
-							{(Object.entries(folderTree) as [string, ArticleMeta[]][]).map(
+							{filteredNotes.length === 0 ? (
+								<div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-center space-y-1.5">
+									{activeTag ? (
+										<>
+											<p className="text-[var(--text-main)] italic">
+												No articles tagged #{activeTag}
+												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
+											</p>
+											<button
+												onClick={() => selectTag(null)}
+												className="text-[var(--primary)] font-semibold hover:underline"
+											>
+												Clear tag filter
+											</button>
+										</>
+									) : (
+										<p className="text-[var(--text-muted)] italic">
+											No articles here yet.
+										</p>
+									)}
+								</div>
+							) :
+								(Object.entries(folderTree) as [string, ArticleMeta[]][]).map(
 								([folderKey, items]) => {
 									const isOpen = openFolders[folderKey] ?? true;
 									const colMeta = collections.find((c) => c.id === folderKey);
@@ -330,7 +361,29 @@ export default function SidebarContent({
 					{/* Tab 2: Chronological Dated Archive View */}
 					{browseTab === 'dated' && (
 						<div className="space-y-3">
-							{(Object.entries(datedTimeline) as [string, ArticleMeta[]][]).map(
+							{filteredNotes.length === 0 ? (
+								<div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-center space-y-1.5">
+									{activeTag ? (
+										<>
+											<p className="text-[var(--text-main)] italic">
+												No articles tagged #{activeTag}
+												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
+											</p>
+											<button
+												onClick={() => selectTag(null)}
+												className="text-[var(--primary)] font-semibold hover:underline"
+											>
+												Clear tag filter
+											</button>
+										</>
+									) : (
+										<p className="text-[var(--text-muted)] italic">
+											No articles here yet.
+										</p>
+									)}
+								</div>
+							) :
+								(Object.entries(datedTimeline) as [string, ArticleMeta[]][]).map(
 								([yearMonth, items]) => (
 									<div key={yearMonth} className="space-y-1">
 										<div className="flex items-center gap-1.5 font-bold text-[var(--text-muted)] font-mono text-[11px] px-1">
