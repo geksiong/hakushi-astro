@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, BookOpen, X } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 
@@ -6,17 +6,32 @@ interface CommandPaletteProps {
 	docs: Array<ArticleMeta & { text?: string }>;
 }
 
+function isEditableTarget(target: EventTarget | null): boolean {
+	const el = target as HTMLElement | null;
+	if (!el || typeof el.tagName !== 'string') return false;
+	return (
+		el.isContentEditable ||
+		el.tagName === 'INPUT' ||
+		el.tagName === 'TEXTAREA' ||
+		el.tagName === 'SELECT'
+	);
+}
+
 export default function CommandPalette({ docs }: CommandPaletteProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
+	const [activeIndex, setActiveIndex] = useState(0);
+	const listRef = useRef<HTMLDivElement>(null);
+
+	const openPalette = () => {
+		setQuery('');
+		setActiveIndex(0);
+		setIsOpen(true);
+	};
 
 	useEffect(() => {
-		const open = () => {
-			setQuery('');
-			setIsOpen(true);
-		};
-		window.addEventListener('open-command-palette', open);
-		return () => window.removeEventListener('open-command-palette', open);
+		window.addEventListener('open-command-palette', openPalette);
+		return () => window.removeEventListener('open-command-palette', openPalette);
 	}, []);
 
 	useEffect(() => {
@@ -24,12 +39,21 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 				e.preventDefault();
 				if (isOpen) setIsOpen(false);
-				else {
-					setQuery('');
-					setIsOpen(true);
-				}
+				else openPalette();
 			} else if (e.key === 'Escape' && isOpen) {
 				setIsOpen(false);
+			} else if (
+				!isOpen &&
+				e.key === '/' &&
+				!e.metaKey &&
+				!e.ctrlKey &&
+				!e.altKey &&
+				!isEditableTarget(e.target)
+			) {
+				// Quick-open from anywhere except editable fields so typing
+				// "/" in inputs still works.
+				e.preventDefault();
+				openPalette();
 			}
 		};
 
@@ -57,6 +81,32 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 		);
 	}, [docs, query]);
 
+	// Restart keyboard selection whenever the result set changes.
+	useEffect(() => {
+		setActiveIndex(0);
+	}, [query, docs]);
+
+	const active = results.length === 0 ? -1 : Math.min(activeIndex, results.length - 1);
+
+	// Keep the keyboard-highlighted result visible while arrowing.
+	useEffect(() => {
+		listRef.current
+			?.querySelector('[data-palette-active="true"]')
+			?.scrollIntoView({ block: 'nearest' });
+	}, [active, isOpen]);
+
+	const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'ArrowDown' && results.length > 0) {
+			e.preventDefault();
+			setActiveIndex((i) => (i + 1) % results.length);
+		} else if (e.key === 'ArrowUp' && results.length > 0) {
+			e.preventDefault();
+			setActiveIndex((i) => (i - 1 + results.length) % results.length);
+		} else if (e.key === 'Enter' && active >= 0) {
+			window.location.href = results[active].url;
+		}
+	};
+
 	if (!isOpen) return null;
 
 	return (
@@ -76,6 +126,11 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 						placeholder="Search all notes, tags, formulas, or collections..."
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
+						onKeyDown={handleInputKeyDown}
+						role="combobox"
+						aria-expanded="true"
+						aria-controls="palette-results"
+						aria-activedescendant={active >= 0 ? `palette-result-${active}` : undefined}
 						className="w-full bg-transparent text-sm text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none"
 					/>
 					<button
@@ -87,22 +142,35 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 				</div>
 
 				{/* Results List */}
-				<div className="max-h-96 overflow-y-auto p-2 space-y-1">
+				<div ref={listRef} id="palette-results" role="listbox" className="max-h-96 overflow-y-auto p-2 space-y-1">
 					{results.length === 0 ? (
 						<div className="p-8 text-center text-[var(--text-muted)] font-mono">
 							No matching notes found for "{query}".
 						</div>
 					) : (
-						results.map((note) => (
+						results.map((note, idx) => (
 							<a
 								key={note.slug}
+								id={`palette-result-${idx}`}
+								role="option"
+								aria-selected={idx === active}
 								href={note.url}
-								className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-[var(--bg-sidebar)] transition-colors text-left group"
+								data-palette-active={idx === active ? 'true' : undefined}
+								onMouseEnter={() => setActiveIndex(idx)}
+								className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors text-left group ${
+									idx === active ? 'bg-[var(--bg-sidebar)]' : 'hover:bg-[var(--bg-sidebar)]'
+								}`}
 							>
 								<div className="space-y-1 pr-2">
 									<div className="flex items-center gap-2">
 										<BookOpen className="w-4 h-4 text-[var(--primary)] shrink-0" />
-										<span className="font-bold text-sm text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">
+										<span
+											className={`font-bold text-sm transition-colors ${
+												idx === active
+													? 'text-[var(--primary)]'
+													: 'text-[var(--text-main)] group-hover:text-[var(--primary)]'
+											}`}
+										>
 											{note.title}
 										</span>
 									</div>
@@ -127,7 +195,8 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 					<span>
 						Use{' '}
 						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↑</kbd>{' '}
-						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↓</kbd> to navigate
+						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↓</kbd> to navigate,{' '}
+						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↵</kbd> to open
 					</span>
 					<span>
 						Press{' '}

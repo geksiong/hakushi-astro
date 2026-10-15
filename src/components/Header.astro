@@ -51,10 +51,12 @@ interface Props {
 			<button
 				id="open-search"
 				type="button"
+				title="Search (press / or ⌘K)"
 				class="w-full max-w-md flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] hover:border-[var(--primary)]/50 transition-colors text-xs"
 			>
 				<Search class="w-3.5 h-3.5 text-[var(--primary)] shrink-0" />
 				<span class="hidden sm:inline flex-1 text-left">Search notes...</span>
+				<kbd class="hidden md:inline px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] font-mono text-[10px]">/</kbd>
 				<kbd class="hidden md:inline px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] font-mono text-[10px]">⌘K</kbd>
 			</button>
 		</div>
