@@ -11,9 +11,11 @@ interface Props {
 	currentCollection?: string;
 	headings?: { depth: number; text: string; slug: string }[];
 	subgraph?: GraphJSON;
+	/** Rendered on /graph: no collection is selected, the graph link is active. */
+	isGraphPage?: boolean;
 }
 
-const { entry, currentCollection, headings, subgraph } = Astro.props;
+const { entry, currentCollection, headings, subgraph, isGraphPage = false } = Astro.props;
 const articles = await getArticleIndex();
 const activeCollection = currentCollection ?? entry?.collection;
 ---
@@ -28,6 +30,7 @@ const activeCollection = currentCollection ?? entry?.collection;
 		articles={articles}
 		currentSlug={entry?.id ?? ''}
 		selectedCollectionId={activeCollection}
+		isGraphPage={isGraphPage}
 	/>
 
 	<!-- Central Article Viewer / Collection Browser -->

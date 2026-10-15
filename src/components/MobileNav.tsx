@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Share2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import SidebarContent from './SidebarContent';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
@@ -85,26 +85,7 @@ export default function MobileNav({ collections, articles }: MobileNavProps) {
 					</button>
 				</div>
 
-				{/* View switcher (the header pill is hidden below md) */}
-				<nav className="grid grid-cols-2 gap-1 p-1 mx-4 mt-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] font-medium text-[11px]">
-					<a
-						href="/"
-						onClick={close}
-						className="flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-					>
-						<BookOpen className="w-3.5 h-3.5" />
-						Reader
-					</a>
-					<a
-						href="/graph"
-						onClick={close}
-						className="flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-					>
-						<Share2 className="w-3.5 h-3.5" />
-						Graph
-					</a>
-				</nav>
-
+				{/* Browse content (collections, graph link, tabs) */}
 				<SidebarContent
 					collections={collections}
 					articles={articles}

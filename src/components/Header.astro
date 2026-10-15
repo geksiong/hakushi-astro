@@ -1,13 +1,11 @@
 ---
-import { Sparkles, Search, BookOpen, Share2, Palette, Menu } from '@lucide/astro';
+import { Sparkles, Search, Palette, Menu } from '@lucide/astro';
 import ThemeMenu from './ThemeMenu';
 import config from 'virtual:hakushi/config';
 
 interface Props {
 	view?: 'reader' | 'graph';
 }
-
-const { view } = Astro.props;
 ---
 
 <header
@@ -48,49 +46,21 @@ const { view } = Astro.props;
 			</a>
 		</div>
 
-		<!-- Middle: Navigation Mode View Switcher -->
-		<div
-			class="hidden md:flex items-center p-1 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border)] text-xs font-medium"
-		>
-			<a
-				href="/"
-				class:list={[
-					'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors',
-					view === 'reader'
-						? 'bg-[var(--bg-surface)] text-[var(--primary)] font-semibold shadow-2xs'
-						: 'text-[var(--text-muted)] hover:text-[var(--text-main)]',
-				]}
-			>
-				<BookOpen class="w-4 h-4" />
-				<span>Reader</span>
-			</a>
-
-			<a
-				href="/graph"
-				class:list={[
-					'flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors',
-					view === 'graph'
-						? 'bg-[var(--bg-surface)] text-[var(--primary)] font-semibold shadow-2xs'
-						: 'text-[var(--text-muted)] hover:text-[var(--text-main)]',
-				]}
-			>
-				<Share2 class="w-4 h-4" />
-				<span>Knowledge Graph</span>
-			</a>
-		</div>
-
-		<!-- Right: Search, Theme Customizer -->
-		<div class="flex items-center gap-2">
+		<!-- Middle: prominent search -->
+		<div class="flex-1 flex justify-center px-2">
 			<button
 				id="open-search"
 				type="button"
-				class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] transition-colors text-xs"
+				class="w-full max-w-md flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] hover:border-[var(--primary)]/50 transition-colors text-xs"
 			>
-				<Search class="w-3.5 h-3.5 text-[var(--primary)]" />
-				<span class="hidden sm:inline">Search notes...</span>
-				<kbd class="hidden sm:inline px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] font-mono text-[10px]">⌘K</kbd>
+				<Search class="w-3.5 h-3.5 text-[var(--primary)] shrink-0" />
+				<span class="hidden sm:inline flex-1 text-left">Search notes...</span>
+				<kbd class="hidden md:inline px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] font-mono text-[10px]">⌘K</kbd>
 			</button>
+		</div>
 
+		<!-- Right: Theme Customizer -->
+		<div class="flex items-center gap-2">
 			<ThemeMenu client:load />
 		</div>
 	</div>

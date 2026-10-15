@@ -7,6 +7,7 @@ import {
 	Microscope,
 	FileText,
 	Share2,
+	Network,
 	Folder,
 	Layers,
 } from 'lucide-react';
@@ -19,6 +20,8 @@ interface SidebarProps {
 	articles: ArticleMeta[];
 	currentSlug: string;
 	selectedCollectionId?: string;
+	/** Set by ReaderShell on /graph so SSR already shows no collection selected. */
+	isGraphPage?: boolean;
 }
 
 const COLLAPSED_ICONS: Record<string, any> = {
@@ -69,6 +72,7 @@ export default function Sidebar({
 	articles,
 	currentSlug,
 	selectedCollectionId,
+	isGraphPage: graphPageProp = false,
 }: SidebarProps) {
 	const [collapsed, setCollapsed] = useState<boolean>(() => {
 		try {
@@ -118,6 +122,14 @@ export default function Sidebar({
 	};
 
 	const activeCollectionId = getActiveCollectionId(selectedCollectionId, collections);
+	// Server-known first (via ReaderShell on /graph, so SSR shows the final
+	// state with no flash); the URL check covers uses without the prop.
+	const [isGraphPage, setIsGraphPage] = useState<boolean>(graphPageProp);
+	useEffect(() => {
+		if (!graphPageProp) {
+			setIsGraphPage(window.location.pathname.replace(/\/+$/, '') === '/graph');
+		}
+	}, [graphPageProp]);
 
 	return (
 		<aside
@@ -160,9 +172,9 @@ export default function Sidebar({
 						href="/"
 						title="All Collections"
 						aria-label="All Collections"
-						aria-current={activeCollectionId === 'all' ? 'page' : undefined}
+						aria-current={activeCollectionId === 'all' && !isGraphPage ? 'page' : undefined}
 						className={`p-2 rounded-lg transition-all ${
-							activeCollectionId === 'all'
+							activeCollectionId === 'all' && !isGraphPage
 								? 'bg-[var(--primary)] text-white shadow-xs'
 								: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
 						}`}
@@ -174,7 +186,7 @@ export default function Sidebar({
 
 					{collections.map((col) => {
 						const IconComponent = COLLAPSED_ICONS[col.iconName ?? 'Folder'] || Folder;
-						const isActive = activeCollectionId === col.id;
+						const isActive = activeCollectionId === col.id && !isGraphPage;
 						return (
 							<a
 								key={col.id}
@@ -188,11 +200,27 @@ export default function Sidebar({
 										: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
 								}`}
 							>
-								<IconComponent className="w-4 h-4" />
-							</a>
-						);
-					})}
-				</nav>
+							<IconComponent className="w-4 h-4" />
+						</a>
+					);
+				})}
+
+				<div aria-hidden="true" className="w-5 border-t border-[var(--border)] my-1" />
+
+				<a
+					href="/graph"
+					title="Knowledge Graph"
+					aria-label="Knowledge Graph"
+					aria-current={isGraphPage ? 'page' : undefined}
+					className={`p-2 rounded-lg transition-all ${
+						isGraphPage
+							? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
+							: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
+					}`}
+				>
+					<Network className="w-4 h-4" />
+				</a>
+			</nav>
 
 			{/* Expanded content - always rendered (hidden when collapsed) so
 			    hydration only patches classes instead of remounting. */}
@@ -200,12 +228,13 @@ export default function Sidebar({
 				data-sidebar-expanded
 				className={`flex-1 flex-col justify-between overflow-y-auto ${collapsed ? 'hidden' : 'flex'}`}
 			>
-				<SidebarContent
-					collections={collections}
-					articles={articles}
-					currentSlug={currentSlug}
-					selectedCollectionId={selectedCollectionId}
-				/>
+			<SidebarContent
+				collections={collections}
+				articles={articles}
+				currentSlug={currentSlug}
+				selectedCollectionId={selectedCollectionId}
+				isGraphPage={isGraphPage}
+			/>
 			</div>
 		</aside>
 	);

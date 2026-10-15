@@ -1,6 +1,6 @@
 ---
 import config from 'virtual:hakushi/config';
-import { BaseLayout, Header } from 'virtual:hakushi/components';
+import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
 import GraphBrowser from '../components/GraphBrowser';
 import { getCachedGraph } from '../lib/graph-data';
 const graph = await getCachedGraph();
@@ -8,7 +8,9 @@ const graph = await getCachedGraph();
 
 <BaseLayout title={`Knowledge Graph · ${config.title}`} description={`Interactive knowledge graph for ${config.title}.`}>
 	<Header view="graph" />
-	<main class="flex-1 p-4 max-w-7xl w-full mx-auto">
-		<GraphBrowser client:load graph={graph} />
-	</main>
+	<ReaderShell isGraphPage>
+		<main class="flex-1 p-4 max-w-7xl w-full mx-auto">
+			<GraphBrowser client:load graph={graph} />
+		</main>
+	</ReaderShell>
 </BaseLayout>

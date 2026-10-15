@@ -10,6 +10,7 @@ import {
 	Sparkles,
 	FolderOpen,
 	Microscope,
+	Network,
 	Share2,
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
@@ -23,6 +24,8 @@ interface SidebarContentProps {
 	selectedCollectionId?: string;
 	/** Called after navigation links are clicked - closes the mobile drawer. */
 	onNavigate?: () => void;
+	/** Set by ReaderShell (via Sidebar) on /graph so SSR shows the final state. */
+	isGraphPage?: boolean;
 }
 
 const COLLECTION_ICONS: Record<string, any> = {
@@ -48,6 +51,7 @@ export default function SidebarContent({
 	currentSlug,
 	selectedCollectionId: initialCollectionId,
 	onNavigate,
+	isGraphPage: graphPageProp = false,
 }: SidebarContentProps) {
 	const [browseTab, setBrowseTab] = useState<BrowseTab>(() => {
 		try {
@@ -74,6 +78,17 @@ export default function SidebarContent({
 	};
 
 	const [selectedCollectionId, setSelectedCollectionId] = useState<string>(getInitialCollection);
+
+	// The reader's view switcher lives here now: highlight the graph link
+	// when the main view shows the knowledge graph. Server-known first (via
+	// ReaderShell on /graph, so SSR shows the final state with no flash);
+	// the URL check covers uses without the prop (e.g. the mobile drawer).
+	const [isGraphPage, setIsGraphPage] = useState<boolean>(graphPageProp);
+	useEffect(() => {
+		if (!graphPageProp) {
+			setIsGraphPage(window.location.pathname.replace(/\/+$/, '') === '/graph');
+		}
+	}, [graphPageProp]);
 
 	useEffect(() => {
 		if (initialCollectionId) {
@@ -207,8 +222,9 @@ export default function SidebarContent({
 								selectCollection('all');
 								onNavigate?.();
 							}}
+							aria-current={selectedCollectionId === 'all' && !isGraphPage ? 'page' : undefined}
 							className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
-								selectedCollectionId === 'all'
+								selectedCollectionId === 'all' && !isGraphPage
 									? 'bg-[var(--primary)] text-white shadow-xs font-semibold'
 									: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
 							}`}
@@ -222,7 +238,7 @@ export default function SidebarContent({
 
 						{collections.map((col) => {
 							const count = articles.filter((n) => n.collection === col.id).length;
-							const isSelected = selectedCollectionId === col.id;
+							const isSelected = selectedCollectionId === col.id && !isGraphPage;
 							const IconComponent = COLLECTION_ICONS[col.iconName ?? 'Folder'] || Folder;
 
 							return (
@@ -249,6 +265,26 @@ export default function SidebarContent({
 							);
 						})}
 					</div>
+				</div>
+
+				{/* Knowledge Graph — reader views and the graph share this sidebar */}
+				<div className="space-y-1">
+					<a
+						href="/graph"
+						onClick={() => onNavigate?.()}
+						aria-current={isGraphPage ? 'page' : undefined}
+						title="Visualize article connections"
+						className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
+							isGraphPage
+								? 'bg-[var(--primary)]/15 text-[var(--primary)] font-semibold border border-[var(--primary)]/30'
+								: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+						}`}
+					>
+						<span className="flex items-center gap-2">
+							<Network className="w-4 h-4 text-[var(--accent)] shrink-0" />
+							Knowledge Graph
+						</span>
+					</a>
 				</div>
 
 				{/* Navigation Mode Switcher Tabs */}
