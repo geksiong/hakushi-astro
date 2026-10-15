@@ -160,48 +160,47 @@ body {
 .md-body :not(pre) > code {
 	font-family: var(--font-code);
 	font-size: 0.8125rem;
-	background: color-mix(in srgb, var(--primary) 10%, transparent);
+	background: color-mix(in srgb, var(--primary) 8%, transparent);
 	color: var(--primary);
-	border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
 	border-radius: 0.375rem;
-	padding: 0.125rem 0.4rem;
+	padding: 0.125rem 0.375rem;
 }
 
-/* Tables - EnhancedTable look. Block + overflow-x keeps wide tables
- * (th uses white-space: nowrap) scrollable inside their rounded frame on
- * narrow screens instead of blowing out the page layout. */
+/* Tables - minimal hairline rows: no boxed frame, no filled header, just
+ * quiet dividers so wide tables feel like text rather than a widget. */
 .md-body table {
 	display: block;
 	width: 100%;
 	max-width: 100%;
 	margin: 1.5rem 0;
-	border-collapse: separate;
-	border-spacing: 0;
-	font-size: 0.75rem;
-	border: 1px solid var(--border);
-	border-radius: 0.75rem;
+	border-collapse: collapse;
+	font-size: 0.8125rem;
+	border-top: 1px solid var(--border);
+	border-bottom: 1px solid var(--border);
 	overflow-x: auto;
-	overflow-y: hidden;
 	-webkit-overflow-scrolling: touch;
 }
 
 .md-body thead {
-	background: var(--bg-sidebar);
+	background: transparent;
 }
 
 .md-body th {
-	font-family: var(--font-heading);
-	font-weight: 700;
-	color: var(--text-main);
+	font-family: var(--font-body);
+	font-weight: 600;
+	font-size: 0.6875rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--text-muted);
 	text-align: left;
-	padding: 0.75rem 1rem;
-	border-bottom: 2px solid var(--border);
+	padding: 0.625rem 0.75rem;
+	border-bottom: 1px solid var(--border);
 	white-space: nowrap;
 }
 
 .md-body td {
-	padding: 0.75rem 1rem;
-	border-bottom: 1px solid var(--border);
+	padding: 0.625rem 0.75rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
 	color: var(--text-muted);
 	vertical-align: top;
 }
@@ -211,14 +210,13 @@ body {
 }
 
 .md-body tbody tr:hover td {
-	background: color-mix(in srgb, var(--primary) 5%, transparent);
+	background: color-mix(in srgb, var(--primary) 3%, transparent);
 	color: var(--text-main);
 }
 
 .md-body img {
 	max-width: 100%;
-	border-radius: 0.75rem;
-	border: 1px solid var(--border);
+	border-radius: 0.5rem;
 }
 
 .md-body kbd {
@@ -239,45 +237,48 @@ body {
 
 /* Fallback plain blockquote */
 .md-body > blockquote {
-	border-left: 4px solid var(--border);
-	padding: 0.5rem 1rem;
+	border-left: 2px solid var(--border);
+	padding: 0.25rem 1rem;
 	margin: 1rem 0;
 	color: var(--text-muted);
 	font-style: italic;
 }
 
 /* ---------------------------------------------------------------------------
- * WikiLinks - pill buttons with an embedded lucide "book-open" icon, matching
- * the renderInlineFormatting() pills of the reference project.
+ * WikiLinks - quiet inline links (no pill): subtle primary text with a
+ * dotted underline and a small icon, so they read as text, not buttons.
  * ------------------------------------------------------------------------- */
 .wikilink {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.25rem;
-	padding: 0.125rem 0.375rem;
-	margin: 0.125rem 0;
-	border-radius: 0.375rem;
-	background: color-mix(in srgb, var(--primary) 10%, transparent);
-	border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+	display: inline;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	background: transparent;
+	border: none;
 	color: var(--primary);
 	font-weight: 500;
-	font-size: 0.75rem;
-	line-height: 1.4;
-	text-decoration: none !important;
-	transition: background-color 150ms ease;
+	font-size: inherit;
+	line-height: inherit;
+	text-decoration: underline dotted color-mix(in srgb, var(--primary) 50%, transparent) !important;
+	text-underline-offset: 3px;
+	transition: color 150ms ease;
 }
 
 .wikilink:hover {
-	background: color-mix(in srgb, var(--primary) 20%, transparent);
+	color: var(--primary-hover);
+	background: transparent;
 }
 
 .wikilink::before {
 	content: '';
 	display: inline-block;
-	width: 0.75rem;
-	height: 0.75rem;
+	width: 0.65rem;
+	height: 0.65rem;
 	flex-shrink: 0;
+	vertical-align: baseline;
+	margin-right: 0.15rem;
 	background-color: currentColor;
+	opacity: 0.7;
 	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v14'/%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/%3E%3C/svg%3E");
 	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v14'/%3E%3Cpath d='M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z'/%3E%3C/svg%3E");
 	-webkit-mask-repeat: no-repeat;
@@ -287,16 +288,15 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Callouts (:::note, :::tip, ...) - AdmonitionCallout.tsx ported to CSS.
+ * Callouts (:::note, :::tip, ...) - quiet hairline note: 1px tinted border,
+ * 2px accent edge, faint wash, no shadow or blur.
  * ------------------------------------------------------------------------- */
 .callout {
 	margin: 1.25rem 0;
-	padding: 1rem;
-	border-radius: 0 0.5rem 0.5rem 0;
-	box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
-	backdrop-filter: blur(4px);
-	border-left-width: 4px;
-	border-left-style: solid;
+	padding: 0.875rem 1rem;
+	border-radius: 0.5rem;
+	border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+	border-left-width: 2px;
 	font-size: 0.875rem;
 	line-height: 1.625;
 }
@@ -330,7 +330,7 @@ body {
 
 .callout-note {
 	border-left-color: #3b82f6;
-	background: rgb(59 130 246 / 0.1);
+	background: rgb(59 130 246 / 0.05);
 	color: rgb(30 58 138);
 }
 .callout-note .callout-title,
@@ -350,7 +350,7 @@ body {
 
 .callout-tip {
 	border-left-color: #10b981;
-	background: rgb(16 185 129 / 0.1);
+	background: rgb(16 185 129 / 0.05);
 	color: rgb(6 78 59);
 }
 .callout-tip .callout-title {
@@ -366,7 +366,7 @@ body {
 
 .callout-warning {
 	border-left-color: #f59e0b;
-	background: rgb(245 158 11 / 0.1);
+	background: rgb(245 158 11 / 0.05);
 	color: rgb(120 53 15);
 }
 .callout-warning .callout-title {
@@ -382,7 +382,7 @@ body {
 
 .callout-danger {
 	border-left-color: #f43f5e;
-	background: rgb(244 63 94 / 0.1);
+	background: rgb(244 63 94 / 0.05);
 	color: rgb(136 19 55);
 }
 .callout-danger .callout-title {
@@ -398,7 +398,7 @@ body {
 
 .callout-info {
 	border-left-color: #06b6d4;
-	background: rgb(6 182 212 / 0.1);
+	background: rgb(6 182 212 / 0.05);
 	color: rgb(22 78 99);
 }
 .callout-info .callout-title {
@@ -414,7 +414,7 @@ body {
 
 .callout-quote {
 	border-left-color: #a855f7;
-	background: rgb(168 85 247 / 0.1);
+	background: rgb(168 85 247 / 0.05);
 	color: rgb(59 7 100);
 }
 .callout-quote .callout-title {
@@ -434,7 +434,7 @@ body {
 
 .callout-check {
 	border-left-color: #14b8a6;
-	background: rgb(20 184 166 / 0.1);
+	background: rgb(20 184 166 / 0.05);
 	color: rgb(19 78 74);
 }
 .callout-check .callout-title {
@@ -449,16 +449,15 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Code blocks - CodeBlock.tsx GitHub-dark chrome.
+ * Code blocks - quiet dark panel: hairline border, no shadow.
  * ------------------------------------------------------------------------- */
 .code-block {
 	margin: 1.25rem 0;
 	border-radius: 0.5rem;
 	overflow: hidden;
-	border: 1px solid #30363d;
+	border: 1px solid var(--border);
 	background: #0d1117;
 	color: #e6edf3;
-	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 	direction: ltr;
 }
 
@@ -581,11 +580,10 @@ body {
  * ------------------------------------------------------------------------- */
 .chart-block {
 	margin: 1.25rem 0;
-	border-radius: 0.75rem;
+	border-radius: 0.5rem;
 	overflow: hidden;
 	border: 1px solid var(--border);
-	background: var(--bg-surface);
-	box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+	background: transparent;
 }
 
 .chart-header {
@@ -594,7 +592,6 @@ body {
 	justify-content: space-between;
 	gap: 0.75rem;
 	padding: 0.625rem 1rem;
-	background: var(--bg-sidebar);
 	border-bottom: 1px solid var(--border);
 	font-size: 0.75rem;
 	font-weight: 600;
@@ -627,7 +624,7 @@ body {
 .chart-invalid {
 	margin: 1rem;
 	padding: 1rem;
-	background: rgb(245 158 11 / 0.1);
+	background: rgb(245 158 11 / 0.05);
 	border: 1px solid rgb(245 158 11 / 0.3);
 	border-radius: 0.5rem;
 	color: rgb(146 64 14);
@@ -644,11 +641,10 @@ body {
  * ------------------------------------------------------------------------- */
 .abc-block {
 	margin: 1.25rem 0;
-	border-radius: 0.75rem;
+	border-radius: 0.5rem;
 	overflow: hidden;
 	border: 1px solid var(--border);
-	background: var(--bg-surface);
-	box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+	background: transparent;
 }
 
 .abc-header {
@@ -656,7 +652,6 @@ body {
 	align-items: center;
 	gap: 0.5rem;
 	padding: 0.625rem 1rem;
-	background: var(--bg-sidebar);
 	border-bottom: 1px solid var(--border);
 	font-size: 0.75rem;
 	font-weight: 600;
@@ -708,7 +703,7 @@ body {
 .abc-invalid {
 	margin: 1rem;
 	padding: 1rem;
-	background: rgb(245 158 11 / 0.1);
+	background: rgb(245 158 11 / 0.05);
 	border: 1px solid rgb(245 158 11 / 0.3);
 	border-radius: 0.5rem;
 	color: rgb(146 64 14);
@@ -728,8 +723,7 @@ body {
 	border-radius: 0.5rem;
 	overflow: hidden;
 	border: 1px solid var(--border);
-	background: var(--bg-surface);
-	box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+	background: transparent;
 	display: flex;
 	flex-direction: column;
 }
@@ -741,14 +735,12 @@ body {
 	padding: 0.5rem 1rem;
 	font-size: 0.75rem;
 	font-weight: 500;
-	background: var(--bg-sidebar);
-	border-bottom: 2px solid var(--border);
+	background: transparent;
+	border-bottom: 1px solid var(--border);
 	border-top: none;
 	border-left: none;
 	border-right: none;
-	border-bottom-color: var(--primary);
-	color: var(--primary);
-	background: var(--bg-surface);
+	color: var(--text-muted);
 	white-space: nowrap;
 	cursor: pointer;
 	font-family: var(--font-body);

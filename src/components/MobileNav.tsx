@@ -69,7 +69,7 @@ export default function MobileNav({ collections, articles, links = [] }: MobileN
 
 			<aside
 				aria-label="Site navigation"
-				className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full overflow-y-auto flex flex-col justify-between bg-[var(--bg-sidebar)] border-r border-[var(--border)] shadow-2xl text-xs transition-transform duration-200 ease-out lg:hidden ${
+				className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full overflow-y-auto flex flex-col justify-between bg-[var(--bg-surface)] border-r border-[var(--border)] text-xs transition-transform duration-200 ease-out lg:hidden ${
 					open ? 'translate-x-0' : '-translate-x-full'
 				}`}
 			>

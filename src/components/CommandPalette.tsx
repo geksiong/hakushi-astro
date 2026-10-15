@@ -116,10 +116,10 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 				className="absolute inset-0 cursor-default"
 				onClick={() => setIsOpen(false)}
 			/>
-			<div className="relative w-full max-w-2xl bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col text-xs">
+			<div className="relative w-full max-w-2xl bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden flex flex-col text-xs">
 				{/* Search Header */}
-				<div className="flex items-center gap-3 p-4 border-b border-[var(--border)] bg-[var(--bg-sidebar)]">
-					<Search className="w-5 h-5 text-[var(--primary)] shrink-0" />
+				<div className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
+					<Search className="w-5 h-5 text-[var(--text-muted)] shrink-0" />
 					<input
 						type="text"
 						autoFocus
@@ -157,18 +157,18 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 								href={note.url}
 								data-palette-active={idx === active ? 'true' : undefined}
 								onMouseEnter={() => setActiveIndex(idx)}
-								className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors text-left group ${
-									idx === active ? 'bg-[var(--bg-sidebar)]' : 'hover:bg-[var(--bg-sidebar)]'
-								}`}
+							className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors text-left group ${
+								idx === active ? 'bg-[var(--bg-sidebar)]/70' : 'hover:bg-[var(--bg-sidebar)]/70'
+							}`}
 							>
 								<div className="space-y-1 pr-2">
 									<div className="flex items-center gap-2">
-										<BookOpen className="w-4 h-4 text-[var(--primary)] shrink-0" />
+										<BookOpen className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
 										<span
 											className={`font-bold text-sm transition-colors ${
 												idx === active
-													? 'text-[var(--primary)]'
-													: 'text-[var(--text-main)] group-hover:text-[var(--primary)]'
+													? 'text-[var(--text-main)]'
+													: 'text-[var(--text-main)]'
 											}`}
 										>
 											{note.title}
@@ -191,7 +191,7 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 				</div>
 
 				{/* Footer info - keyboard hints are irrelevant on touch devices */}
-				<div className="hidden sm:flex p-3 bg-[var(--bg-sidebar)] border-t border-[var(--border)] text-[10px] text-[var(--text-muted)] font-mono justify-between items-center">
+				<div className="hidden sm:flex p-3 border-t border-[var(--border)] text-[10px] text-[var(--text-muted)] font-mono justify-between items-center">
 					<span>
 						Use{' '}
 						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↑</kbd>{' '}

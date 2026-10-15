@@ -60,13 +60,13 @@ export default function ThemeMenu() {
 			<button
 				onClick={() => setShowMenu(!showMenu)}
 				title="Customize Themes & Colors"
-				className="p-2 rounded-lg border border-[var(--border)] bg-[var(--bg-sidebar)] hover:bg-[var(--bg-surface)] text-[var(--text-main)] transition-colors"
+				className="p-2 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-sidebar)] transition-colors"
 			>
-				<PaletteIcon className="w-4 h-4 text-[var(--accent)]" />
+				<PaletteIcon className="w-4 h-4" />
 			</button>
 
 			{showMenu && (
-				<div className="absolute right-0 top-full mt-2 w-[min(18rem,calc(100vw_-_2rem))] p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] shadow-2xl z-50 space-y-4 text-xs animate-in fade-in slide-in-from-top-2">
+				<div className="absolute right-0 top-full mt-2 w-[min(18rem,calc(100vw_-_2rem))] p-4 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] shadow-lg z-50 space-y-4 text-xs animate-in fade-in slide-in-from-top-2">
 					<div className="flex items-center justify-between pb-2 border-b border-[var(--border)] font-bold text-[var(--text-main)]">
 						<span className="flex items-center gap-1.5">
 							<SlidersHorizontal className="w-4 h-4 text-[var(--primary)]" />
@@ -83,18 +83,18 @@ export default function ThemeMenu() {
 					{/* Dark/Light Mode */}
 					<div>
 						<p className="font-semibold text-[var(--text-muted)] mb-2">Appearance</p>
-						<div className="grid grid-cols-3 gap-1 p-1 bg-[var(--bg-sidebar)] rounded-lg border border-[var(--border)]">
+						<div className="grid grid-cols-3 gap-1 p-1 bg-[var(--bg-sidebar)]/60 rounded-lg">
 							{(['light', 'dark', 'auto'] as const).map((m) => {
 								const Icon = MODE_ICONS[m];
 								return (
 									<button
 										key={m}
 										onClick={() => selectMode(m)}
-										className={`flex items-center justify-center gap-1 py-1 rounded text-[11px] capitalize font-medium transition-colors ${
-											mode === m
-												? 'bg-[var(--bg-surface)] text-[var(--primary)] shadow-2xs'
-												: 'text-[var(--text-muted)]'
-										}`}
+									className={`flex items-center justify-center gap-1 py-1 rounded-md text-[11px] capitalize font-medium transition-colors ${
+										mode === m
+											? 'bg-[var(--bg-surface)] text-[var(--text-main)] shadow-xs'
+											: 'text-[var(--text-muted)]'
+									}`}
 									>
 										<Icon className="w-3 h-3" />
 										{m}
@@ -112,11 +112,11 @@ export default function ThemeMenu() {
 								<button
 									key={scheme.id}
 									onClick={() => selectScheme(scheme.id)}
-									className={`p-2 rounded-lg border text-left transition-all ${
-										schemeId === scheme.id
-											? 'border-[var(--primary)] bg-[var(--primary)]/10 font-bold'
-											: 'border-[var(--border)] bg-[var(--bg-sidebar)] hover:bg-[var(--bg-surface)]'
-									}`}
+								className={`p-2 rounded-lg border text-left transition-all ${
+									schemeId === scheme.id
+										? 'border-[var(--primary)]/40 bg-[var(--primary)]/[0.07] font-medium'
+										: 'border-[var(--border)] hover:border-[var(--text-muted)]/40'
+								}`}
 								>
 									<p className="text-[11px] text-[var(--text-main)]">{scheme.badge}</p>
 									<p className="text-[9px] text-[var(--text-muted)] truncate">{scheme.name}</p>
@@ -133,11 +133,11 @@ export default function ThemeMenu() {
 								<button
 									key={st.id}
 									onClick={() => selectStyle(st.id)}
-									className={`p-2 rounded-lg border text-left transition-all ${
-										styleId === st.id
-											? 'border-[var(--accent)] bg-[var(--accent)]/10 font-bold'
-											: 'border-[var(--border)] bg-[var(--bg-sidebar)] hover:bg-[var(--bg-surface)]'
-									}`}
+								className={`p-2 rounded-lg border text-left transition-all ${
+									styleId === st.id
+										? 'border-[var(--accent)]/40 bg-[var(--accent)]/[0.07] font-medium'
+										: 'border-[var(--border)] hover:border-[var(--text-muted)]/40'
+								}`}
 								>
 									<p className="text-[11px] text-[var(--text-main)]">{st.name}</p>
 								</button>

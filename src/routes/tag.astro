@@ -33,7 +33,7 @@ articles.sort((a: any, b: any) => b.date.localeCompare(a.date));
 				<h1 class="flex items-center gap-2 text-3xl font-extrabold text-[var(--text-main)] font-heading"><Tag class="w-5 h-5 text-[var(--secondary)]" />#{name}</h1>
 				<p class="text-xs text-[var(--text-muted)] font-mono">{articles.length} {articles.length === 1 ? 'article' : 'articles'}</p>
 			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">{articles.map((article: any) => <a href={article.url} class="p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)]"><p class="font-semibold text-sm text-[var(--text-main)]">{article.title}</p><p class="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p><div class="flex justify-between mt-3 text-[11px] font-mono text-[var(--text-muted)]"><span>{getCollectionConfig(article.collection)?.name ?? article.collection}</span><span>{article.date}</span></div></a>)}</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">{articles.map((article: any) => <a href={article.url} class="p-4 rounded-lg border border-[var(--border)] hover:bg-[var(--bg-surface)] transition-colors"><p class="font-semibold text-sm text-[var(--text-main)]">{article.title}</p><p class="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p><div class="flex justify-between mt-3 text-[11px] font-mono text-[var(--text-muted)]"><span>{getCollectionConfig(article.collection)?.name ?? article.collection}</span><span>{article.date}</span></div></a>)}</div>
 		</main>
 	</ReaderShell>
 </BaseLayout>

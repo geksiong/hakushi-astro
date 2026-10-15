@@ -278,10 +278,10 @@ export default function SidebarContent({
 								onNavigate?.();
 							}}
 							aria-current={selectedCollectionId === 'all' && !noCollectionSelected ? 'page' : undefined}
-							className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
+							className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
 								selectedCollectionId === 'all' && !noCollectionSelected
-									? 'bg-[var(--primary)] text-white shadow-xs font-semibold'
-									: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+									? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
+									: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
 							}`}
 						>
 							<span className="flex items-center gap-2">
@@ -304,15 +304,15 @@ export default function SidebarContent({
 										selectCollection(col.id);
 										onNavigate?.();
 									}}
-									title={col.description}
-									className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg font-medium transition-all ${
-										isSelected
-											? 'bg-[var(--primary)]/15 text-[var(--primary)] font-semibold border border-[var(--primary)]/30'
-											: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
-									}`}
+								title={col.description}
+								className={`w-full flex items-center justify-between px-3 py-1.5 rounded-md font-medium transition-colors ${
+									isSelected
+										? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+										: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
+								}`}
 								>
 									<span className="flex items-center gap-2 truncate">
-										<IconComponent className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+										<IconComponent className="w-3.5 h-3.5 shrink-0" />
 										<span className="truncate">{col.name}</span>
 									</span>
 									<span className="font-mono text-[10px] text-[var(--text-muted)]">{count}</span>
@@ -329,14 +329,14 @@ export default function SidebarContent({
 						onClick={() => onNavigate?.()}
 						aria-current={isGraphPage ? 'page' : undefined}
 						title="Visualize article connections"
-						className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
+						className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
 							isGraphPage
-								? 'bg-[var(--primary)]/15 text-[var(--primary)] font-semibold border border-[var(--primary)]/30'
-								: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+								? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+								: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
 						}`}
 					>
 						<span className="flex items-center gap-2">
-							<Network className="w-4 h-4 text-[var(--accent)] shrink-0" />
+							<Network className="w-4 h-4 shrink-0" />
 							Knowledge Graph
 						</span>
 					</a>
@@ -360,14 +360,14 @@ export default function SidebarContent({
 									title={link.description || link.label}
 									target={link.external ? '_blank' : undefined}
 									rel={link.external ? 'noopener noreferrer' : undefined}
-									className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
-										isActive
-											? 'bg-[var(--primary)]/15 text-[var(--primary)] font-semibold border border-[var(--primary)]/30'
-											: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
-									}`}
+								className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
+									isActive
+										? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+										: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
+								}`}
 								>
 									<span className="flex items-center gap-2 truncate">
-										<IconComponent className="w-4 h-4 text-[var(--accent)] shrink-0" />
+										<IconComponent className="w-4 h-4 shrink-0" />
 										<span className="truncate">{link.label}</span>
 									</span>
 									{link.external && (
@@ -381,7 +381,7 @@ export default function SidebarContent({
 
 				{/* Navigation Mode Switcher Tabs */}
 				<div className="space-y-3 pt-2 border-t border-[var(--border)]">
-					<div className="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] font-medium text-[11px]">
+					<div className="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--bg-sidebar)]/60 font-medium text-[11px]">
 						{(['folder', 'dated', 'tags'] as const).map((tab) => (
 							<button
 								key={tab}
@@ -391,7 +391,7 @@ export default function SidebarContent({
 								}
 								className={`py-1 rounded-md transition-colors flex items-center justify-center gap-1 ${
 									browseTab === tab
-										? 'bg-[var(--primary)] text-white font-semibold'
+										? 'bg-[var(--bg-surface)] text-[var(--text-main)] font-medium shadow-xs'
 										: 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
 								}`}
 							>
@@ -410,7 +410,7 @@ export default function SidebarContent({
 					{browseTab === 'folder' && (
 						<div className="space-y-2">
 							{filteredNotes.length === 0 ? (
-								<div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-center space-y-1.5">
+								<div className="p-3 rounded-lg border border-dashed border-[var(--border)] text-center space-y-1.5">
 									{activeTag ? (
 										<>
 											<p className="text-[var(--text-main)] italic">
@@ -440,11 +440,11 @@ export default function SidebarContent({
 										<div key={folderKey} className="space-y-1">
 											<button
 												onClick={() => toggleFolder(folderKey)}
-												className="w-full flex items-center justify-between p-1.5 rounded-md hover:bg-[var(--bg-surface)] font-semibold text-[var(--text-main)] uppercase tracking-wider text-[11px]"
+												className="w-full flex items-center justify-between p-1.5 rounded-md hover:bg-[var(--border)]/40 font-semibold text-[var(--text-main)] uppercase tracking-wider text-[11px]"
 											>
 												<span className="flex items-center gap-1.5 capitalize">
 													{isOpen ? (
-														<FolderOpen className="w-3.5 h-3.5 text-[var(--primary)]" />
+														<FolderOpen className="w-3.5 h-3.5" />
 													) : (
 														<Folder className="w-3.5 h-3.5 text-[var(--text-muted)]" />
 													)}
@@ -466,11 +466,11 @@ export default function SidebarContent({
 																key={note.slug}
 																href={note.url}
 																onClick={() => onNavigate?.()}
-																className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
-																	isSelected
-																		? 'bg-[var(--primary)]/10 text-[var(--primary)] font-semibold border-l-2 border-[var(--primary)]'
-																		: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
-																}`}
+															className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
+																isSelected
+																	? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
+																	: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
+															}`}
 															>
 																<span className="truncate pr-1">{note.title}</span>
 																<FileText className="w-3 h-3 text-[var(--text-muted)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -490,7 +490,7 @@ export default function SidebarContent({
 					{browseTab === 'dated' && (
 						<div className="space-y-3">
 							{filteredNotes.length === 0 ? (
-								<div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-center space-y-1.5">
+								<div className="p-3 rounded-lg border border-dashed border-[var(--border)] text-center space-y-1.5">
 									{activeTag ? (
 										<>
 											<p className="text-[var(--text-main)] italic">
@@ -515,7 +515,7 @@ export default function SidebarContent({
 								([yearMonth, items]) => (
 									<div key={yearMonth} className="space-y-1">
 										<div className="flex items-center gap-1.5 font-bold text-[var(--text-muted)] font-mono text-[11px] px-1">
-											<Calendar className="w-3.5 h-3.5 text-[var(--accent)]" />
+											<Calendar className="w-3.5 h-3.5" />
 											<span>{yearMonth}</span>
 										</div>
 										<div className="pl-3 border-l border-[var(--border)] ml-2 space-y-1">
@@ -526,8 +526,8 @@ export default function SidebarContent({
 													onClick={() => onNavigate?.()}
 													className={`w-full text-left p-2 rounded-md transition-colors block ${
 														currentSlug === note.slug
-															? 'bg-[var(--primary)]/10 text-[var(--primary)] font-semibold'
-															: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+															? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
+															: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
 													}`}
 												>
 													<p className="truncate font-medium">{note.title}</p>
@@ -548,7 +548,7 @@ export default function SidebarContent({
 					{browseTab === 'tags' && (
 						<div className="space-y-3">
 							{activeTag && (
-								<div className="flex items-center justify-between p-2 rounded-lg bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-[var(--primary)]">
+								<div className="flex items-center justify-between p-2 rounded-lg bg-[var(--primary)]/[0.07] text-[var(--primary)]">
 									<span className="truncate">Filtering: #{activeTag}</span>
 									<a
 										href="/"
@@ -575,11 +575,11 @@ export default function SidebarContent({
 												onNavigate?.();
 											}}
 											aria-current={isActive ? 'true' : undefined}
-											className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono transition-all ${
-												isActive
-													? 'bg-[var(--primary)] text-white font-bold'
-													: 'bg-[var(--bg-surface)] hover:bg-[var(--border)] text-[var(--text-main)] border border-[var(--border)]'
-											}`}
+										className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono transition-colors ${
+											isActive
+												? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
+												: 'hover:bg-[var(--border)]/40 text-[var(--text-main)] border border-[var(--border)]'
+										}`}
 										>
 											<span>#{tag}</span>
 											<span className="opacity-70 text-[10px]">({count})</span>
@@ -605,8 +605,8 @@ export default function SidebarContent({
 													onClick={() => onNavigate?.()}
 													className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
 														isSelected
-															? 'bg-[var(--primary)]/10 text-[var(--primary)] font-semibold border-l-2 border-[var(--primary)]'
-															: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+															? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
+															: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
 													}`}
 												>
 													<span className="truncate pr-1">{note.title}</span>
@@ -629,10 +629,10 @@ export default function SidebarContent({
 			</div>
 
 			{/* Footer Info */}
-			<div className="p-4 border-t border-[var(--border)] bg-[var(--bg-surface)] text-[11px] text-[var(--text-muted)] font-mono mt-6">
+			<div className="p-4 border-t border-[var(--border)] text-[11px] text-[var(--text-muted)] font-mono mt-6">
 				<p className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
 					<BookOpen className="hidden" />
-					<Sparkles className="w-3.5 h-3.5 text-[var(--primary)]" />
+					<Sparkles className="w-3.5 h-3.5" />
 					Hakushi
 				</p>
 				<p className="mt-0.5">Flexible file &amp; collection layout</p>

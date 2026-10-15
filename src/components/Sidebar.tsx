@@ -178,19 +178,19 @@ export default function Sidebar({
 	return (
 		<aside
 			data-sidebar
-			className={`shrink-0 border-r border-[var(--border)] bg-[var(--bg-sidebar)] h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto hidden lg:flex flex-col text-xs transition-all duration-300 ${
+			className={`shrink-0 border-r border-[var(--border)] h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto hidden lg:flex flex-col text-xs transition-all duration-300 ${
 				collapsed ? 'w-10' : 'w-72'
 			}`}
 		>
 			{/* Toggle button */}
 			<div
 				data-sidebar-toggle
-				className={`flex items-center ${collapsed ? 'justify-center' : 'justify-end'} p-1.5 border-b border-[var(--border)]`}
+				className={`flex items-center ${collapsed ? 'justify-center' : 'justify-end'} p-1.5`}
 			>
 				<button
 					onClick={toggle}
 					title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-					className="p-1.5 rounded-md hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+					className="p-1.5 rounded-md hover:bg-[var(--border)]/40 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 				>
 					{/* Both icons always rendered - visibility toggles via classes so
 					    hydration only patches attributes instead of remounting. */}
@@ -217,10 +217,10 @@ export default function Sidebar({
 						title="All Collections"
 						aria-label="All Collections"
 						aria-current={activeCollectionId === 'all' && !noCollectionSelected ? 'page' : undefined}
-						className={`p-2 rounded-lg transition-all ${
+						className={`p-2 rounded-md transition-colors ${
 							activeCollectionId === 'all' && !noCollectionSelected
-								? 'bg-[var(--primary)] text-white shadow-xs'
-								: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
+								? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+								: 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text-main)]'
 						}`}
 					>
 						<Layers className="w-4 h-4" />
@@ -238,12 +238,12 @@ export default function Sidebar({
 								title={col.description ? `${col.name} — ${col.description}` : col.name}
 								aria-label={col.name}
 								aria-current={isActive ? 'page' : undefined}
-								className={`p-2 rounded-lg transition-all ${
-									isActive
-										? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
-										: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
-								}`}
-							>
+							className={`p-2 rounded-md transition-colors ${
+								isActive
+									? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+									: 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text-main)]'
+							}`}
+						>
 							<IconComponent className="w-4 h-4" />
 						</a>
 					);
@@ -256,10 +256,10 @@ export default function Sidebar({
 					title="Knowledge Graph"
 					aria-label="Knowledge Graph"
 					aria-current={isGraphPage ? 'page' : undefined}
-					className={`p-2 rounded-lg transition-all ${
+					className={`p-2 rounded-md transition-colors ${
 						isGraphPage
-							? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
-							: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
+							? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+							: 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text-main)]'
 					}`}
 				>
 					<Network className="w-4 h-4" />
@@ -281,11 +281,11 @@ export default function Sidebar({
 									aria-current={isActive ? 'page' : undefined}
 									target={link.external ? '_blank' : undefined}
 									rel={link.external ? 'noopener noreferrer' : undefined}
-									className={`p-2 rounded-lg transition-all ${
-										isActive
-											? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
-											: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
-									}`}
+								className={`p-2 rounded-md transition-colors ${
+									isActive
+										? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
+										: 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text-main)]'
+								}`}
 								>
 									<IconComponent className="w-4 h-4" />
 								</a>

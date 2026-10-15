@@ -37,12 +37,12 @@ function TypeToggle({
 			type="button"
 			aria-pressed={checked}
 			onClick={() => onChange(!checked)}
-			className={`flex items-center rounded-md font-medium capitalize transition-all ${
+			className={`flex items-center rounded-md font-medium capitalize transition-colors ${
 				compact ? 'gap-1 px-1.5 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'
 			} ${
 				checked
-					? 'border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-main)] shadow-xs'
-					: 'border border-transparent text-[var(--text-muted)] opacity-50 hover:opacity-90'
+					? 'bg-[var(--bg-surface)] text-[var(--text-main)]'
+					: 'text-[var(--text-muted)] opacity-50 hover:opacity-90'
 			}`}
 		>
 			<span
@@ -345,12 +345,12 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 		<div
 			ref={containerRef}
 			className={`relative w-full text-[var(--text-main)] ${
-				isSubGraph ? 'h-64 rounded-lg' : 'h-[calc(100vh-8rem)] rounded-xl'
-			} border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-sm`}
+				isSubGraph ? 'h-64 rounded-lg' : 'h-[calc(100vh-8rem)] rounded-lg'
+			} border border-[var(--border)] overflow-hidden`}
 		>
 			{/* Control Overlay Bar */}
 			{!isSubGraph && (
-				<div className="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border)] shadow-md text-xs">
+				<div className="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 rounded-lg bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border)] text-xs">
 					<div className="flex items-center gap-2 flex-1 min-w-[220px]">
 						<Search className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
 						<input
@@ -365,7 +365,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 					{/* Stacked as one row of its own below sm, inline via contents at sm+ */}
 					<div className="flex items-center justify-between gap-2 sm:contents">
 						{/* Show / Hide Node Types */}
-						<div className="flex items-center gap-1 bg-[var(--bg-sidebar)] p-1 rounded-md border border-[var(--border)]">
+						<div className="flex items-center gap-1 bg-[var(--bg-sidebar)]/60 p-1 rounded-md">
 							<TypeToggle
 								label="categories"
 								dotColor="var(--accent)"
@@ -391,7 +391,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 
 			{/* Compact Toggles for the Article Subgraph */}
 			{isSubGraph && (
-				<div className="absolute top-2 right-2 z-10 flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border)] shadow-sm">
+				<div className="absolute top-2 right-2 z-10 flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border)]">
 					<TypeToggle
 						compact
 						label="cats"
@@ -423,7 +423,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 
 			{/* Hover Info Tooltip */}
 			{hoveredNode && (
-				<div className="absolute bottom-4 left-4 z-10 p-3 rounded-lg bg-[var(--bg-surface)]/95 border border-[var(--border)] shadow-lg backdrop-blur-md text-xs pointer-events-none space-y-1 animate-in fade-in">
+				<div className="absolute bottom-4 left-4 z-10 p-3 rounded-lg bg-[var(--bg-surface)]/95 border border-[var(--border)] backdrop-blur-md text-xs pointer-events-none space-y-1 animate-in fade-in">
 					<p className="font-semibold text-[var(--text-main)] flex items-center gap-1.5">
 						<span
 							className="w-2.5 h-2.5 rounded-full"
