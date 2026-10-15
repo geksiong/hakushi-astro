@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, CornerDownRight, List } from '@lucide/astro';
+import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, List } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
@@ -134,26 +134,21 @@ const toc = headings.filter((h) => h.depth <= 4);
 	<!-- Backlinks / Linked References -->
 	{
 		backlinks.length > 0 && (
-			<section class="mt-12 pt-6 border-t border-[var(--border)] space-y-3">
-				<h3 class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
-					<CornerDownRight class="w-4 h-4" />
-					Linked References
+			<section class="mt-12 pt-6 border-t border-[var(--border)] space-y-2">
+				<h3 class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+					Linked References <span class="font-mono normal-case">· {backlinks.length}</span>
 				</h3>
-				<div class="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+				<nav class="space-y-0.5">
 					{backlinks.map((bl) => (
 						<a
 							href={`/${bl.slug}`}
-							class="py-3 text-left group transition-colors"
+							title={bl.title}
+							class="block truncate py-1 text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 						>
-							<p class="font-semibold text-xs text-[var(--text-main)] transition-colors">
-								{bl.title}
-							</p>
-							<p class="text-[11px] text-[var(--text-muted)] line-clamp-1 mt-1">
-								{bl.summary || bl.slug}
-							</p>
+							{bl.title}
 						</a>
 					))}
-				</div>
+				</nav>
 			</section>
 		)
 	}
