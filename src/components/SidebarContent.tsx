@@ -174,16 +174,21 @@ export default function SidebarContent({
 		return timeline;
 	}, [filteredNotes]);
 
-	// All Tags count map (across all notes, like the reference)
+	// Tag counts scoped to the selected collection, consistent with the
+	// folder and dated tabs which also filter by collection.
 	const tagCounts = useMemo(() => {
 		const counts: Record<string, number> = {};
-		articles.forEach((note) => {
+		const scoped =
+			selectedCollectionId === 'all'
+				? articles
+				: articles.filter((n) => n.collection === selectedCollectionId);
+		scoped.forEach((note) => {
 			note.tags.forEach((tag) => {
 				counts[tag] = (counts[tag] || 0) + 1;
 			});
 		});
 		return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
-	}, [articles]);
+	}, [articles, selectedCollectionId]);
 
 	return (
 		<>
