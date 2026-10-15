@@ -870,3 +870,12 @@ mjx-container[display='true'] {
 	overflow-y: hidden;
 	padding-bottom: 0.25rem;
 }
+
+/* MathJax renders math as an <svg> inside mjx-container, but Tailwind
+   preflight forces every SVG to display:block - pushing inline math onto
+   its own line. Keep non-display math in the text flow. (Unlayered rules
+   win over Tailwind's layered preflight, so no !important is needed.) */
+.md-body mjx-container:not([display='true']) > svg {
+	display: inline-block;
+	vertical-align: middle;
+}
