@@ -3,10 +3,12 @@ import { X } from 'lucide-react';
 import SidebarContent from './SidebarContent';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
+import type { SidebarLink } from '../lib/sidebar';
 
 interface MobileNavProps {
 	collections: CollectionConfig[];
 	articles: ArticleMeta[];
+	links?: SidebarLink[];
 }
 
 /**
@@ -15,7 +17,7 @@ interface MobileNavProps {
  * articles) has a working hamburger menu. Opens via the `open-sidebar`
  * window event dispatched by the header hamburger button.
  */
-export default function MobileNav({ collections, articles }: MobileNavProps) {
+export default function MobileNav({ collections, articles, links = [] }: MobileNavProps) {
 	const [open, setOpen] = useState(false);
 	const [currentSlug, setCurrentSlug] = useState('');
 	const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(undefined);
@@ -92,6 +94,7 @@ export default function MobileNav({ collections, articles }: MobileNavProps) {
 					currentSlug={currentSlug}
 					selectedCollectionId={selectedCollectionId}
 					onNavigate={close}
+					links={links}
 				/>
 			</aside>
 		</>

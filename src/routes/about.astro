@@ -1,0 +1,21 @@
+---
+import config from 'virtual:hakushi/config';
+import { BaseLayout, Header, ReaderShell, AboutPage } from 'virtual:hakushi/components';
+import { getArticleIndex } from '../lib/articles';
+import { COLLECTIONS } from '../lib/collections';
+import { ABOUT } from '../lib/sidebar';
+
+const articles = await getArticleIndex();
+const title = `${ABOUT.title} · ${config.title}`;
+---
+
+<BaseLayout title={title} description={ABOUT.description || config.description}>
+	<Header view="reader" />
+	<ReaderShell isAboutPage>
+		<AboutPage
+			about={ABOUT}
+			collections={COLLECTIONS}
+			articleCount={articles.length}
+		/>
+	</ReaderShell>
+</BaseLayout>

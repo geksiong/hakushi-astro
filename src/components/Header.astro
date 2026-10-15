@@ -1,11 +1,61 @@
 ---
-import { Sparkles, Search, Palette, Menu } from '@lucide/astro';
+import {
+	Sparkles,
+	Search,
+	Menu,
+	BookOpen,
+	Calendar,
+	Microscope,
+	FileText,
+	Share2,
+	Folder,
+	Layers,
+	Info,
+	Link as LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
+	Network,
+	AtSign,
+	Send,
+} from '@lucide/astro';
 import ThemeMenu from './ThemeMenu';
 import config from 'virtual:hakushi/config';
 
 interface Props {
 	view?: 'reader' | 'graph';
 }
+
+// Icon-only links on the right side of the header (social/contact links).
+// 'Github' maps to a git stand-in - lucide dropped brand icons.
+const HEADER_ICONS: Record<string, any> = {
+	BookOpen,
+	Calendar,
+	Microscope,
+	FileText,
+	Share2,
+	Folder,
+	Layers,
+	Info,
+	Link: LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	Github: GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
+	Network,
+	AtSign,
+	Send,
+};
+
+const headerLinks = config.headerLinks ?? [];
 ---
 
 <header
@@ -61,8 +111,26 @@ interface Props {
 			</button>
 		</div>
 
-		<!-- Right: Theme Customizer -->
-		<div class="flex items-center gap-2">
+		<!-- Right: configurable icon links + Theme Customizer -->
+		<div class="flex items-center gap-1">
+			{headerLinks.map((link) => {
+				const IconComponent = HEADER_ICONS[link.iconName ?? 'Link'] || LinkIcon;
+				return (
+					<a
+						href={link.href}
+						title={link.description || link.label}
+						aria-label={link.label}
+						target={link.external ? '_blank' : undefined}
+						rel={link.external ? 'noopener noreferrer' : undefined}
+						class="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--primary)] hover:bg-[var(--bg-sidebar)] transition-colors"
+					>
+						<IconComponent class="w-4 h-4" />
+					</a>
+				);
+			})}
+			{headerLinks.length > 0 && (
+				<div aria-hidden="true" class="w-px h-5 bg-[var(--border)] mx-1" />
+			)}
 			<ThemeMenu client:load />
 		</div>
 	</div>

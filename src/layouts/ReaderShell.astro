@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import RightToc from '../components/RightToc.astro';
 import { getArticleIndex } from '../lib/articles';
 import { COLLECTIONS } from '../lib/collections';
+import { SIDEBAR_LINKS } from '../lib/sidebar';
 import type { GraphJSON } from '../lib/graph-data';
 
 interface Props {
@@ -13,9 +14,11 @@ interface Props {
 	subgraph?: GraphJSON;
 	/** Rendered on /graph: no collection is selected, the graph link is active. */
 	isGraphPage?: boolean;
+	/** Rendered on /about: no collection is selected, the matching sidebar link is active. */
+	isAboutPage?: boolean;
 }
 
-const { entry, currentCollection, headings, subgraph, isGraphPage = false } = Astro.props;
+const { entry, currentCollection, headings, subgraph, isGraphPage = false, isAboutPage = false } = Astro.props;
 const articles = await getArticleIndex();
 const activeCollection = currentCollection ?? entry?.collection;
 ---
@@ -31,6 +34,8 @@ const activeCollection = currentCollection ?? entry?.collection;
 		currentSlug={entry?.id ?? ''}
 		selectedCollectionId={activeCollection}
 		isGraphPage={isGraphPage}
+		isAboutPage={isAboutPage}
+		links={SIDEBAR_LINKS}
 	/>
 
 	<!-- Central Article Viewer / Collection Browser -->

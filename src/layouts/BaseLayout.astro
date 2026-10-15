@@ -8,6 +8,7 @@ import MobileNav from '../components/MobileNav';
 import { getSearchDocs } from '../lib/search-data';
 import { getArticleIndex } from '../lib/articles';
 import { COLLECTIONS } from '../lib/collections';
+import { SIDEBAR_LINKS } from '../lib/sidebar';
 
 interface Props {
 	title?: string;
@@ -40,7 +41,7 @@ const articles = await getArticleIndex();
 	<body class="min-h-screen flex flex-col antialiased">
 		<slot />
 
-		<MobileNav client:load collections={COLLECTIONS} articles={articles} />
+		<MobileNav client:load collections={COLLECTIONS} articles={articles} links={SIDEBAR_LINKS} />
 		<CommandPalette client:load docs={searchDocs} />
 	</body>
 </html>

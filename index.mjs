@@ -11,7 +11,7 @@ import remarkCharts from './src/plugins/remark-charts.mjs';
 import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
-import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS } from './src/integration/defaults.mjs';
+import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS } from './src/integration/defaults.mjs';
 
 const VIRTUAL_CONFIG = 'virtual:hakushi/config';
 const RESOLVED_CONFIG = `\0${VIRTUAL_CONFIG}`;
@@ -24,6 +24,7 @@ const defaultComponents = {
 	BaseLayout: new URL('./src/layouts/BaseLayout.astro', import.meta.url),
 	Header: new URL('./src/components/Header.astro', import.meta.url),
 	ArticlePage: new URL('./src/components/ArticlePage.astro', import.meta.url),
+	AboutPage: new URL('./src/components/AboutPage.astro', import.meta.url),
 	ReaderShell: new URL('./src/layouts/ReaderShell.astro', import.meta.url),
 	ArticleView: new URL('./src/components/ArticleView.astro', import.meta.url),
 	CollectionPage: new URL('./src/components/CollectionPage.astro', import.meta.url),
@@ -52,6 +53,9 @@ function normalizeOptions(options) {
 		...DEFAULT_CONFIG,
 		...options,
 		collections,
+		about: { ...DEFAULT_ABOUT, ...options.about },
+		sidebarLinks: normalizeLinkList(options.sidebarLinks, DEFAULT_SIDEBAR_LINKS, 'sidebarLinks'),
+		headerLinks: normalizeLinkList(options.headerLinks, DEFAULT_HEADER_LINKS, 'headerLinks'),
 		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 5,
 		theme: { ...DEFAULT_CONFIG.theme, ...options.theme },
 	};
@@ -60,6 +64,31 @@ function normalizeOptions(options) {
 	delete config.routes;
 	if (!ids.has(config.defaultCollection)) config.defaultCollection = collections[0].id;
 	return config;
+}
+
+function isExternalHref(href) {
+	return /^(https?:\/\/|mailto:|tel:)/i.test(href);
+}
+
+/**
+ * Normalize a configurable link list (sidebar or header). Entries need at
+ * least a `label` and an `href`; anything else is dropped so a typo can't
+ * break the layout. `external` defaults to true for absolute URLs so they
+ * open in a new tab.
+ */
+function normalizeLinkList(links, fallback, optionName) {
+	const raw = links ?? fallback;
+	if (!Array.isArray(raw)) {
+		throw new Error(`[hakushi] \`${optionName}\` must be an array.`);
+	}
+	return raw
+		.filter((link) => link && typeof link.label === 'string' && typeof link.href === 'string')
+		.map((link) => ({
+			description: '',
+			iconName: 'Link',
+			...link,
+			external: link.external ?? isExternalHref(link.href),
+		}));
 }
 
 function resolveUserSpecifier(specifier, root) {
@@ -102,13 +131,14 @@ function virtualModules(options, config, root) {
 
 function coreIntegration(options = {}) {
 	const config = normalizeOptions(options);
-	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, categories: true, notFound: true, ...options.routes };
+	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, categories: true, about: true, notFound: true, ...options.routes };
 	return {
 		name: 'hakushi',
 		hooks: {
 			'astro:config:setup': ({ config: astroConfig, updateConfig, injectRoute }) => {
 				const add = (enabled, pattern, file) => enabled && injectRoute({ pattern, entrypoint: new URL(file, import.meta.url) });
 				add(routes.home, '/', './src/routes/index.astro');
+				add(routes.about, '/about', './src/routes/about.astro');
 				add(routes.articles, '/[collection]/[...slug]', './src/routes/article.astro');
 				add(routes.collections, '/[collection]', './src/routes/collection.astro');
 				add(routes.aliases, '/[slug]', './src/routes/alias.astro');
@@ -150,4 +180,4 @@ export default function hakushi(options = {}) {
 	return [react(), mermaid(options.mermaid), coreIntegration(options)];
 }
 
-export { DEFAULT_COLLECTIONS };
+export { DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS };

@@ -1,0 +1,76 @@
+---
+import { ChevronRight, Info } from '@lucide/astro';
+import type { CollectionConfig } from '../lib/collections';
+
+export interface Props {
+	about: { title: string; description: string; content: string };
+	collections: CollectionConfig[];
+	articleCount: number;
+}
+
+const { about, collections, articleCount } = Astro.props;
+/** Plain-text body; blank lines separate paragraphs. */
+const paragraphs = about.content
+	.split(/\n\s*\n/)
+	.map((p) => p.trim())
+	.filter(Boolean);
+---
+
+<div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+	<!-- Breadcrumb Path -->
+	<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+		<a href="/" class="hover:text-[var(--primary)] transition-colors">Home</a>
+		<ChevronRight class="w-3.5 h-3.5" />
+		<span class="text-[var(--text-main)] font-medium truncate">{about.title}</span>
+	</div>
+
+	<!-- Page Header -->
+	<header class="space-y-4 pb-6 border-b border-[var(--border)]">
+		<h1
+			class="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
+		>
+			{about.title}
+		</h1>
+
+		{about.description && (
+			<p class="p-4 rounded-lg bg-[var(--bg-sidebar)] border-l-4 border-[var(--primary)] text-sm text-[var(--text-main)] leading-relaxed italic">
+				{about.description}
+			</p>
+		)}
+	</header>
+
+	<!-- Configured body copy -->
+	{paragraphs.map((paragraph) => (
+		<p class="text-sm text-[var(--text-main)] leading-relaxed">{paragraph}</p>
+	))}
+
+	<!-- Site overview -->
+	<section class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 space-y-4">
+		<h2 class="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+			<Info class="w-4 h-4 text-[var(--primary)]" />
+			This knowledge base
+		</h2>
+		<p class="text-xs text-[var(--text-muted)] font-mono">
+			{articleCount} {articleCount === 1 ? 'article' : 'articles'} across{' '}
+			{collections.length} {collections.length === 1 ? 'collection' : 'collections'}
+		</p>
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+			{collections.map((collection) => (
+				<a
+					href={`/${collection.id}`}
+					title={collection.description}
+					class="p-3 rounded-lg border border-[var(--border)] bg-[var(--bg-main)] hover:border-[var(--primary)] transition-all text-left group"
+				>
+					<p class="font-semibold text-xs text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">
+						{collection.name}
+					</p>
+					{collection.description && (
+						<p class="text-[11px] text-[var(--text-muted)] line-clamp-2 mt-1">
+							{collection.description}
+						</p>
+					)}
+				</a>
+			))}
+		</div>
+	</section>
+</div>

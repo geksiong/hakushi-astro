@@ -10,10 +10,20 @@ import {
 	Network,
 	Folder,
 	Layers,
+	Info,
+	Link as LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
 } from 'lucide-react';
 import SidebarContent from './SidebarContent';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
+import type { SidebarLink } from '../lib/sidebar';
 
 interface SidebarProps {
 	collections: CollectionConfig[];
@@ -22,6 +32,10 @@ interface SidebarProps {
 	selectedCollectionId?: string;
 	/** Set by ReaderShell on /graph so SSR already shows no collection selected. */
 	isGraphPage?: boolean;
+	/** Set by ReaderShell on /about so SSR already shows no collection selected. */
+	isAboutPage?: boolean;
+	/** Configurable pages/sites listed below the collections. */
+	links?: SidebarLink[];
 }
 
 const COLLAPSED_ICONS: Record<string, any> = {
@@ -32,6 +46,18 @@ const COLLAPSED_ICONS: Record<string, any> = {
 	Share2,
 	Folder,
 	Layers,
+	Info,
+	Link: LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	// lucide dropped brand icons - 'Github' maps to a git stand-in.
+	Github: GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
+	Network,
 };
 
 /**
@@ -73,6 +99,8 @@ export default function Sidebar({
 	currentSlug,
 	selectedCollectionId,
 	isGraphPage: graphPageProp = false,
+	isAboutPage: aboutPageProp = false,
+	links = [],
 }: SidebarProps) {
 	const [collapsed, setCollapsed] = useState<boolean>(() => {
 		try {
@@ -131,6 +159,22 @@ export default function Sidebar({
 		}
 	}, [graphPageProp]);
 
+	// Same treatment for /about: server-known first, URL check otherwise.
+	// Any non-collection, non-graph internal sidebar link also deselects
+	// the collections once the client path is known.
+	const normalizePath = (p: string) => p.replace(/\/+$/, '') || '/';
+	const [currentPath, setCurrentPath] = useState<string>(aboutPageProp ? '/about' : '');
+	useEffect(() => {
+		setCurrentPath(normalizePath(window.location.pathname));
+	}, []);
+	const isAboutPage = aboutPageProp || currentPath === '/about';
+	const noCollectionSelected =
+		isGraphPage ||
+		isAboutPage ||
+		links.some((l) => !l.external && normalizePath(l.href) === currentPath);
+	const isLinkActive = (href: string, external?: boolean) =>
+		!external && currentPath !== '' && normalizePath(href) === currentPath;
+
 	return (
 		<aside
 			data-sidebar
@@ -172,9 +216,9 @@ export default function Sidebar({
 						href="/"
 						title="All Collections"
 						aria-label="All Collections"
-						aria-current={activeCollectionId === 'all' && !isGraphPage ? 'page' : undefined}
+						aria-current={activeCollectionId === 'all' && !noCollectionSelected ? 'page' : undefined}
 						className={`p-2 rounded-lg transition-all ${
-							activeCollectionId === 'all' && !isGraphPage
+							activeCollectionId === 'all' && !noCollectionSelected
 								? 'bg-[var(--primary)] text-white shadow-xs'
 								: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
 						}`}
@@ -186,7 +230,7 @@ export default function Sidebar({
 
 					{collections.map((col) => {
 						const IconComponent = COLLAPSED_ICONS[col.iconName ?? 'Folder'] || Folder;
-						const isActive = activeCollectionId === col.id && !isGraphPage;
+						const isActive = activeCollectionId === col.id && !noCollectionSelected;
 						return (
 							<a
 								key={col.id}
@@ -220,6 +264,35 @@ export default function Sidebar({
 				>
 					<Network className="w-4 h-4" />
 				</a>
+
+				{links.length > 0 && (
+					<>
+						<div aria-hidden="true" className="w-5 border-t border-[var(--border)] my-1" />
+
+						{links.map((link) => {
+							const IconComponent = COLLAPSED_ICONS[link.iconName ?? 'Link'] || LinkIcon;
+							const isActive = isLinkActive(link.href, link.external);
+							return (
+								<a
+									key={link.href}
+									href={link.href}
+									title={link.description || link.label}
+									aria-label={link.label}
+									aria-current={isActive ? 'page' : undefined}
+									target={link.external ? '_blank' : undefined}
+									rel={link.external ? 'noopener noreferrer' : undefined}
+									className={`p-2 rounded-lg transition-all ${
+										isActive
+											? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
+											: 'text-[var(--text-muted)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-main)]'
+									}`}
+								>
+									<IconComponent className="w-4 h-4" />
+								</a>
+							);
+						})}
+					</>
+				)}
 			</nav>
 
 			{/* Expanded content - always rendered (hidden when collapsed) so
@@ -234,6 +307,8 @@ export default function Sidebar({
 				currentSlug={currentSlug}
 				selectedCollectionId={selectedCollectionId}
 				isGraphPage={isGraphPage}
+				isAboutPage={isAboutPage}
+				links={links}
 			/>
 			</div>
 		</aside>

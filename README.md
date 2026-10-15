@@ -45,7 +45,7 @@ tags: [guide]
 Link to another note with [[another-note]].
 ```
 
-Run `npm run dev`. Hakushi creates `/`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, tag/category pages, and `/404`.
+Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, tag/category pages, and `/404`.
 
 ## Frontmatter and schema
 
@@ -86,8 +86,23 @@ hakushi({
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
   ],
+  about: {
+    title: 'About',
+    description: 'What this knowledge base is and how to use it.',
+    content: 'Plain text for the built-in /about page; blank lines separate paragraphs.',
+  },
+  sidebarLinks: [
+    { label: 'About', href: '/about', iconName: 'Info', description: 'About this site' },
+    { label: 'GitHub', href: 'https://github.com/acme/docs', iconName: 'Github' },
+  ],
+  headerLinks: [
+    { label: 'GitHub', href: 'https://github.com/acme/docs', iconName: 'Github' },
+    { label: 'Contact', href: 'mailto:hello@acme.com', iconName: 'Mail' },
+  ],
 })
 ```
+
+`sidebarLinks` are listed in the sidebar (desktop, collapsed rail, and mobile drawer) below the collections. Each entry needs a `label` and an `href`; `iconName`, `description`, and `external` are optional. `external` defaults to `true` for absolute URLs, which open in a new tab. Sidebar link icons support `Info`, `Link`, `Globe`, `Mail`, `Github`, `ExternalLink`, `Home`, `Rss`, `MessageCircle`, and the collection icons. `headerLinks` use the same entry shape and render as icon-only buttons on the right side of the header, before the theme picker — intended for social media and contact links. They default to none. Both lists support `GitFork` too; `Github` is aliased to it because lucide no longer ships brand icons. The built-in `/about` route renders `about` and can be replaced with a custom `AboutPage` component (see below) or disabled with `routes: { about: false }`.
 
 When changing collections, give the loader the same IDs:
 
@@ -140,6 +155,7 @@ hakushi({
   components: {
     Header: './src/components/DocsHeader.astro',
     ArticleView: './src/components/ArticleView.astro',
+    AboutPage: './src/components/About.astro',
     CollectionPage: './src/components/CollectionPage.astro',
   },
 })
@@ -150,7 +166,8 @@ hakushi({
 | `BaseLayout` | `title?`, `description?`, default slot |
 | `Header` | `view?: 'reader' \| 'graph'` |
 | `ArticlePage` | `entry` |
-| `ReaderShell` | `entry?`, `currentCollection?`, `headings?`, `subgraph?`, default slot |
+| `AboutPage` | `about` (`title`, `description`, `content`), `collections`, `articleCount` |
+| `ReaderShell` | `entry?`, `currentCollection?`, `headings?`, `subgraph?`, `isGraphPage?`, `isAboutPage?`, default slot |
 | `ArticleView` | `entry`, `Content`, `headings`, `readingTime`, `backlinks` |
 | `CollectionPage` | `collection`, `articles` |
 
@@ -174,7 +191,7 @@ Disable any injected route that the consuming site supplies itself:
 hakushi({ routes: { home: false, collections: false, notFound: false } })
 ```
 
-Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categories`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
+Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categories`, `about`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
 
 ## Markdown features
 

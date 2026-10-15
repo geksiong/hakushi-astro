@@ -12,9 +12,19 @@ import {
 	Microscope,
 	Network,
 	Share2,
+	Info,
+	Link as LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
+import type { SidebarLink } from '../lib/sidebar';
 import { taxonomySlug } from '../lib/slugs';
 
 interface SidebarContentProps {
@@ -26,6 +36,10 @@ interface SidebarContentProps {
 	onNavigate?: () => void;
 	/** Set by ReaderShell (via Sidebar) on /graph so SSR shows the final state. */
 	isGraphPage?: boolean;
+	/** Set by ReaderShell (via Sidebar) on /about so SSR shows the final state. */
+	isAboutPage?: boolean;
+	/** Configurable pages/sites listed below the collections. */
+	links?: SidebarLink[];
 }
 
 const COLLECTION_ICONS: Record<string, any> = {
@@ -36,6 +50,28 @@ const COLLECTION_ICONS: Record<string, any> = {
 	Share2,
 	Folder,
 	Layers,
+};
+
+const LINK_ICONS: Record<string, any> = {
+	BookOpen,
+	Calendar,
+	Microscope,
+	FileText,
+	Share2,
+	Folder,
+	Layers,
+	Info,
+	Link: LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	// lucide dropped brand icons - 'Github' maps to a git stand-in.
+	Github: GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
+	Network,
 };
 
 type BrowseTab = 'folder' | 'dated' | 'tags';
@@ -52,6 +88,8 @@ export default function SidebarContent({
 	selectedCollectionId: initialCollectionId,
 	onNavigate,
 	isGraphPage: graphPageProp = false,
+	isAboutPage: aboutPageProp = false,
+	links = [],
 }: SidebarContentProps) {
 	const [browseTab, setBrowseTab] = useState<BrowseTab>(() => {
 		try {
@@ -89,6 +127,23 @@ export default function SidebarContent({
 			setIsGraphPage(window.location.pathname.replace(/\/+$/, '') === '/graph');
 		}
 	}, [graphPageProp]);
+
+	// Current path for highlighting configurable sidebar links. Server-known
+	// first for /about (via ReaderShell, so SSR shows the final state);
+	// the URL check covers the mobile drawer and other internal links.
+	const normalizePath = (p: string) => p.replace(/\/+$/, '') || '/';
+	const [currentPath, setCurrentPath] = useState<string>(aboutPageProp ? '/about' : '');
+	useEffect(() => {
+		setCurrentPath(normalizePath(window.location.pathname));
+	}, []);
+	const isAboutPage = aboutPageProp || currentPath === '/about';
+	// Any non-collection, non-graph internal link also deselects collections.
+	const noCollectionSelected =
+		isGraphPage ||
+		isAboutPage ||
+		links.some((l) => !l.external && normalizePath(l.href) === currentPath);
+	const isLinkActive = (link: SidebarLink) =>
+		!link.external && currentPath !== '' && normalizePath(link.href) === currentPath;
 
 	useEffect(() => {
 		if (initialCollectionId) {
@@ -222,9 +277,9 @@ export default function SidebarContent({
 								selectCollection('all');
 								onNavigate?.();
 							}}
-							aria-current={selectedCollectionId === 'all' && !isGraphPage ? 'page' : undefined}
+							aria-current={selectedCollectionId === 'all' && !noCollectionSelected ? 'page' : undefined}
 							className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
-								selectedCollectionId === 'all' && !isGraphPage
+								selectedCollectionId === 'all' && !noCollectionSelected
 									? 'bg-[var(--primary)] text-white shadow-xs font-semibold'
 									: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
 							}`}
@@ -238,7 +293,7 @@ export default function SidebarContent({
 
 						{collections.map((col) => {
 							const count = articles.filter((n) => n.collection === col.id).length;
-							const isSelected = selectedCollectionId === col.id && !isGraphPage;
+							const isSelected = selectedCollectionId === col.id && !noCollectionSelected;
 							const IconComponent = COLLECTION_ICONS[col.iconName ?? 'Folder'] || Folder;
 
 							return (
@@ -286,6 +341,43 @@ export default function SidebarContent({
 						</span>
 					</a>
 				</div>
+
+				{/* Configurable pages & external sites */}
+				{links.length > 0 && (
+					<div className="space-y-1">
+						<p className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-[10px] px-3">
+							Pages &amp; Links
+						</p>
+						{links.map((link) => {
+							const isActive = isLinkActive(link);
+							const IconComponent = LINK_ICONS[link.iconName ?? 'Link'] || LinkIcon;
+							return (
+								<a
+									key={link.href}
+									href={link.href}
+									onClick={() => onNavigate?.()}
+									aria-current={isActive ? 'page' : undefined}
+									title={link.description || link.label}
+									target={link.external ? '_blank' : undefined}
+									rel={link.external ? 'noopener noreferrer' : undefined}
+									className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${
+										isActive
+											? 'bg-[var(--primary)]/15 text-[var(--primary)] font-semibold border border-[var(--primary)]/30'
+											: 'hover:bg-[var(--bg-surface)] text-[var(--text-main)]'
+									}`}
+								>
+									<span className="flex items-center gap-2 truncate">
+										<IconComponent className="w-4 h-4 text-[var(--accent)] shrink-0" />
+										<span className="truncate">{link.label}</span>
+									</span>
+									{link.external && (
+										<ExternalLink className="w-3 h-3 text-[var(--text-muted)] shrink-0" />
+									)}
+								</a>
+							);
+						})}
+					</div>
+				)}
 
 				{/* Navigation Mode Switcher Tabs */}
 				<div className="space-y-3 pt-2 border-t border-[var(--border)]">
