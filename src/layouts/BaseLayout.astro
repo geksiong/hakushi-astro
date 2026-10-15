@@ -2,6 +2,7 @@
 import 'virtual:hakushi/styles';
 import config from 'virtual:hakushi/config';
 import { createThemeInitScript } from '../lib/theme-init.mjs';
+import { createSidebarInitScript } from '../lib/sidebar-init.mjs';
 import CommandPalette from '../components/CommandPalette';
 import MobileNav from '../components/MobileNav';
 import { getSearchDocs } from '../lib/search-data';
@@ -34,6 +35,7 @@ const articles = await getArticleIndex();
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;600&family=Fira+Code:wght@400;500&display=swap"
 		/>
 		<script is:inline set:html={createThemeInitScript(config.theme)} />
+		<script is:inline set:html={createSidebarInitScript()} />
 	</head>
 	<body class="min-h-screen flex flex-col antialiased">
 		<slot />

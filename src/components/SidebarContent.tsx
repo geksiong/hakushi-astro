@@ -31,6 +31,7 @@ const COLLECTION_ICONS: Record<string, any> = {
 	FileText,
 	Share2,
 	Folder,
+	Layers,
 };
 
 type BrowseTab = 'folder' | 'dated' | 'tags';

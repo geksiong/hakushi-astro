@@ -817,6 +817,37 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+ * Collapsed sidebar pre-hydration - the `hakushi-sidebar-collapsed` class is
+ * set on <html> by the head init script before first paint. Astro always
+ * server-renders the sidebar expanded, so these rules shrink it and hide the
+ * expanded content until React hydrates (which then renders the same state).
+ * Unlayered CSS wins over Tailwind's layered utilities by design here.
+ * ------------------------------------------------------------------------- */
+html.hakushi-sidebar-collapsed aside[data-sidebar] {
+	width: 2.5rem;
+}
+
+html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-expanded] {
+	display: none;
+}
+
+html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-rail] {
+	display: flex;
+}
+
+html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-toggle] {
+	justify-content: center;
+}
+
+html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-icon='open'] {
+	display: block;
+}
+
+html.hakushi-sidebar-collapsed aside[data-sidebar] [data-sidebar-icon='close'] {
+	display: none;
+}
+
+/* ---------------------------------------------------------------------------
  * Misc chrome
  * ------------------------------------------------------------------------- */
 *::-webkit-scrollbar {
