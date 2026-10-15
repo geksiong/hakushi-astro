@@ -183,6 +183,76 @@ export default function CollectionBrowser({
 		return pages;
 	};
 
+	// Pagination controls (rendered both above and below the list so users
+	// don't have to scroll to change pages)
+	const renderPagination = (label: string, keyPrefix: string) =>
+		totalItems > 0 ? (
+			<nav
+				aria-label={label}
+				className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono"
+			>
+				{/* Status counter */}
+				<div className="text-[var(--text-muted)]">
+					Showing <span className="font-semibold text-[var(--text-main)]">{startIndex + 1}</span>–
+					<span className="font-semibold text-[var(--text-main)]">{endIndex}</span> of{' '}
+					<span className="font-semibold text-[var(--text-main)]">{totalItems}</span> articles
+				</div>
+
+				{/* Navigation buttons */}
+				<div className="flex items-center gap-1">
+					{/* Previous Button */}
+					<button
+						onClick={() => goToPage(safePage - 1)}
+						disabled={safePage <= 1}
+						className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--bg-main)] disabled:hover:text-[var(--text-main)] disabled:hover:border-[var(--border)] transition-all font-sans font-medium"
+						aria-label="Previous page"
+					>
+						<ChevronLeft className="w-4 h-4" />
+						<span className="hidden sm:inline">Previous</span>
+					</button>
+
+					{/* Page number buttons */}
+					<div className="flex items-center gap-1 mx-1">
+						{getPageNumbers().map((p, idx) => {
+							if (typeof p === 'string') {
+								return (
+									<span key={`${keyPrefix}-ellipsis-${idx}`} className="px-2 py-1 text-[var(--text-muted)]">
+										…
+									</span>
+								);
+							}
+							const isCurrent = p === safePage;
+							return (
+								<button
+									key={`${keyPrefix}-page-${p}`}
+									onClick={() => goToPage(p)}
+									aria-current={isCurrent ? 'page' : undefined}
+									className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold transition-all ${
+										isCurrent
+											? 'bg-[var(--primary)] text-white shadow-xs'
+											: 'border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
+									}`}
+								>
+									{p}
+								</button>
+							);
+						})}
+					</div>
+
+					{/* Next Button */}
+					<button
+						onClick={() => goToPage(safePage + 1)}
+						disabled={safePage >= totalPages}
+						className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--bg-main)] disabled:hover:text-[var(--text-main)] disabled:hover:border-[var(--border)] transition-all font-sans font-medium"
+						aria-label="Next page"
+					>
+						<span className="hidden sm:inline">Next</span>
+						<ChevronRight className="w-4 h-4" />
+					</button>
+				</div>
+			</nav>
+		) : null;
+
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-8 space-y-8 animate-in fade-in">
 			{/* Breadcrumb Path */}
@@ -297,6 +367,9 @@ export default function CollectionBrowser({
 					</div>
 				</div>
 			</header>
+
+			{/* Pagination Controls (top) */}
+			{renderPagination('Collection pagination top', 'top')}
 
 			{/* Articles Listing */}
 			{paginatedArticles.length === 0 ? (
@@ -423,73 +496,8 @@ export default function CollectionBrowser({
 				</div>
 			)}
 
-			{/* Pagination Controls Footer */}
-			{totalItems > 0 && (
-				<nav
-					aria-label="Collection pagination"
-					className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono"
-				>
-					{/* Status counter */}
-					<div className="text-[var(--text-muted)]">
-						Showing <span className="font-semibold text-[var(--text-main)]">{startIndex + 1}</span>–
-						<span className="font-semibold text-[var(--text-main)]">{endIndex}</span> of{' '}
-						<span className="font-semibold text-[var(--text-main)]">{totalItems}</span> articles
-					</div>
-
-					{/* Navigation buttons */}
-					<div className="flex items-center gap-1">
-						{/* Previous Button */}
-						<button
-							onClick={() => goToPage(safePage - 1)}
-							disabled={safePage <= 1}
-							className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--bg-main)] disabled:hover:text-[var(--text-main)] disabled:hover:border-[var(--border)] transition-all font-sans font-medium"
-							aria-label="Previous page"
-						>
-							<ChevronLeft className="w-4 h-4" />
-							<span className="hidden sm:inline">Previous</span>
-						</button>
-
-						{/* Page number buttons */}
-						<div className="flex items-center gap-1 mx-1">
-							{getPageNumbers().map((p, idx) => {
-								if (typeof p === 'string') {
-									return (
-										<span key={`ellipsis-${idx}`} className="px-2 py-1 text-[var(--text-muted)]">
-											…
-										</span>
-									);
-								}
-								const isCurrent = p === safePage;
-								return (
-									<button
-										key={p}
-										onClick={() => goToPage(p)}
-										aria-current={isCurrent ? 'page' : undefined}
-										className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold transition-all ${
-											isCurrent
-												? 'bg-[var(--primary)] text-white shadow-xs'
-												: 'border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
-										}`}
-									>
-										{p}
-									</button>
-								);
-							})}
-						</div>
-
-						{/* Next Button */}
-						<button
-							onClick={() => goToPage(safePage + 1)}
-							disabled={safePage >= totalPages}
-							className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--bg-main)] disabled:hover:text-[var(--text-main)] disabled:hover:border-[var(--border)] transition-all font-sans font-medium"
-							aria-label="Next page"
-						>
-							<span className="hidden sm:inline">Next</span>
-							<ChevronRight className="w-4 h-4" />
-						</button>
-					</div>
-				</nav>
-			)}
+			{/* Pagination Controls (bottom) */}
+			{renderPagination('Collection pagination bottom', 'bottom')}
 		</div>
 	);
 }
