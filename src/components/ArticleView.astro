@@ -1,6 +1,7 @@
 ---
 import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, CornerDownRight, List } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
+import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
 import type { ReadingTime, Backlink } from '../lib/articles';
 
@@ -14,6 +15,7 @@ interface Props {
 
 const { entry, Content, headings, readingTime, backlinks } = Astro.props;
 const data = entry.data;
+const displayTitle = resolveEntryTitle(entry);
 const colConfig = getCollectionConfig(entry.collection);
 const colName = colConfig?.name ?? entry.collection;
 const toc = headings.filter((h) => h.depth <= 4);
@@ -32,7 +34,7 @@ const toc = headings.filter((h) => h.depth <= 4);
 				</>
 			)
 		}
-		<span class="text-[var(--text-main)] font-medium truncate">{data.title}</span>
+		<span class="text-[var(--text-main)] font-medium truncate">{displayTitle}</span>
 	</div>
 
 	<!-- Article Header -->
@@ -40,7 +42,7 @@ const toc = headings.filter((h) => h.depth <= 4);
 		<h1
 			class="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
 		>
-			{data.title}
+			{displayTitle}
 		</h1>
 
 		<!-- Metadata Chips -->

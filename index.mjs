@@ -7,6 +7,7 @@ import { unified } from '@astrojs/markdown-remark';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import remarkWikilinks from './src/plugins/remark-wikilinks.mjs';
+import remarkFirstH1Title from './src/plugins/remark-first-h1-title.mjs';
 import remarkCharts from './src/plugins/remark-charts.mjs';
 import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
@@ -150,7 +151,7 @@ function coreIntegration(options = {}) {
 				updateConfig({
 					markdown: {
 						processor: unified({
-							remarkPlugins: [remarkWikilinks, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
+							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
 							rehypePlugins: [rehypeMathjax, rehypeEnhancer],
 						}),
 						shikiConfig: {

@@ -3,6 +3,7 @@ import config from 'virtual:hakushi/config';
 import { BaseLayout, Header, ReaderShell, ArticleView } from 'virtual:hakushi/components';
 import { render } from 'astro:content';
 import { calculateReadingTime, getBacklinks, type ReadingTime, type Backlink } from '../lib/articles';
+import { resolveEntryTitle } from '../lib/title';
 import { getCachedGraph, getSubgraph } from '../lib/graph-data';
 
 export interface ArticlePageProps {
@@ -16,7 +17,7 @@ const readingTime: ReadingTime = calculateReadingTime(entry.body ?? '');
 const backlinks: Backlink[] = await getBacklinks(entry.id);
 const subgraph = await getSubgraph(entry.id);
 
-const title = `${entry.data.title} · ${config.title}`;
+const title = `${resolveEntryTitle(entry)} · ${config.title}`;
 ---
 
 <BaseLayout title={title} description={entry.data.summary ?? config.description}>

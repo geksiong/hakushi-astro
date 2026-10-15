@@ -1,5 +1,4 @@
 ---
-title: Designing Hakushi Color Schemes & Themes
 collection: blog
 category: Design Systems
 tags: [design, css, hakushi, themes, ui-ux]

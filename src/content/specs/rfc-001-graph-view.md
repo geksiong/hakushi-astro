@@ -8,8 +8,6 @@ author: System Architect
 summary: Technical specification for real-time D3 force simulation, node clustering, and local sub-graph article previews.
 ---
 
-# RFC 001: Knowledge Graph Engine Specification
-
 ## Status: ACCEPTED
 
 This RFC outlines the architectural specification for Hakushi's interactive knowledge graph engine.

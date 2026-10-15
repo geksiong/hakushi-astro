@@ -4,6 +4,7 @@ import { Folder, ChevronRight } from '@lucide/astro';
 import config from 'virtual:hakushi/config';
 import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
 import { getCollectionConfig } from '../lib/collections';
+import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/graph-data';
 
 export async function getStaticPaths() {
@@ -14,7 +15,7 @@ export async function getStaticPaths() {
 		for (const doc of entries) if (doc.data.category) {
 			const slug = taxonomySlug(doc.data.category);
 			if (!byCategory.has(slug)) byCategory.set(slug, { name: doc.data.category, articles: [] });
-			byCategory.get(slug)!.articles.push({ title: doc.data.title, summary: doc.data.summary ?? '', date: String(doc.data.date ?? ''), url: `/${doc.id}`, collection: id });
+			byCategory.get(slug)!.articles.push({ title: resolveEntryTitle(doc), summary: doc.data.summary ?? '', date: String(doc.data.date ?? ''), url: `/${doc.id}`, collection: id });
 		}
 	}
 	return [...byCategory].map(([category, props]) => ({ params: { category }, props }));

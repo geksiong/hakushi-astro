@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import { COLLECTIONS } from './collections';
+import { resolveEntryTitle } from './title';
 
 /** Every collection id, as a literal union for Astro's typed helpers. */
 export type ArticleCollectionId = string;
@@ -44,7 +45,7 @@ function toMeta(entry: ArticleEntry): ArticleMeta {
 		slug: entry.id,
 		url: `/${entry.id}`,
 		collection: entry.collection,
-		title: entry.data.title,
+		title: resolveEntryTitle(entry),
 		category: entry.data.category,
 		tags: entry.data.tags ?? [],
 		date: entry.data.date ? entry.data.date.toISOString().slice(0, 10) : undefined,
@@ -126,7 +127,7 @@ export function getBacklinkMap(): Promise<Map<string, Backlink[]>> {
 					if (!resolved || resolved.slug === doc.id) continue;
 					const list = map.get(resolved.slug) ?? [];
 					if (!list.some((b) => b.slug === doc.id)) {
-						list.push({ slug: doc.id, title: doc.data.title, summary: doc.data.summary });
+						list.push({ slug: doc.id, title: resolveEntryTitle(doc), summary: doc.data.summary });
 						map.set(resolved.slug, list);
 					}
 				}

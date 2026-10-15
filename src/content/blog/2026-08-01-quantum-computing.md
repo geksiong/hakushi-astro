@@ -1,5 +1,4 @@
 ---
-title: Quantum Advantage in Graph Neural Networks
 collection: blog
 category: Quantum Computing
 tags: [quantum, qnn, algorithms, ai, graph-theory]

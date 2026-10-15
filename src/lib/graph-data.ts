@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import { COLLECTIONS } from './collections';
+import { resolveEntryTitle } from './title';
 
 export interface GraphNodeJSON {
 	id: string;
@@ -78,7 +79,7 @@ export async function getGraphData(): Promise<GraphJSON> {
 		for (const doc of entries) {
 			nodes.push({
 				id: doc.id,
-				name: doc.data.title ?? doc.id,
+				name: resolveEntryTitle(doc),
 				type: 'article',
 				collection: id,
 				url: `/${doc.id}`,

@@ -5,7 +5,7 @@ import { DEFAULT_COLLECTIONS } from './src/integration/defaults.mjs';
 /** Create Hakushi's frontmatter schema, optionally adding project-specific fields. */
 export function hakushiSchema({ extend = {} } = {}) {
 	return z.object({
-		title: z.string(),
+		title: z.string().optional(),
 		category: z.string().optional(),
 		tags: z.array(z.string()).default([]),
 		date: z.coerce.date().optional(),

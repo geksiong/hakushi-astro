@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import { COLLECTIONS } from './collections';
 import { calculateReadingTime, type ArticleMeta } from './articles';
+import { resolveEntryTitle } from './title';
 
 export type ArticleCollectionId = string;
 const COLLECTION_IDS = COLLECTIONS.map((c) => c.id);
@@ -19,11 +20,12 @@ export function getSearchDocs(): Promise<SearchDoc[]> {
 		);
 		return groups.flat().map((entry) => {
 			const body = (entry.body ?? '').toLowerCase();
+			const title = resolveEntryTitle(entry);
 			return {
 				slug: entry.id,
 				url: `/${entry.id}`,
 				collection: entry.collection,
-				title: entry.data.title,
+				title,
 				category: entry.data.category,
 				tags: entry.data.tags ?? [],
 				date: entry.data.date ? entry.data.date.toISOString().slice(0, 10) : undefined,
@@ -31,7 +33,7 @@ export function getSearchDocs(): Promise<SearchDoc[]> {
 				summary: entry.data.summary,
 				readingTime: calculateReadingTime(entry.body ?? ''),
 				text: [
-					entry.data.title,
+					title,
 					entry.data.category ?? '',
 					entry.collection,
 					entry.data.date?.toISOString().slice(0, 10) ?? '',

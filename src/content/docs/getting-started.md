@@ -1,5 +1,4 @@
 ---
-title: Getting Started with Hakushi
 collection: docs
 category: Guides
 tags: [hakushi, documentation, quickstart, astro]

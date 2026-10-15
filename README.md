@@ -49,7 +49,7 @@ Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/do
 
 ## Frontmatter and schema
 
-Only `title` is required. The built-in schema also accepts `summary`, `category`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
+No field is required. The built-in schema accepts `title`, `summary`, `category`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
 
 Extend it with project fields:
 
@@ -65,6 +65,8 @@ export const collections = createHakushiCollections({
 ```
 
 The package also exports `hakushiLoader({ base, pattern })` for defining an individual collection.
+
+When frontmatter has no `title`, the article's first level-1 heading (`# Title`) is used instead — in the article header, sidebar and collection listings, search, backlinks, and the knowledge graph. That heading is then removed from the rendered article body (including the table of contents) so it isn't shown twice. Articles with a frontmatter `title` render their body unchanged. Without either, the entry id is shown.
 
 ## Configuration
 

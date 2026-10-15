@@ -8,6 +8,4 @@ author: Dr. Elena Rostova
 summary: Combining fast full-text lexical indexing with dense semantic vector embeddings for note retrieval.
 ---
 
-# Hybrid Keyword and Vector Embeddings in Digital Gardens
-
 Modern digital gardens require both exact keyword matching and semantic conceptual search.

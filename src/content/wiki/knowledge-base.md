@@ -1,5 +1,4 @@
 ---
-title: Personal Knowledge Base Index
 collection: wiki
 category: Digital Garden
 tags: [wiki, index, notes, zettelkasten]

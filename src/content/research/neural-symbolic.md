@@ -8,8 +8,6 @@ author: AI Research Lab
 summary: Hybrid AI systems that merge continuous neural embeddings with discrete symbolic graph rules for hallucination-free reasoning.
 ---
 
-# Neural-Symbolic AI & Knowledge Graphs
-
 Pure neural models excel at pattern recognition but struggle with multi-hop logical deduction and strict factual constraint verification.
 
 :::danger

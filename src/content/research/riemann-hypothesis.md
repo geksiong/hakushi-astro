@@ -1,5 +1,4 @@
 ---
-title: Riemann Zeta Function & Spectral Graph Theory
 collection: research
 category: Mathematics
 tags: [math, riemann, zeta, spectral-graph, number-theory]

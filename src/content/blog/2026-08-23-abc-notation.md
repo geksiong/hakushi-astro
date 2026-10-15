@@ -7,8 +7,6 @@ author: Hakushi
 summary: A demonstration of rendering sheet music inline from ABC notation code fences.
 ---
 
-# Sheet Music with ABC Notation
-
 Fences tagged with `abc` are rendered as engraved sheet music instead of code. The header pulls its title from the tune's `T:` field.
 
 ## Ode to Joy

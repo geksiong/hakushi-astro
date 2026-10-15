@@ -1,5 +1,4 @@
 ---
-title: Designing Intuitive Knowledge Base Navigation
 collection: blog
 category: Design Systems
 tags: [ui-ux, design, information-architecture, navigation]
