@@ -1,12 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
 import config from 'virtual:hakushi/config';
-import { ArticlePage } from 'virtual:hakushi/components';
+import { getArticleIndex } from '../lib/articles';
+import { CollectionPage } from 'virtual:hakushi/components';
 
-const entries = await (getCollection as any)(config.defaultCollection, ({ data }: any) => !data.draft);
-entries.sort((a: any, b: any) => (b.data.date?.toISOString?.() ?? '').localeCompare(a.data.date?.toISOString?.() ?? ''));
-const entry = entries[0];
-if (!entry) throw new Error(`[hakushi] No articles found in the "${config.defaultCollection}" collection.`);
+const articles = await getArticleIndex();
+
+const collection = {
+	id: 'all',
+	name: 'All Collections',
+	description: `Browse every article across all ${config.collections.length} collections.`,
+	iconName: 'Layers',
+} as any;
 ---
 
-<ArticlePage entry={entry} />
+<CollectionPage collection={collection} articles={articles} />

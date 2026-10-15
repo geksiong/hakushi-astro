@@ -1,19 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
-import ArticlePage from '../components/ArticlePage.astro';
 import { COLLECTIONS } from '../lib/collections';
+import { getArticleIndex } from '../lib/articles';
+import CollectionPage from '../components/CollectionPage.astro';
 
-// The home page shows the first collection - its most recent article, exactly
-// like the reference app defaults to the first note of "Technical Docs".
-const firstCollectionId = COLLECTIONS[0].id;
-const entries = await getCollection(firstCollectionId as 'docs', ({ data }) => !data.draft);
+const articles = await getArticleIndex();
 
-entries.sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? ''));
-const entry = entries[0];
-
-if (!entry) {
-	throw new Error(`No articles found in the "${firstCollectionId}" collection`);
-}
+const collection = {
+	id: 'all',
+	name: 'All Collections',
+	description: `Browse every article across all ${COLLECTIONS.length} collections.`,
+	iconName: 'Layers',
+} as any;
 ---
 
-<ArticlePage entry={entry} />
+<CollectionPage collection={collection} articles={articles} />

@@ -25,6 +25,7 @@ interface CollectionBrowserProps {
 	collection: CollectionConfig;
 	articles: ArticleMeta[];
 	articlesPerPage?: number;
+	collections?: CollectionConfig[];
 }
 
 const COLLECTION_ICONS: Record<string, any> = {
@@ -34,6 +35,7 @@ const COLLECTION_ICONS: Record<string, any> = {
 	FileText,
 	Share2,
 	Folder,
+	Layers,
 };
 
 type SortOrder = 'newest' | 'oldest' | 'title-asc' | 'title-desc';
@@ -42,6 +44,7 @@ export default function CollectionBrowser({
 	collection,
 	articles,
 	articlesPerPage = 5,
+	collections = [],
 }: CollectionBrowserProps) {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
@@ -154,6 +157,10 @@ export default function CollectionBrowser({
 	};
 
 	const IconComponent = COLLECTION_ICONS[collection.iconName ?? 'Folder'] || Folder;
+	const isAll = collection.id === 'all';
+
+	const getCollectionName = (id: string) =>
+		collections.find((c) => c.id === id)?.name ?? id;
 
 	// Helper to generate page number array with ellipsis
 	const getPageNumbers = () => {
@@ -180,15 +187,24 @@ export default function CollectionBrowser({
 		<div className="max-w-4xl mx-auto px-4 py-8 space-y-8 animate-in fade-in">
 			{/* Breadcrumb Path */}
 			<div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
-				<a href="/" className="hover:text-[var(--primary)] transition-colors flex items-center gap-1">
-					<Layers className="w-3.5 h-3.5" />
-					<span>Collections</span>
-				</a>
-				<ChevronRight className="w-3.5 h-3.5" />
-				<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
-					<IconComponent className="w-3.5 h-3.5 text-[var(--accent)]" />
-					{collection.name}
-				</span>
+				{isAll ? (
+					<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
+						<Layers className="w-3.5 h-3.5 text-[var(--accent)]" />
+						{collection.name}
+					</span>
+				) : (
+					<>
+						<a href="/" className="hover:text-[var(--primary)] transition-colors flex items-center gap-1">
+							<Layers className="w-3.5 h-3.5" />
+							<span>Collections</span>
+						</a>
+						<ChevronRight className="w-3.5 h-3.5" />
+						<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
+							<IconComponent className="w-3.5 h-3.5 text-[var(--accent)]" />
+							{collection.name}
+						</span>
+					</>
+				)}
 			</div>
 
 			{/* Collection Header Banner */}
@@ -215,7 +231,7 @@ export default function CollectionBrowser({
 							{articles.length} {articles.length === 1 ? 'article' : 'articles'}
 						</span>
 						<span className="px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] capitalize">
-							{collection.type === 'dated' ? 'Chronological' : 'Folder'}
+							{isAll ? 'Mixed' : collection.type === 'dated' ? 'Chronological' : 'Folder'}
 						</span>
 					</div>
 				</div>
@@ -229,7 +245,11 @@ export default function CollectionBrowser({
 							type="text"
 							value={searchQuery}
 							onChange={(e) => handleSearchChange(e.target.value)}
-							placeholder="Search in this collection (title, summary, tags, author)..."
+							placeholder={
+								isAll
+									? 'Search across all collections (title, summary, tags, author)...'
+									: 'Search in this collection (title, summary, tags, author)...'
+							}
 							className="w-full pl-9 pr-8 py-2 rounded-lg bg-[var(--bg-sidebar)] border border-[var(--border)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-hidden focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
 						/>
 						{searchQuery && (
@@ -283,7 +303,7 @@ export default function CollectionBrowser({
 				<div className="p-12 text-center rounded-2xl bg-[var(--bg-surface)] border border-dashed border-[var(--border)] space-y-3">
 					<Folder className="w-10 h-10 mx-auto text-[var(--text-muted)] opacity-50" />
 					<p className="font-semibold text-[var(--text-main)]">
-						{searchQuery ? 'No articles match your search' : 'No articles in this collection'}
+						{searchQuery ? 'No articles match your search' : isAll ? 'No articles yet' : 'No articles in this collection'}
 					</p>
 					{searchQuery && (
 						<p className="text-xs text-[var(--text-muted)]">
@@ -319,8 +339,19 @@ export default function CollectionBrowser({
 									) : (
 										<span className="inline-flex items-center gap-1 text-[var(--text-muted)]">
 											<FileText className="w-3 h-3" />
-											<span className="capitalize">{collection.name}</span>
+											<span className="capitalize">
+												{isAll ? getCollectionName(article.collection) : collection.name}
+											</span>
 										</span>
+									)}
+									{isAll && (
+										<a
+											href={`/${article.collection}`}
+											className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--primary)] hover:border-[var(--primary)]/50 transition-colors"
+										>
+											<Layers className="w-3 h-3" />
+											<span className="capitalize">{getCollectionName(article.collection)}</span>
+										</a>
 									)}
 								</div>
 

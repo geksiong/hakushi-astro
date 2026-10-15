@@ -1,6 +1,6 @@
 import type { AstroIntegration } from 'astro';
 
-export type HakushiIconName = 'BookOpen' | 'Calendar' | 'Microscope' | 'FileText' | 'Share2';
+export type HakushiIconName = 'BookOpen' | 'Calendar' | 'Microscope' | 'FileText' | 'Share2' | 'Folder' | 'Layers';
 export interface HakushiCollection {
 	id: string;
 	name: string;

@@ -13,6 +13,7 @@ export interface Props {
 const { collection, articles } = Astro.props;
 const title = `${collection.name} · ${config.title}`;
 const articlesPerPage = (collection as any).articlesPerPage ?? (config as any).articlesPerPage ?? 5;
+const allCollections = (config as any).collections ?? [];
 ---
 
 <BaseLayout title={title} description={collection.description || config.description}>
@@ -23,6 +24,7 @@ const articlesPerPage = (collection as any).articlesPerPage ?? (config as any).a
 			collection={collection}
 			articles={articles}
 			articlesPerPage={articlesPerPage}
+			collections={allCollections}
 		/>
 	</ReaderShell>
 </BaseLayout>

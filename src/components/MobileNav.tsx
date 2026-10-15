@@ -23,6 +23,10 @@ export default function MobileNav({ collections, articles }: MobileNavProps) {
 	useEffect(() => {
 		const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
 		setCurrentSlug(cleanPath);
+		if (cleanPath === '') {
+			setSelectedCollectionId('all');
+			return;
+		}
 		const firstSegment = cleanPath.split('/')[0];
 		if (collections.some((c) => c.id === firstSegment)) {
 			setSelectedCollectionId(firstSegment);
