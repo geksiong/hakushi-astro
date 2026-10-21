@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import { Folder, ChevronRight } from '@lucide/astro';
 import config from 'virtual:hakushi/config';
 import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
-import { getCollectionConfig } from '../lib/collections';
+import ArticleListing from '../components/ArticleListing';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/graph-data';
 
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 		for (const doc of entries) if (doc.data.category) {
 			const slug = taxonomySlug(doc.data.category);
 			if (!byCategory.has(slug)) byCategory.set(slug, { name: doc.data.category, articles: [] });
-			byCategory.get(slug)!.articles.push({ title: resolveEntryTitle(doc), summary: doc.data.summary ?? '', date: String(doc.data.date ?? ''), url: `/${doc.id}`, collection: id });
+			byCategory.get(slug)!.articles.push({ title: resolveEntryTitle(doc), summary: doc.data.summary ?? '', date: doc.data.date?.toISOString().slice(0, 10) ?? '', url: `/${doc.id}`, collection: id, mainImage: doc.data.mainImage });
 		}
 	}
 	return [...byCategory].map(([category, props]) => ({ params: { category }, props }));
@@ -33,7 +33,7 @@ articles.sort((a: any, b: any) => b.date.localeCompare(a.date));
 			<h1 class="flex items-center gap-2 text-3xl font-extrabold text-[var(--text-main)] font-heading"><Folder class="w-5 h-5 text-[var(--accent)]" />{name}</h1>
 			<p class="text-xs text-[var(--text-muted)] font-mono">{articles.length} {articles.length === 1 ? 'article' : 'articles'}</p>
 		</div>
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">{articles.map((article: any) => <a href={article.url} class="p-4 rounded-lg border border-[var(--border)] hover:bg-[var(--bg-surface)] transition-colors"><p class="font-semibold text-sm text-[var(--text-main)]">{article.title}</p><p class="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p><div class="flex justify-between mt-3 text-[11px] font-mono text-[var(--text-muted)]"><span>{getCollectionConfig(article.collection)?.name ?? article.collection}</span><span>{article.date}</span></div></a>)}</div>
+		<ArticleListing client:load articles={articles} collections={config.collections} storageKey={`hakushi_listing_layout:category:${Astro.params.category}`} />
 	</main>
 	</ReaderShell>
 </BaseLayout>

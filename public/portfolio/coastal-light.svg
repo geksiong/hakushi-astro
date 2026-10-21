@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Illustrated coastline at sunset">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#555d83"/><stop offset="1" stop-color="#e7a886"/></linearGradient>
+    <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#55798c"/><stop offset="1" stop-color="#233d59"/></linearGradient>
+  </defs>
+  <rect width="1200" height="470" fill="url(#sky)"/>
+  <circle cx="830" cy="315" r="110" fill="#f4d39a"/>
+  <path d="M0 425q240-35 490 0t710-10v335H0z" fill="url(#sea)"/>
+  <path d="M0 560q255-45 440 25t760 15v150H0z" fill="#2e5368"/>
+  <path d="M0 590q145-75 290-50t240 100q-250 10-530 110z" fill="#d6a17e"/>
+  <path d="M655 525h340M735 560h230M575 605h210" stroke="#f4d39a" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+</svg>

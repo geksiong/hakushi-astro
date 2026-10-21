@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Abstract studio identity in coral, cream, and navy">
+  <rect width="1200" height="750" fill="#edebe3"/>
+  <path d="M0 0h720v750H0z" fill="#d66d57"/>
+  <path d="M0 0h360v375H0z" fill="#e7a67a"/>
+  <path d="M360 375h360v375H360z" fill="#e7a67a"/>
+  <circle cx="360" cy="375" r="230" fill="#233446"/>
+  <path d="M720 0h480v290H720z" fill="#233446"/>
+  <path d="M720 290h480v460H720z" fill="#f4d6a7"/>
+  <path d="M815 395h290M815 455h290M815 515h205" stroke="#233446" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="1035" cy="145" r="55" fill="#f4d6a7"/>
+</svg>

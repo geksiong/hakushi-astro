@@ -16,6 +16,8 @@ import {
 	X,
 	SlidersHorizontal,
 	Layers,
+	LayoutGrid,
+	List,
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
@@ -49,6 +51,20 @@ export default function CollectionBrowser({
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 	const [pageSize, setPageSize] = useState<number>(articlesPerPage);
+	const [listingLayout, setListingLayout] = useState<'grid' | 'list'>('grid');
+
+	useEffect(() => {
+		try {
+			setListingLayout(localStorage.getItem(`hakushi_listing_layout:${collection.id}`) === 'list' ? 'list' : 'grid');
+		} catch {
+			setListingLayout('grid');
+		}
+	}, [collection.id]);
+
+	const changeListingLayout = (layout: 'grid' | 'list') => {
+		setListingLayout(layout);
+		try { localStorage.setItem(`hakushi_listing_layout:${collection.id}`, layout); } catch { /* storage can be unavailable */ }
+	};
 
 	useEffect(() => {
 		setPageSize(articlesPerPage);
@@ -254,7 +270,7 @@ export default function CollectionBrowser({
 		) : null;
 
 	return (
-		<div className="max-w-4xl mx-auto px-4 py-8 space-y-8 animate-in fade-in">
+		<div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-in fade-in">
 			{/* Breadcrumb Path */}
 			<div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
 				{isAll ? (
@@ -334,7 +350,7 @@ export default function CollectionBrowser({
 					</div>
 
 					{/* Sort & PageSize controls */}
-					<div className="flex items-center gap-3">
+					<div className="flex flex-wrap items-center gap-3">
 						<div className="flex items-center gap-1.5 text-[var(--text-muted)]">
 							<SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
 							<select
@@ -364,6 +380,10 @@ export default function CollectionBrowser({
 								))}
 							</select>
 						</div>
+						<div className="inline-flex rounded-full border border-[var(--border)] p-0.5" role="group" aria-label="Listing layout">
+							<button type="button" onClick={() => changeListingLayout('grid')} aria-pressed={listingLayout === 'grid'} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 font-medium ${listingLayout === 'grid' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><LayoutGrid className="w-3.5 h-3.5" />Grid</button>
+							<button type="button" onClick={() => changeListingLayout('list')} aria-pressed={listingLayout === 'list'} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 font-medium ${listingLayout === 'list' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><List className="w-3.5 h-3.5" />List</button>
+						</div>
 					</div>
 				</div>
 			</header>
@@ -391,6 +411,19 @@ export default function CollectionBrowser({
 						</p>
 					)}
 				</div>
+			) : listingLayout === 'grid' ? (
+				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+					{paginatedArticles.map((article) => (
+						<a key={article.slug} href={article.url} className="group overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)] transition-colors flex flex-col">
+							{article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className="w-full aspect-[16/10] object-cover" />}
+							<div className="min-w-0 p-4 flex-1">
+								<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
+								{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>}
+								<div className="flex flex-wrap justify-between gap-2 text-xs font-mono text-[var(--text-muted)] mt-3"><span>{getCollectionName(article.collection)}</span><span>{article.date}</span></div>
+							</div>
+						</a>
+					))}
+				</div>
 			) : (
 				<div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
 					{paginatedArticles.map((article) => (
@@ -398,6 +431,11 @@ export default function CollectionBrowser({
 							key={article.slug}
 							className="py-6 group relative space-y-2.5"
 						>
+							{article.mainImage && (
+								<a href={article.url} className="block overflow-hidden rounded-lg">
+									<img src={article.mainImage} alt="" loading="lazy" className="w-full max-h-80 object-cover" />
+								</a>
+							)}
 							{/* Top meta row: Category & Date */}
 							<div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[var(--text-muted)]">
 								<div className="flex items-center gap-2">

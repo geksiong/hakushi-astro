@@ -94,6 +94,12 @@ const toc = headings.filter((h) => h.depth <= 4);
 		}
 	</header>
 
+	{data.mainImage && (
+		<figure class="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
+			<img src={data.mainImage} alt={displayTitle} class="block w-full max-h-[36rem] object-contain" />
+		</figure>
+	)}
+
 	<!-- Mobile "On This Page" (the right-hand TOC card is hidden below lg) -->
 	{
 		toc.length > 0 && (

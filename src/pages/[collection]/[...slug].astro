@@ -1,13 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
 import ArticlePage from '../../components/ArticlePage.astro';
+import { COLLECTIONS } from '../../lib/collections';
 
 export async function getStaticPaths() {
-	const ids = ['docs', 'blog', 'research', 'specs', 'wiki'] as const;
 	const paths: Array<{ params: { collection: string; slug: string }; props: { entry: any } }> = [];
 
-	for (const id of ids) {
-		const entries = await getCollection(id, ({ data }) => !data.draft);
+	for (const { id } of COLLECTIONS) {
+		const entries = await getCollection(id as 'docs', ({ data }) => !data.draft);
 		for (const entry of entries) {
 			paths.push({ params: { collection: id, slug: entry.id }, props: { entry } });
 		}

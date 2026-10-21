@@ -31,7 +31,7 @@ import { createHakushiCollections } from 'hakushi/loaders';
 export const collections = createHakushiCollections();
 ```
 
-Add Markdown to any default directory: `src/content/docs`, `blog`, `research`, `specs`, or `wiki`. At least `docs` must contain an article:
+Add Markdown to any default directory: `src/content/docs`, `blog`, `research`, `specs`, `wiki`, or `portfolio`. At least `docs` must contain an article:
 
 ```md
 ---
@@ -49,7 +49,33 @@ Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/do
 
 ## Frontmatter and schema
 
-No field is required. The built-in schema accepts `title`, `summary`, `category`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
+No field is required. The built-in schema accepts `title`, `summary`, `category`, `mainImage`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
+
+Every collection, category, and tag listing lets readers switch between grid and list layouts. The choice is saved for each listing. The default `portfolio` collection contains sample projects, artwork, and visual studies; it needs no special collection type. Add an optional `mainImage` to each article to show it in listings and above the article body. Use a path from `public/` (for example `/images/studio.jpg`) or an absolute image URL. Articles without an image display as text cards.
+
+For a custom portfolio collection, give the integration and loader the same ID:
+
+```js
+// astro.config.mjs
+collections: [{ id: 'projects', name: 'Projects', iconName: 'Layers' }]
+```
+
+```ts
+// src/content.config.ts
+export const collections = createHakushiCollections({ collections: [{ id: 'projects' }] });
+```
+
+Then add an article at `src/content/projects/studio-renovation.md`:
+
+```md
+---
+title: Studio renovation
+mainImage: /images/studio.jpg
+summary: A small workspace redesign.
+---
+
+Project details go here.
+```
 
 Extend it with project fields:
 
@@ -87,6 +113,7 @@ hakushi({
   collections: [
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
+    { id: 'projects', name: 'Projects', iconName: 'Layers', articlesPerPage: 9 },
   ],
   about: {
     title: 'About',

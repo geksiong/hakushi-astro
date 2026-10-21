@@ -52,6 +52,14 @@ export const DEFAULT_COLLECTIONS = [
 		iconName: 'Share2',
 		type: 'folder',
 	},
+	{
+		id: 'portfolio',
+		name: 'Portfolio',
+		description: 'Selected projects, artwork, and visual studies.',
+		iconName: 'Layers',
+		type: 'folder',
+		articlesPerPage: 9,
+	},
 ];
 
 export const DEFAULT_CONFIG = {

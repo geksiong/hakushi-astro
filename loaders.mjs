@@ -7,6 +7,7 @@ export function hakushiSchema({ extend = {} } = {}) {
 	return z.object({
 		title: z.string().optional(),
 		category: z.string().optional(),
+		mainImage: z.string().optional(),
 		tags: z.array(z.string()).default([]),
 		date: z.coerce.date().optional(),
 		author: z.string().optional(),
@@ -22,7 +23,7 @@ export function hakushiLoader({ base, pattern = '**/*.md' }) {
 }
 
 /**
- * Create the five default content collections. Individual definitions can be
+ * Create the default content collections. Individual definitions can be
  * replaced by spreading this result in `src/content.config.ts`.
  */
 export function createHakushiCollections({ base = './src/content', schema = hakushiSchema(), collections = DEFAULT_COLLECTIONS } = {}) {

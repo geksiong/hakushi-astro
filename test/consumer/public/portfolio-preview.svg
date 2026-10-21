@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Abstract portfolio preview">
+  <rect width="800" height="500" fill="#26334c"/>
+  <circle cx="410" cy="235" r="150" fill="#75b7a8"/>
+  <path d="M0 420 220 240l160 140 160-170 260 200v90H0z" fill="#e8bb7d"/>
+</svg>

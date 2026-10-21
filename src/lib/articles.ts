@@ -33,6 +33,7 @@ export interface ArticleMeta {
 	collection: string;
 	title: string;
 	category?: string;
+	mainImage?: string;
 	tags: string[];
 	date?: string;
 	author?: string;
@@ -47,6 +48,7 @@ function toMeta(entry: ArticleEntry): ArticleMeta {
 		collection: entry.collection,
 		title: resolveEntryTitle(entry),
 		category: entry.data.category,
+		mainImage: entry.data.mainImage,
 		tags: entry.data.tags ?? [],
 		date: entry.data.date ? entry.data.date.toISOString().slice(0, 10) : undefined,
 		author: entry.data.author,

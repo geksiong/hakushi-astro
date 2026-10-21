@@ -4,7 +4,8 @@ import { Folder, ChevronRight } from '@lucide/astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import ReaderShell from '../../layouts/ReaderShell.astro';
-import { COLLECTIONS, getCollectionConfig } from '../../lib/collections';
+import { COLLECTIONS } from '../../lib/collections';
+import ArticleListing from '../../components/ArticleListing';
 import { resolveEntryTitle } from '../../lib/title';
 import { taxonomySlug } from '../../lib/graph-data';
 
@@ -14,6 +15,7 @@ interface ArticleCard {
 	date: string;
 	url: string;
 	collection: string;
+	mainImage?: string;
 }
 
 interface Props {
@@ -40,9 +42,10 @@ export async function getStaticPaths() {
 			byCategory.get(slug)!.articles.push({
 				title: resolveEntryTitle(doc),
 				summary: doc.data.summary ?? '',
-				date: String(doc.data.date ?? ''),
+				date: doc.data.date?.toISOString().slice(0, 10) ?? '',
 				url: `/${doc.id}`,
 				collection: id,
+				mainImage: doc.data.mainImage,
 			});
 		}
 	}
@@ -84,25 +87,7 @@ articles.sort((a, b) => b.date.localeCompare(a.date));
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-			{
-				articles.map((article) => (
-					<a
-						href={article.url}
-						class="p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)] transition-all group shadow-2xs"
-					>
-						<p class="font-semibold text-sm text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">
-							{article.title}
-						</p>
-						<p class="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>
-						<div class="flex items-center justify-between gap-2 mt-3 text-[11px] font-mono text-[var(--text-muted)]">
-							<span class="capitalize">{getCollectionConfig(article.collection)?.name ?? article.collection}</span>
-							<span>{article.date}</span>
-						</div>
-					</a>
-				))
-			}
-		</div>
+		<ArticleListing client:load articles={articles} collections={COLLECTIONS} storageKey={`hakushi_listing_layout:category:${Astro.params.category}`} />
 	</main>
 	</ReaderShell>
 </BaseLayout>

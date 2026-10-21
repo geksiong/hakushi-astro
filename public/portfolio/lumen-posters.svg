@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Abstract poster composition with luminous overlapping circles">
+  <rect width="1200" height="750" fill="#202339"/>
+  <rect x="80" y="75" width="1040" height="600" rx="24" fill="#292b47"/>
+  <circle cx="500" cy="370" r="250" fill="#f5b368"/>
+  <circle cx="700" cy="355" r="210" fill="#e26b78" opacity=".86"/>
+  <circle cx="610" cy="465" r="175" fill="#8d8fd6" opacity=".82"/>
+  <path d="M180 130h225M180 170h135M850 580h170M910 615h110" stroke="#f7e4c9" stroke-width="13" stroke-linecap="round"/>
+  <circle cx="1010" cy="170" r="24" fill="#f7e4c9"/>
+</svg>
