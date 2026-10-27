@@ -16,7 +16,7 @@ const paragraphs = about.content
 	.filter(Boolean);
 ---
 
-<div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+<div class="article-container space-y-6">
 	<!-- Breadcrumb Path -->
 	<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
 		<a href="/" class="hover:text-[var(--primary)] transition-colors">Home</a>
@@ -27,7 +27,8 @@ const paragraphs = about.content
 	<!-- Page Header -->
 	<header class="space-y-4 pb-6 border-b border-[var(--border)]">
 		<h1
-			class="text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
+			class="font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
+			style="font-size: calc(var(--font-size-h1, 2.15rem) * 1.15);"
 		>
 			{about.title}
 		</h1>

@@ -43,7 +43,14 @@ export interface HakushiOptions {
 	/** Icon-only links on the right side of the header (e.g. social/contact links). Defaults to none. */
 	headerLinks?: HakushiHeaderLink[];
 	articlesPerPage?: number;
-	theme?: { mode?: 'light' | 'dark' | 'auto'; colorScheme?: string; style?: string };
+	theme?: {
+		mode?: 'light' | 'dark' | 'auto';
+		colorScheme?: string;
+		style?: string;
+		layout?: string;
+		fontSize?: string;
+		preset?: string;
+	};
 	customCss?: (string | URL)[];
 	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage', string | URL>>;
 	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'categories' | 'about' | 'notFound', boolean>>;
@@ -58,7 +65,14 @@ export default function hakushi(options?: HakushiOptions): AstroIntegration[];
 declare module 'virtual:hakushi/config' {
 	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'favicon' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
 		articlesPerPage: number;
-		theme: { mode: 'light' | 'dark' | 'auto'; colorScheme: string; style: string };
+		theme: {
+			mode: 'light' | 'dark' | 'auto';
+			colorScheme: string;
+			style: string;
+			layout?: string;
+			fontSize?: string;
+			preset?: string;
+		};
 	};
 	export default config;
 }

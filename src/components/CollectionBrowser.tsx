@@ -270,7 +270,7 @@ export default function CollectionBrowser({
 		) : null;
 
 	return (
-		<div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-in fade-in">
+		<div className="collection-browser-container space-y-8 animate-in fade-in">
 			{/* Breadcrumb Path */}
 			<div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
 				{isAll ? (

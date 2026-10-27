@@ -27,7 +27,165 @@
 	--font-code: 'Fira Code', monospace;
 	--radius: 0.5rem;
 
+	/* Dynamic Layout Dimensions & Rhythm */
+	--shell-max-width: 82rem;
+	--content-max-width: 52rem;
+	--content-padding-x: 1.75rem;
+	--content-padding-y: 2rem;
+	--line-height-body: 1.75;
+	--line-height-heading: 1.25;
+	--spacing-paragraph: 0.95rem;
+	--card-padding: 1.25rem;
+
+	/* Dynamic Typographic Scale */
+	--font-size-base: 1rem;
+	--font-size-h1: 2.15rem;
+	--font-size-h2: 1.55rem;
+	--font-size-h3: 1.25rem;
+
 	color-scheme: light;
+}
+
+/* ---------------------------------------------------------------------------
+ * Direct Layout Schemes: Compact, Comfortable, Spacious
+ * ------------------------------------------------------------------------- */
+html[data-layout="compact"] {
+	--shell-max-width: 74rem;
+	--content-max-width: 44rem;
+	--content-padding-x: 1rem;
+	--content-padding-y: 1.25rem;
+	--line-height-body: 1.55;
+	--line-height-heading: 1.2;
+	--spacing-paragraph: 0.55rem;
+	--card-padding: 0.75rem;
+}
+
+html[data-layout="comfortable"] {
+	--shell-max-width: 82rem;
+	--content-max-width: 52rem;
+	--content-padding-x: 1.75rem;
+	--content-padding-y: 2rem;
+	--line-height-body: 1.75;
+	--line-height-heading: 1.25;
+	--spacing-paragraph: 0.95rem;
+	--card-padding: 1.25rem;
+}
+
+html[data-layout="spacious"] {
+	--shell-max-width: 96rem;
+	--content-max-width: 64rem;
+	--content-padding-x: 2.75rem;
+	--content-padding-y: 3rem;
+	--line-height-body: 1.95;
+	--line-height-heading: 1.32;
+	--spacing-paragraph: 1.35rem;
+	--card-padding: 1.75rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Direct Root Font-Size Scaling: Guaranteed full-document rem response
+ * ------------------------------------------------------------------------- */
+html[data-font-size="sm"] {
+	font-size: 14px;
+	--font-size-base: 0.875rem;
+	--font-size-h1: 1.75rem;
+	--font-size-h2: 1.35rem;
+	--font-size-h3: 1.1rem;
+}
+
+html[data-font-size="md"] {
+	font-size: 16px;
+	--font-size-base: 1rem;
+	--font-size-h1: 2.15rem;
+	--font-size-h2: 1.55rem;
+	--font-size-h3: 1.25rem;
+}
+
+html[data-font-size="lg"] {
+	font-size: 18px;
+	--font-size-base: 1.125rem;
+	--font-size-h1: 2.45rem;
+	--font-size-h2: 1.75rem;
+	--font-size-h3: 1.35rem;
+}
+
+html[data-font-size="xl"] {
+	font-size: 20px;
+	--font-size-base: 1.25rem;
+	--font-size-h1: 2.75rem;
+	--font-size-h2: 1.95rem;
+	--font-size-h3: 1.45rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Preset Thematic Atmospheres & Artistic Nuances
+ * ------------------------------------------------------------------------- */
+html[data-preset="paper"] {
+	--radius: 0.375rem;
+}
+
+html[data-preset="paper"] .md-body {
+	letter-spacing: 0.005em;
+}
+
+html[data-preset="paper"] .md-body a:not(.wikilink) {
+	text-decoration-style: dotted;
+	text-underline-offset: 3px;
+}
+
+html[data-preset="paper"] .md-body blockquote {
+	border-left-color: var(--primary);
+	font-style: italic;
+	font-family: var(--font-body);
+}
+
+html[data-preset="academic"] {
+	--radius: 0.2rem;
+}
+
+html[data-preset="academic"] .md-body h1,
+html[data-preset="academic"] .md-body h2,
+html[data-preset="academic"] .md-body h3 {
+	letter-spacing: -0.015em;
+}
+
+html[data-preset="academic"] .md-body table {
+	border-top-width: 2px;
+	border-bottom-width: 2px;
+}
+
+html[data-preset="refined"] {
+	--radius: 0.375rem;
+}
+
+html[data-preset="refined"] .md-body h1 {
+	font-style: normal;
+	letter-spacing: -0.02em;
+}
+
+html[data-preset="social"] {
+	--radius: 0.875rem;
+}
+
+html[data-preset="social"] .md-body h1,
+html[data-preset="social"] .md-body h2 {
+	letter-spacing: -0.03em;
+}
+
+html[data-preset="earth"] {
+	--radius: 0.5rem;
+}
+
+html[data-preset="earth"] .md-body blockquote {
+	border-left-color: var(--primary);
+	background: color-mix(in srgb, var(--primary) 4%, transparent);
+	padding: 0.75rem 1rem;
+	border-radius: 0 0.375rem 0.375rem 0;
+}
+
+html[data-preset="earth"] .md-body a:not(.wikilink) {
+	text-decoration-color: color-mix(in srgb, var(--primary) 50%, transparent);
+	text-underline-offset: 3px;
 }
 
 .dark {
@@ -57,68 +215,65 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+ * Adaptive Content Containers
+ * Responsive to user layout preference (compact, comfortable, spacious).
+ * ------------------------------------------------------------------------- */
+.reader-shell {
+	width: 100%;
+	max-width: var(--shell-max-width, 82rem);
+	transition: max-width 200ms ease;
+}
+
+.header-container {
+	width: 100%;
+	max-width: var(--shell-max-width, 82rem);
+	transition: max-width 200ms ease;
+}
+
+.article-container {
+	width: 100%;
+	max-width: var(--content-max-width, 52rem);
+	padding-left: var(--content-padding-x, 1.75rem);
+	padding-right: var(--content-padding-x, 1.75rem);
+	padding-top: var(--content-padding-y, 2rem);
+	padding-bottom: var(--content-padding-y, 2rem);
+	margin-left: auto;
+	margin-right: auto;
+	transition: max-width 200ms ease, padding 200ms ease;
+}
+
+.collection-browser-container {
+	width: 100%;
+	max-width: calc(var(--content-max-width, 52rem) + 12rem);
+	padding-left: var(--content-padding-x, 1.75rem);
+	padding-right: var(--content-padding-x, 1.75rem);
+	padding-top: var(--content-padding-y, 2rem);
+	padding-bottom: var(--content-padding-y, 2rem);
+	margin-left: auto;
+	margin-right: auto;
+	transition: max-width 200ms ease, padding 200ms ease;
+}
+
+/* ---------------------------------------------------------------------------
  * Markdown article body - mirrors the element classes used by the reference
- * ArticleView renderer.
+ * ArticleView renderer, enhanced for dynamic typography & layout scales.
  * ------------------------------------------------------------------------- */
 .md-body {
-	font-size: 1rem;
-	line-height: 1.75;
+	font-size: var(--font-size-base, 1rem);
+	line-height: var(--line-height-body, 1.75);
 	word-wrap: break-word;
-}
-
-.md-body h1,
-.md-body h2,
-.md-body h3,
-.md-body h4 {
-	font-family: var(--font-heading);
-	color: var(--text-main);
-	scroll-margin-top: 6rem;
-}
-
-.md-body h1 {
-	font-size: 1.875rem;
-	line-height: 2.25rem;
-	font-weight: 800;
-	letter-spacing: -0.025em;
-	margin: 1.5rem 0;
-	padding-bottom: 0.5rem;
-	border-bottom: 1px solid var(--border);
-}
-
-@media (min-width: 768px) {
-	.md-body h1 {
-		font-size: 2rem;
-		line-height: 2.5rem;
-	}
-}
-
-.md-body h2 {
-	font-size: 1.25rem;
-	line-height: 1.75rem;
-	font-weight: 700;
-	margin: 1.25rem 0;
-}
-
-@media (min-width: 768px) {
-	.md-body h2 {
-		font-size: 1.5rem;
-		line-height: 2rem;
-	}
-}
-
-.md-body h3 {
-	font-size: 1.125rem;
-	font-weight: 600;
-	margin: 1rem 0;
+	transition: font-size 150ms ease, line-height 150ms ease;
 }
 
 .md-body p {
-	margin: 0.75rem 0;
+	font-size: 1em;
+	line-height: var(--line-height-body, 1.75);
+	margin: var(--spacing-paragraph, 0.95rem) 0;
 }
 
 .md-body ul,
 .md-body ol {
-	margin: 0.75rem 0;
+	margin: var(--spacing-paragraph, 0.95rem) 0;
 	padding-left: 1.5rem;
 }
 
@@ -131,18 +286,54 @@ body {
 }
 
 .md-body li {
-	margin: 0.375rem 0;
+	font-size: 1em;
+	line-height: var(--line-height-body, 1.75);
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 0.4) 0;
 }
 
 .md-body li > ul,
 .md-body li > ol {
-	margin: 0.25rem 0;
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 0.25) 0;
+}
+
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4 {
+	font-family: var(--font-heading);
+	color: var(--text-main);
+	line-height: var(--line-height-heading, 1.25);
+	scroll-margin-top: 6rem;
+}
+
+.md-body h1 {
+	font-size: var(--font-size-h1, 2.15rem);
+	line-height: var(--line-height-heading, 1.2);
+	font-weight: 800;
+	letter-spacing: -0.025em;
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 2) 0 var(--spacing-paragraph, 0.95rem);
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.md-body h2 {
+	font-size: var(--font-size-h2, 1.55rem);
+	line-height: var(--line-height-heading, 1.25);
+	font-weight: 700;
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 1.8) 0 calc(var(--spacing-paragraph, 0.95rem) * 0.6);
+}
+
+.md-body h3 {
+	font-size: var(--font-size-h3, 1.25rem);
+	line-height: var(--line-height-heading, 1.25);
+	font-weight: 600;
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 1.4) 0 calc(var(--spacing-paragraph, 0.95rem) * 0.5);
 }
 
 .md-body hr {
 	border: 0;
 	border-top: 1px solid var(--border);
-	margin: 2rem 0;
+	margin: calc(var(--spacing-paragraph, 0.95rem) * 2.5) 0;
 }
 
 .md-body strong {

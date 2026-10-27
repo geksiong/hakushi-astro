@@ -78,5 +78,7 @@ export const DEFAULT_CONFIG = {
 		mode: 'dark',
 		colorScheme: 'hakushi',
 		style: 'sans',
+		layout: 'comfortable',
+		fontSize: 'md',
 	},
 };
