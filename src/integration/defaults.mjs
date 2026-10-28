@@ -65,7 +65,7 @@ export const DEFAULT_COLLECTIONS = [
 export const DEFAULT_CONFIG = {
 	title: 'Hakushi',
 	description: 'Notes & Knowledge Graph Engine',
-	versionLabel: 'v2.5',
+	versionLabel: '',
 	lang: 'en',
 	favicon: null,
 	defaultCollection: 'docs',

@@ -1,6 +1,5 @@
 ---
 import {
-	Sparkles,
 	Search,
 	Menu,
 	BookOpen,
@@ -59,7 +58,7 @@ const headerLinks = config.headerLinks ?? [];
 ---
 
 <header
-	class="sticky top-0 z-30 w-full bg-[var(--bg-main)]/80 backdrop-blur-md border-b border-[var(--border)] px-4 py-3 transition-colors duration-200"
+	class="sticky top-0 z-30 w-full h-16 flex items-center bg-[var(--bg-main)]/80 backdrop-blur-md border-b border-[var(--border)] px-4 transition-colors duration-200"
 >
 	<div class="header-container mx-auto flex items-center justify-between gap-4">
 		<!-- Left: Mobile Menu Toggle + Brand Logo & Title -->
@@ -72,42 +71,28 @@ const headerLinks = config.headerLinks ?? [];
 			>
 				<Menu class="w-5 h-5" />
 			</button>
-			<a href="/" class="flex items-center gap-3">
-				<div
-					class="w-8 h-8 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center font-bold"
-				>
-					<Sparkles class="w-4 h-4" />
-				</div>
-				<div>
-					<div class="flex items-center gap-2">
-						<span class="font-extrabold text-base tracking-tight text-[var(--text-main)] font-heading">
-							{config.title}
-						</span>
-						<span
-							class="px-2 py-0.5 rounded-full bg-[var(--primary)]/[0.07] text-[var(--primary)] font-mono text-[10px] font-medium"
-						>
-							{config.versionLabel}
-						</span>
-					</div>
-					<p class="text-[11px] text-[var(--text-muted)] hidden sm:block">
-						{config.description}
-					</p>
-				</div>
+			<a href="/" class="flex items-baseline gap-2">
+				<span class="font-extrabold text-base tracking-tight text-[var(--text-main)] font-heading">
+					{config.title}
+				</span>
+				{config.versionLabel && (
+					<span class="text-[11px] text-[var(--text-muted)]">{config.versionLabel}</span>
+				)}
 			</a>
 		</div>
 
-		<!-- Middle: prominent search -->
-		<div class="flex-1 flex justify-center px-2">
+		<!-- Middle: search - a full pill from sm up, an icon button on phones -->
+		<div class="flex-1 flex justify-end sm:justify-center sm:px-2">
 			<button
 				id="open-search"
 				type="button"
-				title="Search (press / or ⌘K)"
-				class="w-full max-w-md flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-sidebar)]/60 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--border)]/40 transition-colors text-xs"
+				aria-label="Search"
+				title="Search (press /)"
+				class="sm:w-full sm:max-w-md flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-md sm:rounded-full sm:bg-[var(--bg-sidebar)]/60 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-sidebar)] sm:hover:bg-[var(--border)]/40 transition-colors text-xs"
 			>
-				<Search class="w-3.5 h-3.5 shrink-0" />
+				<Search class="w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0" />
 				<span class="hidden sm:inline flex-1 text-left">Search notes...</span>
 				<kbd class="hidden md:inline px-1.5 py-0.5 rounded-md bg-[var(--bg-surface)] font-mono text-[10px]">/</kbd>
-				<kbd class="hidden md:inline px-1.5 py-0.5 rounded-md bg-[var(--bg-surface)] font-mono text-[10px]">⌘K</kbd>
 			</button>
 		</div>
 
