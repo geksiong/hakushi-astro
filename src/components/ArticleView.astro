@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, ChevronDown } from '@lucide/astro';
+import { ChevronRight, ChevronDown, Pause, Play, Square } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
@@ -64,15 +64,27 @@ const displayDate = formatDate(date);
 				config.readAloud && (
 					<span id="read-aloud" hidden>
 						{' · '}
-						<button type="button" data-read-aloud-toggle class="hover:text-[var(--text-main)] transition-colors">
-							Listen
+						<button
+							type="button"
+							data-read-aloud-toggle
+							aria-label="Read article aloud"
+							title="Read article aloud"
+							class="inline-flex items-center align-middle -mt-px hover:text-[var(--text-main)] transition-colors"
+						>
+							<span data-read-aloud-label>Listen</span>
+							<Pause data-read-aloud-icon="pause" class="w-3.5 h-3.5" hidden />
+							<Play data-read-aloud-icon="play" class="w-3.5 h-3.5" hidden />
 						</button>
-						<span data-read-aloud-stop-group hidden>
-							{' · '}
-							<button type="button" data-read-aloud-stop class="hover:text-[var(--text-main)] transition-colors">
-								Stop
-							</button>
-						</span>
+						<button
+							type="button"
+							data-read-aloud-stop
+							aria-label="Stop reading"
+							title="Stop reading"
+							class="ml-2 inline-flex items-center align-middle -mt-px hover:text-[var(--text-main)] transition-colors"
+							hidden
+						>
+							<Square class="w-3.5 h-3.5" />
+						</button>
 					</span>
 				)
 			}

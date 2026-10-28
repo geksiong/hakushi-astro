@@ -6,9 +6,10 @@ const BUTTON =
 ---
 
 <!--
-	Bottom-right controls that fade in once the page is scrolled down: scroll
+	Controls that fade in at the bottom once the page is scrolled down: scroll
 	to top, plus pause/resume and stop while an article is being read aloud
-	(the header's Listen control is off screen by then).
+	(the header's Listen control is off screen by then). Fixed to the viewport
+	bottom but lined up with the right edge of the content column.
 -->
 <div
 	id="floating-controls"
@@ -38,6 +39,24 @@ const BUTTON =
 	const scrollTop = root?.querySelector<HTMLButtonElement>('[data-scroll-top]');
 
 	if (root && readAloud && toggle && stop && scrollTop) {
+		// Line the cluster up with the right edge of the page's text column
+		// (inside its padding) rather than the browser edge. Re-run whenever
+		// the main column resizes, e.g. when a sidebar is collapsed.
+		const CONTENT = 'main.article-container, main .article-container, main .collection-browser-container';
+		const place = () => {
+			const content = document.querySelector<HTMLElement>(CONTENT) ?? document.querySelector<HTMLElement>('main');
+			if (!content) return;
+			const edge = content.getBoundingClientRect().right - (parseFloat(getComputedStyle(content).paddingRight) || 0);
+			// Measure the fixed containing block's right edge from the cluster
+			// itself: clientWidth can include the reserved scrollbar gutter.
+			const viewportRight = root.getBoundingClientRect().right + (parseFloat(getComputedStyle(root).right) || 0);
+			root.style.right = `${Math.max(16, viewportRight - edge)}px`;
+		};
+		place();
+		window.addEventListener('resize', place);
+		const main = document.querySelector('main');
+		if (main) new ResizeObserver(place).observe(main);
+
 		const SHOW_AFTER = 400;
 		const update = () => {
 			root.toggleAttribute('data-visible', window.scrollY > SHOW_AFTER);

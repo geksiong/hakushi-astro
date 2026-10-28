@@ -84,9 +84,11 @@ function collectChunks(lang: string): Chunk[] {
 export function setupReadAloud() {
 	const root = document.getElementById('read-aloud');
 	const toggle = root?.querySelector<HTMLButtonElement>('[data-read-aloud-toggle]');
-	const stopGroup = root?.querySelector<HTMLElement>('[data-read-aloud-stop-group]');
+	const label = toggle?.querySelector<HTMLElement>('[data-read-aloud-label]');
+	const pauseIcon = toggle?.querySelector<SVGElement>('[data-read-aloud-icon="pause"]');
+	const playIcon = toggle?.querySelector<SVGElement>('[data-read-aloud-icon="play"]');
 	const stopButton = root?.querySelector<HTMLButtonElement>('[data-read-aloud-stop]');
-	if (!root || !toggle || !stopGroup || !stopButton) return;
+	if (!root || !toggle || !label || !pauseIcon || !playIcon || !stopButton) return;
 	if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
 
 	const synth = window.speechSynthesis;
@@ -121,9 +123,14 @@ export function setupReadAloud() {
 
 	const render = (next: State) => {
 		state = next;
-		toggle.textContent = state === 'playing' ? 'Pause' : state === 'paused' ? 'Resume' : 'Listen';
-		toggle.setAttribute('aria-label', state === 'idle' ? 'Read article aloud' : `${toggle.textContent} reading`);
-		stopGroup.hidden = state === 'idle';
+		// Idle shows the "Listen" label; while reading, pause/resume and stop icons.
+		const name = state === 'playing' ? 'Pause reading' : state === 'paused' ? 'Resume reading' : 'Read article aloud';
+		toggle.setAttribute('aria-label', name);
+		toggle.title = name;
+		label.hidden = state !== 'idle';
+		pauseIcon.toggleAttribute('hidden', state !== 'playing');
+		playIcon.toggleAttribute('hidden', state !== 'paused');
+		stopButton.hidden = state === 'idle';
 		if (state === 'idle') highlight(null);
 		document.dispatchEvent(new CustomEvent('hakushi:read-aloud-state', { detail: { state } }));
 	};
