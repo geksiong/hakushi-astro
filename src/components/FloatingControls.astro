@@ -1,0 +1,70 @@
+---
+import { ArrowUp, Pause, Play, Square } from '@lucide/astro';
+
+const BUTTON =
+	'p-2.5 rounded-full border border-[var(--border)] bg-[var(--bg-surface)]/90 backdrop-blur-md text-[var(--text-muted)] hover:text-[var(--text-main)] shadow-sm transition-colors';
+---
+
+<!--
+	Bottom-right controls that fade in once the page is scrolled down: scroll
+	to top, plus pause/resume and stop while an article is being read aloud
+	(the header's Listen control is off screen by then).
+-->
+<div
+	id="floating-controls"
+	class="floating-controls fixed z-30 flex items-center gap-2 bottom-[max(1rem,env(safe-area-inset-bottom))] right-4"
+>
+	<div data-floating-read-aloud class="flex items-center gap-2" hidden>
+		<button type="button" data-floating-read-aloud-toggle aria-label="Pause reading" title="Pause reading" class={BUTTON}>
+			<Pause data-icon="pause" class="w-4 h-4" />
+			<Play data-icon="play" class="w-4 h-4" hidden />
+		</button>
+		<button type="button" data-floating-read-aloud-stop aria-label="Stop reading" title="Stop reading" class={BUTTON}>
+			<Square class="w-4 h-4" />
+		</button>
+	</div>
+	<button type="button" data-scroll-top aria-label="Scroll to top" title="Scroll to top" class={BUTTON}>
+		<ArrowUp class="w-4 h-4" />
+	</button>
+</div>
+
+<script>
+	import type { ReadAloudState } from '../scripts/read-aloud';
+
+	const root = document.getElementById('floating-controls');
+	const readAloud = root?.querySelector<HTMLElement>('[data-floating-read-aloud]');
+	const toggle = root?.querySelector<HTMLButtonElement>('[data-floating-read-aloud-toggle]');
+	const stop = root?.querySelector<HTMLButtonElement>('[data-floating-read-aloud-stop]');
+	const scrollTop = root?.querySelector<HTMLButtonElement>('[data-scroll-top]');
+
+	if (root && readAloud && toggle && stop && scrollTop) {
+		const SHOW_AFTER = 400;
+		const update = () => {
+			root.toggleAttribute('data-visible', window.scrollY > SHOW_AFTER);
+		};
+		update();
+		window.addEventListener('scroll', update, { passive: true });
+
+		scrollTop.addEventListener('click', () => {
+			window.dispatchEvent(new CustomEvent('hakushi:user-scroll'));
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+		});
+
+		const command = (action: 'toggle' | 'stop') =>
+			document.dispatchEvent(new CustomEvent('hakushi:read-aloud-command', { detail: { action } }));
+		toggle.addEventListener('click', () => command('toggle'));
+		stop.addEventListener('click', () => command('stop'));
+
+		document.addEventListener('hakushi:read-aloud-state', (e) => {
+			const state = (e as CustomEvent<{ state: ReadAloudState }>).detail.state;
+			readAloud.hidden = state === 'idle';
+			const playing = state === 'playing';
+			const label = playing ? 'Pause reading' : 'Resume reading';
+			toggle.setAttribute('aria-label', label);
+			toggle.title = label;
+			toggle.querySelector<SVGElement>('[data-icon="pause"]')?.toggleAttribute('hidden', !playing);
+			toggle.querySelector<SVGElement>('[data-icon="play"]')?.toggleAttribute('hidden', playing);
+		});
+	}
+</script>

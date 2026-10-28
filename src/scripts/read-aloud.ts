@@ -10,7 +10,15 @@
  * block is queued as its own utterance (long ones split by sentence), which
  * keeps Chrome from cutting off long utterances and lets the block being
  * spoken be highlighted.
+ *
+ * Other controls (the floating cluster) stay in sync through two document
+ * events: `hakushi:read-aloud-state` ({ state }) is dispatched on every state
+ * change, and `hakushi:read-aloud-command` ({ action: 'toggle' | 'stop' })
+ * drives playback.
  */
+
+export type ReadAloudState = 'idle' | 'playing' | 'paused';
+export type ReadAloudCommand = 'toggle' | 'stop';
 
 const BLOCKS = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, dt, dd, figcaption, .callout-title';
 const SKIP = 'pre, .code-block, .chart-block, .abc-block, .mermaid, mjx-container, svg, table, button, script, style, [aria-hidden="true"]';
@@ -83,9 +91,12 @@ export function setupReadAloud() {
 
 	const synth = window.speechSynthesis;
 	const lang = document.documentElement.lang;
-	type State = 'idle' | 'playing' | 'paused';
+	type State = ReadAloudState;
 	let state: State = 'idle';
 	let current: HTMLElement | null = null;
+	// Follow the spoken block by scrolling, until the reader scrolls on their
+	// own; following resumes once the spoken block is back on screen.
+	let follow = true;
 	// Bumped on every stop so callbacks from cancelled utterances are ignored.
 	let session = 0;
 
@@ -100,7 +111,10 @@ export function setupReadAloud() {
 		if (!el) return;
 		el.classList.add('read-aloud-current');
 		const rect = el.getBoundingClientRect();
-		if (rect.top < 80 || rect.bottom > window.innerHeight) {
+		const onScreen = rect.top >= 80 && rect.bottom <= window.innerHeight;
+		if (onScreen) {
+			follow = true;
+		} else if (follow) {
 			el.scrollIntoView({ block: 'center', behavior: 'smooth' });
 		}
 	};
@@ -111,6 +125,7 @@ export function setupReadAloud() {
 		toggle.setAttribute('aria-label', state === 'idle' ? 'Read article aloud' : `${toggle.textContent} reading`);
 		stopGroup.hidden = state === 'idle';
 		if (state === 'idle') highlight(null);
+		document.dispatchEvent(new CustomEvent('hakushi:read-aloud-state', { detail: { state } }));
 	};
 
 	const stop = () => {
@@ -123,6 +138,7 @@ export function setupReadAloud() {
 		const chunks = collectChunks(lang);
 		if (chunks.length === 0) return;
 		const id = ++session;
+		follow = true;
 		synth.cancel();
 		chunks.forEach((chunk, i) => {
 			const utterance = new SpeechSynthesisUtterance(chunk.text);
@@ -144,7 +160,7 @@ export function setupReadAloud() {
 		render('playing');
 	};
 
-	toggle.addEventListener('click', () => {
+	const togglePlayback = () => {
 		if (state === 'idle') {
 			play();
 		} else if (state === 'playing') {
@@ -154,7 +170,25 @@ export function setupReadAloud() {
 			synth.resume();
 			render('playing');
 		}
-	});
+	};
+
+	toggle.addEventListener('click', togglePlayback);
 	stopButton.addEventListener('click', stop);
+	document.addEventListener('hakushi:read-aloud-command', (e) => {
+		const action = (e as CustomEvent<{ action: ReadAloudCommand }>).detail?.action;
+		if (action === 'toggle') togglePlayback();
+		else if (action === 'stop') stop();
+	});
+
+	// Any scrolling by the reader (or the scroll-to-top button) pauses following.
+	const unfollow = () => {
+		follow = false;
+	};
+	window.addEventListener('wheel', unfollow, { passive: true });
+	window.addEventListener('touchmove', unfollow, { passive: true });
+	window.addEventListener('hakushi:user-scroll', unfollow);
+	window.addEventListener('keydown', (e) => {
+		if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) unfollow();
+	});
 	window.addEventListener('pagehide', () => synth.cancel());
 }

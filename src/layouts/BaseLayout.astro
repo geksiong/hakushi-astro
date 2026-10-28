@@ -5,6 +5,7 @@ import { createThemeInitScript } from '../lib/theme-init.mjs';
 import { createSidebarInitScript } from '../lib/sidebar-init.mjs';
 import CommandPalette from '../components/CommandPalette';
 import MobileNav from '../components/MobileNav';
+import FloatingControls from '../components/FloatingControls.astro';
 import { getSearchDocs } from '../lib/search-data';
 import { getArticleIndex } from '../lib/articles';
 import { COLLECTIONS } from '../lib/collections';
@@ -43,5 +44,6 @@ const articles = await getArticleIndex();
 
 		<MobileNav client:load collections={COLLECTIONS} articles={articles} links={SIDEBAR_LINKS} />
 		<CommandPalette client:load docs={searchDocs} />
+		<FloatingControls />
 	</body>
 </html>

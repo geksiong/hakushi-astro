@@ -929,6 +929,36 @@ html:not(:has(#right-sidebar)) [data-toggle-sidebar='right'] {
 }
 
 /* ---------------------------------------------------------------------------
+ * Floating controls (scroll to top, read-aloud pause/stop) - fade in once
+ * the page is scrolled down; `visibility` keeps them out of the tab order
+ * while hidden.
+ * ------------------------------------------------------------------------- */
+.floating-controls {
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(0.5rem);
+	transition: opacity 150ms ease, transform 150ms ease, visibility 0s linear 150ms;
+}
+
+.floating-controls[data-visible] {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+	transition: opacity 150ms ease, transform 150ms ease, visibility 0s;
+}
+
+.floating-controls [hidden] {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.floating-controls,
+	.floating-controls[data-visible] {
+		transition: none;
+	}
+}
+
+/* ---------------------------------------------------------------------------
  * Misc chrome
  * ------------------------------------------------------------------------- */
 *::-webkit-scrollbar {
