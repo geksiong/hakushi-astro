@@ -236,7 +236,7 @@ Hakushi owns the unified Markdown processor. Take care not to replace `markdown.
 
 ## Read aloud
 
-Articles show a **Listen** control in their metadata line. It reads the title, summary and body aloud using the browser's built-in speech synthesis (the Web Speech API), in the site's `lang`, highlighting each block as it is spoken. While reading, it becomes **Pause**/**Resume** and **Stop**. Code blocks, diagrams, charts, music notation, tables and math are skipped. The control only appears in browsers that support speech synthesis. Set `readAloud: false` to remove it.
+Articles show a **Listen** control in their metadata line. It reads the title, summary and body aloud using the browser's built-in speech synthesis (the Web Speech API), in the site's `lang`, highlighting each block as it is spoken. While reading, it becomes **Pause**/**Resume** and **Stop**. Code blocks, diagrams, charts, music notation, tables and display math are skipped; inline math is read as "formula". The control only appears in browsers that support speech synthesis. Set `readAloud: false` to remove it.
 
 ## Keyboard shortcuts
 

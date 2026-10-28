@@ -5,7 +5,8 @@
  * Text comes from the elements marked `data-read-aloud` (title, summary and
  * body). The body is read block by block - headings, paragraphs, list items,
  * quotes - skipping code blocks, diagrams, charts, music, math (MathJax keeps
- * no readable source) and tables. Inline code is read as text. Each
+ * no readable source) and tables. Inline code is read as text and inline
+ * math as "formula". Each
  * block is queued as its own utterance (long ones split by sentence), which
  * keeps Chrome from cutting off long utterances and lets the block being
  * spoken be highlighted.
@@ -13,6 +14,9 @@
 
 const BLOCKS = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, dt, dd, figcaption, .callout-title';
 const SKIP = 'pre, .code-block, .chart-block, .abc-block, .mermaid, mjx-container, svg, table, button, script, style, [aria-hidden="true"]';
+// MathJax keeps no readable source, so inline math is spoken as a placeholder
+// to keep the sentence intact; display math is skipped like other figures.
+const INLINE_MATH = 'mjx-container:not([display="true"])';
 const MAX_CHUNK = 220;
 
 interface Chunk {
@@ -26,6 +30,8 @@ function ownText(el: Element): string {
 	for (const node of el.childNodes) {
 		if (node.nodeType === Node.TEXT_NODE) {
 			text += node.textContent ?? '';
+		} else if (node instanceof Element && node.matches(INLINE_MATH)) {
+			text += ' formula ';
 		} else if (node instanceof Element && !node.matches(SKIP) && !node.matches(BLOCKS)) {
 			text += ownText(node);
 		}
