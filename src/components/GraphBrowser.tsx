@@ -24,22 +24,18 @@ function TypeToggle({
 	dotColor,
 	checked,
 	onChange,
-	compact = false,
 }: {
 	label: string;
 	dotColor: string;
 	checked: boolean;
 	onChange: (value: boolean) => void;
-	compact?: boolean;
 }) {
 	return (
 		<button
 			type="button"
 			aria-pressed={checked}
 			onClick={() => onChange(!checked)}
-			className={`flex items-center rounded-md font-medium capitalize transition-colors ${
-				compact ? 'gap-1 px-1.5 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'
-			} ${
+			className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium capitalize transition-colors ${
 				checked
 					? 'bg-[var(--bg-surface)] text-[var(--text-main)]'
 					: 'text-[var(--text-muted)] opacity-50 hover:opacity-90'
@@ -277,8 +273,9 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 			.attr('stroke', '#ffffff')
 			.attr('stroke-width', 1.5);
 
-		// Labels
-		nodeElements
+		// Labels - the compact article subgraph only reveals them on hover so
+		// overlapping names don't clutter the sidebar.
+		const labels = nodeElements
 			.append('text')
 			.text((d) => d.name)
 			.attr('x', (d) => d.val + 6)
@@ -286,7 +283,8 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 			.attr('font-size', isSubGraph ? '10px' : '12px')
 			.attr('font-weight', (d) => (d.type === 'article' ? '600' : '400'))
 			.attr('fill', 'currentColor')
-			.attr('class', 'text-[var(--text-main)] pointer-events-none select-none');
+			.attr('class', 'text-[var(--text-main)] pointer-events-none select-none')
+			.attr('opacity', isSubGraph ? 0 : 1);
 
 		// Hover highlighting: light up the hovered node, its direct neighbours and
 		// the connecting edges while fading everything else. The focused article
@@ -304,6 +302,11 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 				const tId = endId((d as unknown as { target: unknown }).target);
 				return sId === hoveredId || tId === hoveredId ? 0.95 : 0.05;
 			});
+			if (isSubGraph) {
+				labels.attr('opacity', (d) =>
+					hoveredId && (d.id === hoveredId || neighborIds?.has(d.id)) ? 1 : 0
+				);
+			}
 		};
 
 		// Event Listeners
@@ -389,26 +392,6 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 				</div>
 			)}
 
-			{/* Compact Toggles for the Article Subgraph */}
-			{isSubGraph && (
-				<div className="absolute top-2 right-2 z-10 flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border)]">
-					<TypeToggle
-						compact
-						label="cats"
-						dotColor="var(--accent)"
-						checked={showCategories}
-						onChange={setShowCategories}
-					/>
-					<TypeToggle
-						compact
-						label="tags"
-						dotColor="var(--secondary)"
-						checked={showTags}
-						onChange={setShowTags}
-					/>
-				</div>
-			)}
-
 			{/* SVG Canvas - touch-none lets d3-zoom own pinch/pan gestures */}
 			<svg
 				ref={svgRef}
@@ -422,7 +405,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 			)}
 
 			{/* Hover Info Tooltip */}
-			{hoveredNode && (
+			{hoveredNode && !isSubGraph && (
 				<div className="absolute bottom-4 left-4 z-10 p-3 rounded-lg bg-[var(--bg-surface)]/95 border border-[var(--border)] backdrop-blur-md text-xs pointer-events-none space-y-1 animate-in fade-in">
 					<p className="font-semibold text-[var(--text-main)] flex items-center gap-1.5">
 						<span

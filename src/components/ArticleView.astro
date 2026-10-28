@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, ChevronDown, List } from '@lucide/astro';
+import { ChevronRight, ChevronDown } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
@@ -72,10 +72,7 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 		toc.length > 0 && (
 			<details class="lg:hidden group rounded-lg border border-[var(--border)]">
 				<summary class="flex items-center justify-between p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-						<span class="font-bold text-[var(--text-main)] uppercase tracking-wider text-xs flex items-center gap-1.5">
-							<List class="w-3.5 h-3.5" />
-							On This Page
-						</span>
+						<span class="text-xs text-[var(--text-muted)]">On this page</span>
 					<ChevronDown class="w-4 h-4 text-[var(--text-muted)] transition-transform group-open:rotate-180" />
 				</summary>
 				<nav class="space-y-1 px-4 pb-4">

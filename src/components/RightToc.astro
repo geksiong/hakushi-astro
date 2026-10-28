@@ -1,5 +1,5 @@
 ---
-import { List, Share2, ChevronUp, PanelRightClose, PanelRightOpen } from '@lucide/astro';
+import { ChevronDown } from '@lucide/astro';
 import GraphBrowser from './GraphBrowser';
 import type { GraphJSON } from '../lib/graph-data';
 
@@ -15,140 +15,60 @@ const toc = headings.filter((h) => h.depth <= 4);
 
 <aside
 	id="right-sidebar"
-	data-right-sidebar
-	class="shrink-0 hidden lg:block sticky top-20 self-start text-xs max-h-[calc(100vh-6rem)] overflow-y-auto transition-all duration-300 w-64"
-	data-collapsed="false"
+	class="shrink-0 hidden lg:block sticky top-20 self-start w-64 pt-4 text-xs max-h-[calc(100vh-6rem)] overflow-y-auto space-y-8"
 >
-	<!-- Toggle button -->
-	<div id="right-sidebar-toggle-container" data-right-sidebar-toggle class="flex items-center justify-start p-1.5 mb-2">
+	<!-- Table of Contents -->
+	{
+		toc.length > 0 && (
+			<nav aria-label="On this page" class="space-y-2">
+				<p class="text-[var(--text-muted)]">On this page</p>
+				<div class="border-l border-[var(--border)]">
+					{toc.map((item) => (
+						<a
+							href={`#${item.slug}`}
+							data-toc-link={item.slug}
+							class:list={[
+								'-ml-px block truncate py-1 pr-2 border-l-2 border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors',
+								item.depth <= 2 ? 'pl-3' : 'pl-6',
+							]}
+						>
+							{item.text}
+						</a>
+					))}
+				</div>
+			</nav>
+		)
+	}
+
+	<!-- Article Local Knowledge Graph Subset -->
+	<div class="space-y-2">
 		<button
-			id="toggle-right-sidebar"
-			title="Collapse sidebar"
-			class="p-1.5 rounded-md hover:bg-[var(--border)]/40 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+			id="toggle-local-graph"
+			type="button"
+			aria-expanded="true"
+			aria-controls="local-graph-body"
+			class="w-full flex items-center justify-between text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 		>
-			<PanelRightClose id="icon-collapse-right" data-right-sidebar-icon="collapse" class="w-4 h-4" />
-			<PanelRightOpen id="icon-expand-right" data-right-sidebar-icon="expand" class="w-4 h-4 hidden" />
+			Graph
+			<ChevronDown class="w-3.5 h-3.5 transition-transform" />
 		</button>
-	</div>
 
-	<!-- Content area - hidden when collapsed -->
-	<div id="right-sidebar-content" data-right-sidebar-content class="space-y-6">
-		<!-- Table of Contents Section -->
-		<div class="space-y-2">
-			<div class="flex items-center justify-between">
-				<span class="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-					<List class="w-3.5 h-3.5" />
-					On This Page
-				</span>
-				<span class="font-mono text-[var(--text-muted)] text-[10px]">{toc.length} sections</span>
-			</div>
-
-			{
-				toc.length === 0 ? (
-					<p class="text-[var(--text-muted)] italic text-center py-2">No headings found.</p>
-				) : (
-					<nav class="space-y-1">
-						{toc.map((item) => (
-							<a
-								href={`#${item.slug}`}
-								data-toc-link={item.slug}
-								class:list={[
-									'w-full text-left py-1 px-2 rounded-md transition-colors truncate block',
-									item.depth === 1 ? 'pl-0 font-semibold' : item.depth === 2 ? 'pl-2 font-medium' : 'pl-4 text-[11px] text-[var(--text-muted)]',
-								]}
-							>
-								{item.text}
-							</a>
-						))}
-					</nav>
-				)
-			}
-		</div>
-
-		<!-- Article Local Knowledge Graph Subset -->
-		<div class="space-y-2 pt-4 mt-2 border-t border-[var(--border)]">
-			<div class="flex items-center justify-between">
-				<span class="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-					<Share2 class="w-3.5 h-3.5" />
-					Article Graph
-				</span>
-				<button id="toggle-local-graph" class="text-[var(--text-muted)] hover:text-[var(--text-main)]">
-					<ChevronUp class="w-3.5 h-3.5 transition-transform" />
-				</button>
-			</div>
-
-			<div id="local-graph-body" class="space-y-2">
-				<GraphBrowser client:idle graph={subgraph} focus={slug} isSubGraph />
-				<p class="text-[10px] text-[var(--text-muted)] text-center italic">
-					Showing direct links &amp; tag clusters for this article.
-				</p>
-			</div>
+		<div id="local-graph-body">
+			<GraphBrowser client:idle graph={subgraph} focus={slug} isSubGraph />
 		</div>
 	</div>
 </aside>
 
 <script>
-	const sidebar = document.getElementById('right-sidebar');
-	const toggleBtn = document.getElementById('toggle-right-sidebar');
-	const toggleContainer = document.getElementById('right-sidebar-toggle-container');
-	const content = document.getElementById('right-sidebar-content');
-	const iconCollapse = document.getElementById('icon-collapse-right');
-	const iconExpand = document.getElementById('icon-expand-right');
-
-	function applyCollapsed(collapsed: boolean) {
-		if (!sidebar || !content || !iconCollapse || !iconExpand || !toggleContainer || !toggleBtn) return;
-		sidebar.dataset.collapsed = String(collapsed);
-		try {
-			document.documentElement.classList.toggle('hakushi-right-collapsed', collapsed);
-		} catch { /* ignore */ }
-		if (collapsed) {
-			sidebar.classList.remove('w-64');
-			sidebar.classList.add('w-10');
-			content.classList.add('hidden');
-			iconCollapse.classList.add('hidden');
-			iconExpand.classList.remove('hidden');
-			toggleContainer.classList.remove('justify-start');
-			toggleContainer.classList.add('justify-center');
-			toggleBtn.title = 'Expand sidebar';
-		} else {
-			sidebar.classList.remove('w-10');
-			sidebar.classList.add('w-64');
-			content.classList.remove('hidden');
-			iconCollapse.classList.remove('hidden');
-			iconExpand.classList.add('hidden');
-			toggleContainer.classList.remove('justify-center');
-			toggleContainer.classList.add('justify-start');
-			toggleBtn.title = 'Collapse sidebar';
-		}
-	}
-
-	// The head init script already applied the stored state to <html>
-	// before paint (and CSS pre-shrunk the sidebar), so just sync the
-	// script state with it instead of re-applying after first paint -
-	// re-applying here is what used to shift the article sideways.
-	try {
-		if (document.documentElement.classList.contains('hakushi-right-collapsed')) {
-			applyCollapsed(true);
-		}
-	} catch { /* ignore */ }
-
-	toggleBtn?.addEventListener('click', () => {
-		const isCollapsed = sidebar?.dataset.collapsed === 'true';
-		const next = !isCollapsed;
-		applyCollapsed(next);
-		try {
-			localStorage.setItem('hakushi_right_sidebar_collapsed', String(next));
-		} catch { /* ignore */ }
-	});
-
-	// Local graph toggle (existing functionality)
+	// Local graph toggle
 	const toggle = document.getElementById('toggle-local-graph');
 	const body = document.getElementById('local-graph-body');
 	toggle?.addEventListener('click', () => {
-		if (!body || !toggle) return;
+		if (!body) return;
 		const hidden = body.style.display === 'none';
 		body.style.display = hidden ? '' : 'none';
-		toggle.querySelector('svg')?.classList.toggle('rotate-180', !hidden);
+		toggle.setAttribute('aria-expanded', String(hidden));
+		toggle.querySelector('svg')?.classList.toggle('-rotate-90', !hidden);
 	});
 
 	// Active section highlighting
@@ -161,11 +81,10 @@ const toc = headings.filter((h) => h.depth <= 4);
 		activeId = id;
 		for (const [id2, link] of byId) {
 			const selected = id2 === id;
-			link.classList.toggle('bg-[var(--primary)]/10', selected);
-			link.classList.toggle('text-[var(--primary)]', selected);
-			link.classList.toggle('font-semibold', selected);
-			link.classList.toggle('border-l-2', selected);
 			link.classList.toggle('border-[var(--primary)]', selected);
+			link.classList.toggle('border-transparent', !selected);
+			link.classList.toggle('text-[var(--text-main)]', selected);
+			link.classList.toggle('text-[var(--text-muted)]', !selected);
 		}
 	};
 
