@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, ChevronDown, Pause, Play, Square } from '@lucide/astro';
+import { ChevronRight, ChevronDown, Pause, Play, Square, Volume2 } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
@@ -71,7 +71,10 @@ const displayDate = formatDate(date);
 							title="Read article aloud"
 							class="inline-flex items-center align-middle -mt-px hover:text-[var(--text-main)] transition-colors"
 						>
-							<span data-read-aloud-label>Listen</span>
+							<span data-read-aloud-label class="inline-flex items-center gap-1">
+								<Volume2 class="w-3.5 h-3.5" />
+								Listen
+							</span>
 							<Pause data-read-aloud-icon="pause" class="w-3.5 h-3.5" hidden />
 							<Play data-read-aloud-icon="play" class="w-3.5 h-3.5" hidden />
 						</button>
