@@ -4,6 +4,7 @@ import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
 import type { ReadingTime, Backlink } from '../lib/articles';
+import config from 'virtual:hakushi/config';
 
 interface Props {
 	entry: any;
@@ -19,6 +20,10 @@ const displayTitle = resolveEntryTitle(entry);
 const colConfig = getCollectionConfig(entry.collection);
 const colName = colConfig?.name ?? entry.collection;
 const toc = headings.filter((h) => h.depth <= 4);
+// Frontmatter dates are calendar days parsed as UTC midnight - format in UTC
+// so the day never shifts with the build machine's timezone.
+const date: Date | undefined = data.date;
+const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
 ---
 
 <article class="article-container space-y-6">
@@ -48,10 +53,14 @@ const toc = headings.filter((h) => h.depth <= 4);
 
 		<!-- Metadata -->
 		<div class="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
-			<div class="flex items-center gap-1.5">
-				<Calendar class="w-3.5 h-3.5" />
-				<span>{data.date}</span>
-			</div>
+			{
+				date && (
+					<div class="flex items-center gap-1.5">
+						<Calendar class="w-3.5 h-3.5" />
+						<time datetime={date.toISOString().slice(0, 10)}>{displayDate}</time>
+					</div>
+				)
+			}
 
 			<div class="flex items-center gap-1.5">
 				<Clock class="w-3.5 h-3.5" />
