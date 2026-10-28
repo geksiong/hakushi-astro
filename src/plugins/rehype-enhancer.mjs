@@ -37,7 +37,11 @@ const CALLOUT_META = {
 	tab: { icon: null, defaultTitle: null },
 };
 
-const OPEN_RE = /^:::(tab|note|tip|warning|danger|info|quote|check)\s*(.*)$/i;
+// The title is the rest of the marker line only. The body can share the
+// marker's text node (":::tip\nPlain text\n:::"), so neither `\s*` (it would
+// swallow the newline and take the body's first line as the title) nor a
+// `$` anchor (it would need the marker to end the whole node) is safe here.
+const OPEN_RE = /^:::(tab|note|tip|warning|danger|info|quote|check)\b[ \t]*([^\n]*)(?:\n|$)/i;
 
 /**
  * rehype-enhancer
