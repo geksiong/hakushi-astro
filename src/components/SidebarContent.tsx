@@ -1,31 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-	Folder,
-	Calendar,
-	BookOpen,
-	ChevronRight,
-	ChevronDown,
-	Layers,
-	FileText,
-	Sparkles,
-	FolderOpen,
-	Microscope,
-	Network,
-	Share2,
-	Info,
-	Link as LinkIcon,
-	Globe,
-	Mail,
-	GitFork,
-	ExternalLink,
-	Home,
-	Rss,
-	MessageCircle,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
 import type { SidebarLink } from '../lib/sidebar';
-import { taxonomySlug } from '../lib/slugs';
 
 interface SidebarContentProps {
 	collections: CollectionConfig[];
@@ -42,85 +19,28 @@ interface SidebarContentProps {
 	links?: SidebarLink[];
 }
 
-const COLLECTION_ICONS: Record<string, any> = {
-	BookOpen,
-	Calendar,
-	Microscope,
-	FileText,
-	Share2,
-	Folder,
-	Layers,
-};
-
-const LINK_ICONS: Record<string, any> = {
-	BookOpen,
-	Calendar,
-	Microscope,
-	FileText,
-	Share2,
-	Folder,
-	Layers,
-	Info,
-	Link: LinkIcon,
-	Globe,
-	Mail,
-	GitFork,
-	// lucide dropped brand icons - 'Github' maps to a git stand-in.
-	Github: GitFork,
-	ExternalLink,
-	Home,
-	Rss,
-	MessageCircle,
-	Network,
-};
-
-type BrowseTab = 'folder' | 'dated' | 'tags';
+const ROW = 'flex items-center rounded-md transition-colors';
+const ACTIVE = 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium';
+const IDLE = 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--border)]/40';
 
 /**
  * The browse UI shared by the desktop inline sidebar (Sidebar.tsx) and the
- * mobile drawer (MobileNav.tsx): collection filter, folder/dated/tags tabs
- * and the branding footer.
+ * mobile drawer (MobileNav.tsx): one tree of collections, each expanding to
+ * its articles, with the graph and configurable links pinned below.
  */
 export default function SidebarContent({
 	collections,
 	articles,
 	currentSlug,
-	selectedCollectionId: initialCollectionId,
+	selectedCollectionId,
 	onNavigate,
 	isGraphPage: graphPageProp = false,
 	isAboutPage: aboutPageProp = false,
 	links = [],
 }: SidebarContentProps) {
-	const [browseTab, setBrowseTab] = useState<BrowseTab>(() => {
-		try {
-			return (localStorage.getItem('hakushi_browse_tab') as BrowseTab) || 'folder';
-		} catch {
-			return 'folder';
-		}
-	});
-
-	const getInitialCollection = () => {
-		if (initialCollectionId) return initialCollectionId;
-		if (typeof window !== 'undefined') {
-			const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-			const firstSegment = path.split('/')[0];
-			if (collections.some((c) => c.id === firstSegment)) {
-				return firstSegment;
-			}
-		}
-		try {
-			return localStorage.getItem('hakushi_collection') || 'all';
-		} catch {
-			return 'all';
-		}
-	};
-
-	const [selectedCollectionId, setSelectedCollectionId] = useState<string>(getInitialCollection);
-
-	// The reader's view switcher lives here now: highlight the graph link
-	// when the main view shows the knowledge graph. Server-known first (via
-	// ReaderShell on /graph, so SSR shows the final state with no flash);
-	// the URL check covers uses without the prop (e.g. the mobile drawer).
+	// Server-known first (via ReaderShell on /graph, so SSR shows the final
+	// state with no flash); the URL check covers uses without the prop
+	// (e.g. the mobile drawer).
 	const [isGraphPage, setIsGraphPage] = useState<boolean>(graphPageProp);
 	useEffect(() => {
 		if (!graphPageProp) {
@@ -145,498 +65,116 @@ export default function SidebarContent({
 	const isLinkActive = (link: SidebarLink) =>
 		!link.external && currentPath !== '' && normalizePath(link.href) === currentPath;
 
-	useEffect(() => {
-		if (initialCollectionId) {
-			setSelectedCollectionId(initialCollectionId);
-		}
-	}, [initialCollectionId]);
-	const [activeTag, setActiveTag] = useState<string | null>(() => {
-		// Prefer the tag from the URL when on a /tags/[tag] page so the
-		// cloud highlights the tag shown in the main view after navigation.
-		if (typeof window !== 'undefined') {
-			const match = window.location.pathname.match(/^\/tags\/([^/]+)\/?$/);
-			if (match) {
-				const slug = decodeURIComponent(match[1]);
-				const found = articles.find((n) =>
-					n.tags.some((t) => taxonomySlug(t) === slug)
-				);
-				const name = found?.tags.find((t) => taxonomySlug(t) === slug);
-				if (name) return name;
-			}
-		}
-		try {
-			return localStorage.getItem('hakushi_tag') || null;
-		} catch {
-			return null;
-		}
-	});
-	const [openFolders, setOpenFolders] = useState<Record<string, boolean>>(
-		Object.fromEntries(collections.map((c) => [c.id, true]))
+	// Only the collection being viewed starts expanded.
+	const [openFolders, setOpenFolders] = useState<Record<string, boolean>>(() =>
+		selectedCollectionId ? { [selectedCollectionId]: true } : {}
 	);
-
-	const selectTab = (tab: BrowseTab) => {
-		setBrowseTab(tab);
-		try {
-			localStorage.setItem('hakushi_browse_tab', tab);
-		} catch {
-			/* ignore */
+	useEffect(() => {
+		if (selectedCollectionId) {
+			setOpenFolders((prev) => ({ ...prev, [selectedCollectionId]: true }));
 		}
+	}, [selectedCollectionId]);
+
+	const toggleFolder = (id: string) => {
+		setOpenFolders((prev) => ({ ...prev, [id]: !prev[id] }));
 	};
-
-	const selectCollection = (id: string) => {
-		setSelectedCollectionId(id);
-		try {
-			localStorage.setItem('hakushi_collection', id);
-		} catch {
-			/* ignore */
-		}
-	};
-
-	const selectTag = (tag: string | null) => {
-		setActiveTag(tag);
-		try {
-			if (tag) localStorage.setItem('hakushi_tag', tag);
-			else localStorage.removeItem('hakushi_tag');
-		} catch {
-			/* ignore */
-		}
-	};
-
-	const toggleFolder = (folderKey: string) => {
-		setOpenFolders((prev) => ({ ...prev, [folderKey]: !prev[folderKey] }));
-	};
-
-	// Filter notes by selected collection + active tag
-	const filteredNotes = useMemo(() => {
-		let result = articles;
-		if (selectedCollectionId !== 'all') {
-			result = result.filter((n) => n.collection === selectedCollectionId);
-		}
-		if (activeTag) {
-			result = result.filter((n) => n.tags.includes(activeTag));
-		}
-		return result;
-	}, [articles, selectedCollectionId, activeTag]);
-
-	// Group notes by Folder Hierarchy
-	const folderTree = useMemo(() => {
-		const tree: Record<string, ArticleMeta[]> = {};
-		filteredNotes.forEach((note) => {
-			const folderKey = note.collection || 'uncategorized';
-			if (!tree[folderKey]) tree[folderKey] = [];
-			tree[folderKey].push(note);
-		});
-		return tree;
-	}, [filteredNotes]);
-
-	// Group notes chronologically by Year-Month
-	const datedTimeline = useMemo(() => {
-		const timeline: Record<string, ArticleMeta[]> = {};
-		const sorted = [...filteredNotes].sort((a, b) =>
-			(b.date ?? '').localeCompare(a.date ?? '')
-		);
-
-		sorted.forEach((note) => {
-			const yearMonth = note.date ? note.date.substring(0, 7) : 'Undated';
-			if (!timeline[yearMonth]) timeline[yearMonth] = [];
-			timeline[yearMonth].push(note);
-		});
-		return timeline;
-	}, [filteredNotes]);
-
-	// Tag counts scoped to the selected collection, consistent with the
-	// folder and dated tabs which also filter by collection.
-	const tagCounts = useMemo(() => {
-		const counts: Record<string, number> = {};
-		const scoped =
-			selectedCollectionId === 'all'
-				? articles
-				: articles.filter((n) => n.collection === selectedCollectionId);
-		scoped.forEach((note) => {
-			note.tags.forEach((tag) => {
-				counts[tag] = (counts[tag] || 0) + 1;
-			});
-		});
-		return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
-	}, [articles, selectedCollectionId]);
 
 	return (
 		<>
-			<div className="p-4 space-y-5">
-				{/* Collection Selector Filter */}
-				<div className="space-y-2">
-					<p className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-[10px] flex items-center justify-between">
-						<span>Collections</span>
-						<span className="font-mono text-[var(--primary)]">{articles.length} items</span>
-					</p>
+			<nav aria-label="Collections" className="flex-1 p-3 space-y-0.5">
+				{collections.map((col) => {
+					const items = articles.filter((n) => n.collection === col.id);
+					const isOpen = openFolders[col.id] ?? false;
+					// The collection row is active on its index page; on one of
+					// its articles the article row carries the highlight instead.
+					const isSelected =
+						selectedCollectionId === col.id &&
+						!noCollectionSelected &&
+						!items.some((n) => n.slug === currentSlug);
 
-					<div className="space-y-1">
-						<a
-							href="/"
-							onClick={() => {
-								selectCollection('all');
-								onNavigate?.();
-							}}
-							aria-current={selectedCollectionId === 'all' && !noCollectionSelected ? 'page' : undefined}
-							className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
-								selectedCollectionId === 'all' && !noCollectionSelected
-									? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
-									: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-							}`}
-						>
-							<span className="flex items-center gap-2">
-								<Layers className="w-4 h-4" />
-								All Collections
-							</span>
-							<span className="font-mono text-[10px] opacity-80">{articles.length}</span>
-						</a>
-
-						{collections.map((col) => {
-							const count = articles.filter((n) => n.collection === col.id).length;
-							const isSelected = selectedCollectionId === col.id && !noCollectionSelected;
-							const IconComponent = COLLECTION_ICONS[col.iconName ?? 'Folder'] || Folder;
-
-							return (
-								<a
-									key={col.id}
-									href={`/${col.id}`}
-									onClick={() => {
-										selectCollection(col.id);
-										onNavigate?.();
-									}}
-								title={col.description}
-								className={`w-full flex items-center justify-between px-3 py-1.5 rounded-md font-medium transition-colors ${
-									isSelected
-										? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
-										: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-								}`}
+					return (
+						<div key={col.id}>
+							<div className={`${ROW} ${isSelected ? ACTIVE : IDLE}`}>
+								<button
+									type="button"
+									onClick={() => toggleFolder(col.id)}
+									aria-expanded={isOpen}
+									aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${col.name}`}
+									className="p-1.5 shrink-0 text-[var(--text-muted)] hover:text-[var(--text-main)]"
 								>
-									<span className="flex items-center gap-2 truncate">
-										<IconComponent className="w-3.5 h-3.5 shrink-0" />
-										<span className="truncate">{col.name}</span>
-									</span>
-									<span className="font-mono text-[10px] text-[var(--text-muted)]">{count}</span>
-								</a>
-							);
-						})}
-					</div>
-				</div>
-
-				{/* Knowledge Graph — reader views and the graph share this sidebar */}
-				<div className="space-y-1">
-					<a
-						href="/graph"
-						onClick={() => onNavigate?.()}
-						aria-current={isGraphPage ? 'page' : undefined}
-						title="Visualize article connections"
-						className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
-							isGraphPage
-								? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
-								: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-						}`}
-					>
-						<span className="flex items-center gap-2">
-							<Network className="w-4 h-4 shrink-0" />
-							Knowledge Graph
-						</span>
-					</a>
-				</div>
-
-				{/* Configurable pages & external sites */}
-				{links.length > 0 && (
-					<div className="space-y-1">
-						<p className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-[10px] px-3">
-							Pages &amp; Links
-						</p>
-						{links.map((link) => {
-							const isActive = isLinkActive(link);
-							const IconComponent = LINK_ICONS[link.iconName ?? 'Link'] || LinkIcon;
-							return (
-								<a
-									key={link.href}
-									href={link.href}
-									onClick={() => onNavigate?.()}
-									aria-current={isActive ? 'page' : undefined}
-									title={link.description || link.label}
-									target={link.external ? '_blank' : undefined}
-									rel={link.external ? 'noopener noreferrer' : undefined}
-								className={`w-full flex items-center justify-between px-3 py-2 rounded-md font-medium transition-colors ${
-									isActive
-										? 'bg-[var(--primary)]/[0.08] text-[var(--primary)]'
-										: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-								}`}
-								>
-									<span className="flex items-center gap-2 truncate">
-										<IconComponent className="w-4 h-4 shrink-0" />
-										<span className="truncate">{link.label}</span>
-									</span>
-									{link.external && (
-										<ExternalLink className="w-3 h-3 text-[var(--text-muted)] shrink-0" />
-									)}
-								</a>
-							);
-						})}
-					</div>
-				)}
-
-				{/* Navigation Mode Switcher Tabs */}
-				<div className="space-y-3 pt-2 border-t border-[var(--border)]">
-					<div className="grid grid-cols-3 gap-1 p-1 rounded-lg bg-[var(--bg-sidebar)]/60 font-medium text-[11px]">
-						{(['folder', 'dated', 'tags'] as const).map((tab) => (
-							<button
-								key={tab}
-								onClick={() => selectTab(tab)}
-								title={
-									tab === 'tags' && activeTag ? `Filtered by #${activeTag}` : undefined
-								}
-								className={`py-1 rounded-md transition-colors flex items-center justify-center gap-1 ${
-									browseTab === tab
-										? 'bg-[var(--bg-surface)] text-[var(--text-main)] font-medium shadow-xs'
-										: 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-								}`}
-							>
-								{tab === 'folder' ? 'Folders' : tab === 'dated' ? 'Dated' : 'Tags'}
-								{tab === 'tags' && activeTag && (
-									<span
-										aria-label={`Tag filter active: ${activeTag}`}
-										className="inline-block w-1.5 h-1.5 rounded-full bg-current shrink-0"
+									<ChevronRight
+										className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-90' : ''}`}
 									/>
-								)}
-							</button>
-						))}
-					</div>
-
-					{/* Tab 1: Folder Tree View */}
-					{browseTab === 'folder' && (
-						<div className="space-y-2">
-							{filteredNotes.length === 0 ? (
-								<div className="p-3 rounded-lg border border-dashed border-[var(--border)] text-center space-y-1.5">
-									{activeTag ? (
-										<>
-											<p className="text-[var(--text-main)] italic">
-												No articles tagged #{activeTag}
-												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
-											</p>
-											<button
-												onClick={() => selectTag(null)}
-												className="text-[var(--primary)] font-semibold hover:underline"
-											>
-												Clear tag filter
-											</button>
-										</>
-									) : (
-										<p className="text-[var(--text-muted)] italic">
-											No articles here yet.
-										</p>
-									)}
-								</div>
-							) :
-								(Object.entries(folderTree) as [string, ArticleMeta[]][]).map(
-								([folderKey, items]) => {
-									const isOpen = openFolders[folderKey] ?? true;
-									const colMeta = collections.find((c) => c.id === folderKey);
-
-									return (
-										<div key={folderKey} className="space-y-1">
-											<button
-												onClick={() => toggleFolder(folderKey)}
-												className="w-full flex items-center justify-between p-1.5 rounded-md hover:bg-[var(--border)]/40 font-semibold text-[var(--text-main)] uppercase tracking-wider text-[11px]"
-											>
-												<span className="flex items-center gap-1.5 capitalize">
-													{isOpen ? (
-														<FolderOpen className="w-3.5 h-3.5" />
-													) : (
-														<Folder className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-													)}
-													{colMeta ? colMeta.name : folderKey}
-												</span>
-												{isOpen ? (
-													<ChevronDown className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-												) : (
-													<ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-												)}
-											</button>
-
-											{isOpen && (
-												<div className="pl-3 space-y-0.5 border-l border-[var(--border)] ml-2">
-													{items.map((note) => {
-														const isSelected = currentSlug === note.slug;
-														return (
-															<a
-																key={note.slug}
-																href={note.url}
-																onClick={() => onNavigate?.()}
-															className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
-																isSelected
-																	? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
-																	: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-															}`}
-															>
-																<span className="truncate pr-1">{note.title}</span>
-																<FileText className="w-3 h-3 text-[var(--text-muted)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-															</a>
-														);
-													})}
-												</div>
-											)}
-										</div>
-									);
-								}
-							)}
-						</div>
-					)}
-
-					{/* Tab 2: Chronological Dated Archive View */}
-					{browseTab === 'dated' && (
-						<div className="space-y-3">
-							{filteredNotes.length === 0 ? (
-								<div className="p-3 rounded-lg border border-dashed border-[var(--border)] text-center space-y-1.5">
-									{activeTag ? (
-										<>
-											<p className="text-[var(--text-main)] italic">
-												No articles tagged #{activeTag}
-												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
-											</p>
-											<button
-												onClick={() => selectTag(null)}
-												className="text-[var(--primary)] font-semibold hover:underline"
-											>
-												Clear tag filter
-											</button>
-										</>
-									) : (
-										<p className="text-[var(--text-muted)] italic">
-											No articles here yet.
-										</p>
-									)}
-								</div>
-							) :
-								(Object.entries(datedTimeline) as [string, ArticleMeta[]][]).map(
-								([yearMonth, items]) => (
-									<div key={yearMonth} className="space-y-1">
-										<div className="flex items-center gap-1.5 font-bold text-[var(--text-muted)] font-mono text-[11px] px-1">
-											<Calendar className="w-3.5 h-3.5" />
-											<span>{yearMonth}</span>
-										</div>
-										<div className="pl-3 border-l border-[var(--border)] ml-2 space-y-1">
-											{items.map((note) => (
-												<a
-													key={note.slug}
-													href={note.url}
-													onClick={() => onNavigate?.()}
-													className={`w-full text-left p-2 rounded-md transition-colors block ${
-														currentSlug === note.slug
-															? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
-															: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-													}`}
-												>
-													<p className="truncate font-medium">{note.title}</p>
-													<p className="text-[10px] text-[var(--text-muted)] font-mono">
-														{note.date}
-													</p>
-												</a>
-											))}
-										</div>
-									</div>
-								)
-							)}
-						</div>
-					)}
-
-					{/* Tab 3: Tag Cloud Index View — selecting a tag navigates to
-					    the tag page so the main view shows the filtered list. */}
-					{browseTab === 'tags' && (
-						<div className="space-y-3">
-							{activeTag && (
-								<div className="flex items-center justify-between p-2 rounded-lg bg-[var(--primary)]/[0.07] text-[var(--primary)]">
-									<span className="truncate">Filtering: #{activeTag}</span>
-									<a
-										href="/"
-										onClick={() => {
-											selectTag(null);
-											onNavigate?.();
-										}}
-										className="font-bold hover:underline shrink-0 ml-2"
-									>
-										Clear
-									</a>
-								</div>
-							)}
-
-							<div className="flex flex-wrap gap-1.5">
-								{Object.entries(tagCounts).map(([tag, count]) => {
-									const isActive = activeTag === tag;
-									return (
-										<a
-											key={tag}
-											href={`/tags/${taxonomySlug(tag)}`}
-											onClick={() => {
-												selectTag(tag);
-												onNavigate?.();
-											}}
-											aria-current={isActive ? 'true' : undefined}
-										className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono transition-colors ${
-											isActive
-												? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
-												: 'hover:bg-[var(--border)]/40 text-[var(--text-main)] border border-[var(--border)]'
-										}`}
-										>
-											<span>#{tag}</span>
-											<span className="opacity-70 text-[10px]">({count})</span>
-										</a>
-									);
-								})}
+								</button>
+								<a
+									href={`/${col.id}`}
+									onClick={() => onNavigate?.()}
+									aria-current={isSelected ? 'page' : undefined}
+									title={col.description}
+									className={`flex-1 truncate py-1.5 pr-2 ${isSelected ? '' : 'text-[var(--text-main)]'}`}
+								>
+									{col.name}
+								</a>
 							</div>
 
-							{activeTag && (
-								<div className="space-y-1">
-									<p className="font-bold text-[var(--text-muted)] uppercase tracking-wider text-[10px] px-1">
-										{filteredNotes.length}{' '}
-										{filteredNotes.length === 1 ? 'article' : 'articles'} tagged #
-										{activeTag}
-									</p>
-									<div className="pl-3 space-y-0.5 border-l border-[var(--border)] ml-2">
-										{filteredNotes.map((note) => {
-											const isSelected = currentSlug === note.slug;
+							{isOpen && (
+								<div className="ml-[1.1rem] pl-2 border-l border-[var(--border)] space-y-0.5 py-0.5">
+									{items.length === 0 ? (
+										<p className="px-2 py-1.5 text-[var(--text-muted)] italic">No articles yet.</p>
+									) : (
+										items.map((note) => {
+											const isCurrent = currentSlug === note.slug;
 											return (
 												<a
 													key={note.slug}
 													href={note.url}
 													onClick={() => onNavigate?.()}
-													className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md transition-colors text-left group ${
-														isSelected
-															? 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium'
-															: 'hover:bg-[var(--border)]/40 text-[var(--text-main)]'
-													}`}
+													aria-current={isCurrent ? 'page' : undefined}
+													title={note.title}
+													className={`${ROW} px-2 py-1.5 ${isCurrent ? ACTIVE : IDLE}`}
 												>
-													<span className="truncate pr-1">{note.title}</span>
-													<FileText className="w-3 h-3 text-[var(--text-muted)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+													<span className="truncate">{note.title}</span>
 												</a>
 											);
-										})}
-										{filteredNotes.length === 0 && (
-											<p className="px-2 py-1.5 text-[var(--text-muted)] italic">
-												No articles match this tag
-												{selectedCollectionId !== 'all' ? ' in this collection' : ''}.
-											</p>
-										)}
-									</div>
+										})
+									)}
 								</div>
 							)}
 						</div>
-					)}
-				</div>
-			</div>
+					);
+				})}
+			</nav>
 
-			{/* Footer Info */}
-			<div className="p-4 border-t border-[var(--border)] text-[11px] text-[var(--text-muted)] font-mono mt-6">
-				<p className="flex items-center gap-1.5 font-semibold text-[var(--text-main)]">
-					<BookOpen className="hidden" />
-					<Sparkles className="w-3.5 h-3.5" />
-					Hakushi
-				</p>
-				<p className="mt-0.5">Flexible file &amp; collection layout</p>
-			</div>
+			{/* Graph and configurable pages & external sites */}
+			<nav aria-label="Pages" className="p-3 space-y-0.5 border-t border-[var(--border)]">
+				<a
+					href="/graph"
+					onClick={() => onNavigate?.()}
+					aria-current={isGraphPage ? 'page' : undefined}
+					title="Visualize article connections"
+					className={`${ROW} px-2 py-1.5 ${isGraphPage ? ACTIVE : IDLE}`}
+				>
+					Knowledge Graph
+				</a>
+				{links.map((link) => {
+					const isActive = isLinkActive(link);
+					return (
+						<a
+							key={link.href}
+							href={link.href}
+							onClick={() => onNavigate?.()}
+							aria-current={isActive ? 'page' : undefined}
+							title={link.description || link.label}
+							target={link.external ? '_blank' : undefined}
+							rel={link.external ? 'noopener noreferrer' : undefined}
+							className={`${ROW} justify-between gap-2 px-2 py-1.5 ${isActive ? ACTIVE : IDLE}`}
+						>
+							<span className="truncate">{link.label}</span>
+							{link.external && <ExternalLink className="w-3 h-3 shrink-0 opacity-60" />}
+						</a>
+					);
+				})}
+			</nav>
 		</>
 	);
 }
