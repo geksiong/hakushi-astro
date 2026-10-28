@@ -237,7 +237,7 @@ export default function CollectionBrowser({
 			<header className="space-y-2">
 				{!isAll && (
 					<a href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
-						All collections
+						All articles
 					</a>
 				)}
 				<h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
