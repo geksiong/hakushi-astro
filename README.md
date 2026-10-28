@@ -233,6 +233,19 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categor
 
 Hakushi owns the unified Markdown processor. Take care not to replace `markdown.processor` when adding more Markdown configuration.
 
+## Keyboard shortcuts
+
+| Key | Action |
+| --- | --- |
+| `/` | Open search |
+| `Ctrl` `K` / `⌘` `K` | Open or close search |
+| `↑` `↓` | Move through search results |
+| `Enter` | Open the selected search result |
+| `Esc` | Close search or the mobile navigation drawer |
+| `\` | Hide or show both sidebars (desktop widths) |
+
+`/` and `\` are ignored while typing in a text field, so both characters can still be typed. `\` hides both sidebars when either one is showing and shows both when both are hidden; the panel buttons at either end of the header toggle each sidebar on its own. Sidebar state is remembered per browser.
+
 ## Package development and publishing
 
 ```sh
