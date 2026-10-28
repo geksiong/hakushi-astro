@@ -2,6 +2,10 @@
 import {
 	Search,
 	Menu,
+	PanelLeftClose,
+	PanelLeftOpen,
+	PanelRightClose,
+	PanelRightOpen,
 	BookOpen,
 	Calendar,
 	Microscope,
@@ -71,6 +75,17 @@ const headerLinks = config.headerLinks ?? [];
 			>
 				<Menu class="w-5 h-5" />
 			</button>
+			<button
+				type="button"
+				data-toggle-sidebar="left"
+				aria-controls="left-sidebar"
+				aria-expanded="true"
+				title="Hide navigation"
+				class="hidden lg:inline-flex p-2 rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-sidebar)] hover:text-[var(--text-main)] transition-colors"
+			>
+				<PanelLeftClose data-sidebar-icon="hide" class="w-4 h-4" />
+				<PanelLeftOpen data-sidebar-icon="show" class="w-4 h-4" />
+			</button>
 			<a href="/" class="flex items-baseline gap-2">
 				<span class="font-extrabold text-base tracking-tight text-[var(--text-main)] font-heading">
 					{config.title}
@@ -116,6 +131,17 @@ const headerLinks = config.headerLinks ?? [];
 			{headerLinks.length > 0 && (
 				<div aria-hidden="true" class="w-px h-5 bg-[var(--border)] mx-1" />
 			)}
+			<button
+				type="button"
+				data-toggle-sidebar="right"
+				aria-controls="right-sidebar"
+				aria-expanded="true"
+				title="Hide contents and graph"
+				class="hidden lg:inline-flex p-2 rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-sidebar)] hover:text-[var(--text-main)] transition-colors"
+			>
+				<PanelRightClose data-sidebar-icon="hide" class="w-4 h-4" />
+				<PanelRightOpen data-sidebar-icon="show" class="w-4 h-4" />
+			</button>
 			<ThemeMenu client:load />
 		</div>
 	</div>
@@ -129,4 +155,32 @@ const headerLinks = config.headerLinks ?? [];
 	document.getElementById('open-sidebar')?.addEventListener('click', () => {
 		window.dispatchEvent(new CustomEvent('open-sidebar'));
 	});
+
+	// Desktop sidebar collapse toggles. The collapsed state lives as a class
+	// on <html> (restored before paint by the head init script); CSS hides
+	// the sidebar and swaps the icon, so this only flips the class.
+	const SIDEBARS = {
+		left: { className: 'hakushi-left-collapsed', key: 'hakushi_left_collapsed', label: 'navigation' },
+		right: { className: 'hakushi-right-collapsed', key: 'hakushi_right_collapsed', label: 'contents and graph' },
+	} as const;
+
+	for (const button of document.querySelectorAll<HTMLButtonElement>('[data-toggle-sidebar]')) {
+		const side = SIDEBARS[button.dataset.toggleSidebar as keyof typeof SIDEBARS];
+		if (!side) continue;
+		const sync = () => {
+			const collapsed = document.documentElement.classList.contains(side.className);
+			button.setAttribute('aria-expanded', String(!collapsed));
+			button.title = `${collapsed ? 'Show' : 'Hide'} ${side.label}`;
+		};
+		sync();
+		button.addEventListener('click', () => {
+			const collapsed = document.documentElement.classList.toggle(side.className);
+			try {
+				localStorage.setItem(side.key, String(collapsed));
+			} catch {
+				/* storage can be unavailable */
+			}
+			sync();
+		});
+	}
 </script>

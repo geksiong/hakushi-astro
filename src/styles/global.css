@@ -890,6 +890,34 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+ * Collapsible sidebars - the `hakushi-left-collapsed` / `hakushi-right-collapsed`
+ * classes are set on <html> by the head init script before first paint and
+ * flipped by the header toggles. Unlayered CSS wins over Tailwind's layered
+ * `lg:flex` / `lg:block` utilities here by design.
+ * ------------------------------------------------------------------------- */
+html.hakushi-left-collapsed aside[data-sidebar],
+html.hakushi-right-collapsed #right-sidebar {
+	display: none;
+}
+
+[data-toggle-sidebar] [data-sidebar-icon='show'],
+html.hakushi-left-collapsed [data-toggle-sidebar='left'] [data-sidebar-icon='hide'],
+html.hakushi-right-collapsed [data-toggle-sidebar='right'] [data-sidebar-icon='hide'] {
+	display: none;
+}
+
+html.hakushi-left-collapsed [data-toggle-sidebar='left'] [data-sidebar-icon='show'],
+html.hakushi-right-collapsed [data-toggle-sidebar='right'] [data-sidebar-icon='show'] {
+	display: block;
+}
+
+/* A toggle only shows on pages that have its sidebar. */
+html:not(:has(#left-sidebar)) [data-toggle-sidebar='left'],
+html:not(:has(#right-sidebar)) [data-toggle-sidebar='right'] {
+	display: none;
+}
+
+/* ---------------------------------------------------------------------------
  * Misc chrome
  * ------------------------------------------------------------------------- */
 *::-webkit-scrollbar {
