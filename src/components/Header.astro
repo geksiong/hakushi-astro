@@ -160,27 +160,57 @@ const headerLinks = config.headerLinks ?? [];
 	// on <html> (restored before paint by the head init script); CSS hides
 	// the sidebar and swaps the icon, so this only flips the class.
 	const SIDEBARS = {
-		left: { className: 'hakushi-left-collapsed', key: 'hakushi_left_collapsed', label: 'navigation' },
-		right: { className: 'hakushi-right-collapsed', key: 'hakushi_right_collapsed', label: 'contents and graph' },
+		left: { className: 'hakushi-left-collapsed', key: 'hakushi_left_collapsed', label: 'navigation', id: 'left-sidebar' },
+		right: { className: 'hakushi-right-collapsed', key: 'hakushi_right_collapsed', label: 'contents and graph', id: 'right-sidebar' },
 	} as const;
+	type Side = keyof typeof SIDEBARS;
+	const root = document.documentElement;
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-toggle-sidebar]'));
 
-	for (const button of document.querySelectorAll<HTMLButtonElement>('[data-toggle-sidebar]')) {
-		const side = SIDEBARS[button.dataset.toggleSidebar as keyof typeof SIDEBARS];
-		if (!side) continue;
-		const sync = () => {
-			const collapsed = document.documentElement.classList.contains(side.className);
+	const isCollapsed = (side: Side) => root.classList.contains(SIDEBARS[side].className);
+
+	const syncButtons = () => {
+		for (const button of buttons) {
+			const side = button.dataset.toggleSidebar as Side;
+			const collapsed = isCollapsed(side);
 			button.setAttribute('aria-expanded', String(!collapsed));
-			button.title = `${collapsed ? 'Show' : 'Hide'} ${side.label}`;
-		};
-		sync();
+			button.title = `${collapsed ? 'Show' : 'Hide'} ${SIDEBARS[side].label} (\\ toggles both)`;
+		}
+	};
+
+	const setCollapsed = (side: Side, collapsed: boolean) => {
+		root.classList.toggle(SIDEBARS[side].className, collapsed);
+		try {
+			localStorage.setItem(SIDEBARS[side].key, String(collapsed));
+		} catch {
+			/* storage can be unavailable */
+		}
+	};
+
+	for (const button of buttons) {
 		button.addEventListener('click', () => {
-			const collapsed = document.documentElement.classList.toggle(side.className);
-			try {
-				localStorage.setItem(side.key, String(collapsed));
-			} catch {
-				/* storage can be unavailable */
-			}
-			sync();
+			const side = button.dataset.toggleSidebar as Side;
+			setCollapsed(side, !isCollapsed(side));
+			syncButtons();
 		});
 	}
+	syncButtons();
+
+	// "\" toggles both: if any sidebar on this page is showing, hide both;
+	// otherwise show both. Ignored while typing and on narrow screens, where
+	// the sidebars aren't inline.
+	const isEditableTarget = (target: EventTarget | null) => {
+		const el = target as HTMLElement | null;
+		return !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));
+	};
+	window.addEventListener('keydown', (e) => {
+		if (e.key !== '\\' || e.metaKey || e.ctrlKey || e.altKey || isEditableTarget(e.target)) return;
+		if (!window.matchMedia('(min-width: 64rem)').matches) return;
+		const present = (Object.keys(SIDEBARS) as Side[]).filter((side) => document.getElementById(SIDEBARS[side].id));
+		if (present.length === 0) return;
+		e.preventDefault();
+		const collapse = present.some((side) => !isCollapsed(side));
+		for (const side of Object.keys(SIDEBARS) as Side[]) setCollapsed(side, collapse);
+		syncButtons();
+	});
 </script>
