@@ -110,6 +110,7 @@ hakushi({
     style: 'sans',         // sans, serif, mono, editorial
   },
   articlesPerPage: 12,    // articles per page when browsing a collection (default 12)
+  readAloud: true,        // Listen control that reads articles aloud (default true)
   collections: [
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
@@ -232,6 +233,10 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categor
 - Code titles such as ```` ```ts title="example.ts" ````
 
 Hakushi owns the unified Markdown processor. Take care not to replace `markdown.processor` when adding more Markdown configuration.
+
+## Read aloud
+
+Articles show a **Listen** control in their metadata line. It reads the title, summary and body aloud using the browser's built-in speech synthesis (the Web Speech API), in the site's `lang`, highlighting each block as it is spoken. While reading, it becomes **Pause**/**Resume** and **Stop**. Code blocks, diagrams, charts, music notation, tables and math are skipped. The control only appears in browsers that support speech synthesis. Set `readAloud: false` to remove it.
 
 ## Keyboard shortcuts
 

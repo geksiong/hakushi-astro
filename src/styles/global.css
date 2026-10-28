@@ -918,6 +918,17 @@ html:not(:has(#right-sidebar)) [data-toggle-sidebar='right'] {
 }
 
 /* ---------------------------------------------------------------------------
+ * Read aloud - the block currently being spoken gets a faint highlight so
+ * the reader can follow along.
+ * ------------------------------------------------------------------------- */
+.read-aloud-current {
+	background: color-mix(in srgb, var(--primary) 8%, transparent);
+	border-radius: 0.25rem;
+	box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--primary) 8%, transparent);
+	transition: background-color 150ms ease;
+}
+
+/* ---------------------------------------------------------------------------
  * Misc chrome
  * ------------------------------------------------------------------------- */
 *::-webkit-scrollbar {

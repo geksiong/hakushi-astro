@@ -74,6 +74,7 @@ export const DEFAULT_CONFIG = {
 	sidebarLinks: DEFAULT_SIDEBAR_LINKS,
 	headerLinks: DEFAULT_HEADER_LINKS,
 	articlesPerPage: 12,
+	readAloud: true,
 	theme: {
 		mode: 'dark',
 		colorScheme: 'hakushi',

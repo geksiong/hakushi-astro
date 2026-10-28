@@ -8,6 +8,7 @@ declare module 'virtual:hakushi/config' {
 		lang: string;
 		favicon: string | null;
 		defaultCollection: string;
+		readAloud: boolean;
 		collections: import('./lib/collections').CollectionConfig[];
 		theme: { mode: 'light' | 'dark' | 'auto'; colorScheme: string; style: string };
 	};

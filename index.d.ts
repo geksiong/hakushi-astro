@@ -43,6 +43,8 @@ export interface HakushiOptions {
 	/** Icon-only links on the right side of the header (e.g. social/contact links). Defaults to none. */
 	headerLinks?: HakushiHeaderLink[];
 	articlesPerPage?: number;
+	/** Show a Listen control on articles that reads them aloud with the browser's speech synthesis. Defaults to `true`; hidden where unsupported. */
+	readAloud?: boolean;
 	theme?: {
 		mode?: 'light' | 'dark' | 'auto';
 		colorScheme?: string;
@@ -65,6 +67,7 @@ export default function hakushi(options?: HakushiOptions): AstroIntegration[];
 declare module 'virtual:hakushi/config' {
 	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'favicon' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
 		articlesPerPage: number;
+		readAloud: boolean;
 		theme: {
 			mode: 'light' | 'dark' | 'auto';
 			colorScheme: string;

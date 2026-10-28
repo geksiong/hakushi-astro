@@ -5,6 +5,7 @@ import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
 import type { ReadingTime, Backlink } from '../lib/articles';
 import { formatDate } from '../lib/dates';
+import config from 'virtual:hakushi/config';
 
 interface Props {
 	entry: any;
@@ -45,19 +46,36 @@ const displayDate = formatDate(date);
 	<!-- Article Header -->
 	<header class="space-y-3 pb-6 border-b border-[var(--border)]">
 		<h1
+			data-read-aloud
 			class="font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
 			style="font-size: calc(var(--font-size-h1, 2.15rem) * 1.15);"
 		>
 			{displayTitle}
 		</h1>
 
-		{data.summary && <p class="text-base text-[var(--text-muted)] leading-relaxed">{data.summary}</p>}
+		{data.summary && <p data-read-aloud class="text-base text-[var(--text-muted)] leading-relaxed">{data.summary}</p>}
 
 		<p class="text-xs text-[var(--text-muted)]">
 			{date && <time datetime={date.toISOString().slice(0, 10)}>{displayDate}</time>}
 			{date && ' · '}
 			{readingTime.minutes} min read
 			{data.author && ` · ${data.author}`}
+			{
+				config.readAloud && (
+					<span id="read-aloud" hidden>
+						{' · '}
+						<button type="button" data-read-aloud-toggle class="hover:text-[var(--text-main)] transition-colors">
+							Listen
+						</button>
+						<span data-read-aloud-stop-group hidden>
+							{' · '}
+							<button type="button" data-read-aloud-stop class="hover:text-[var(--text-main)] transition-colors">
+								Stop
+							</button>
+						</span>
+					</span>
+				)
+			}
 		</p>
 	</header>
 
@@ -97,7 +115,7 @@ const displayDate = formatDate(date);
 	}
 
 	<!-- Main Formatted Article Content -->
-	<div class="md-body max-w-none space-y-4">
+	<div data-read-aloud class="md-body max-w-none space-y-4">
 		<Content />
 	</div>
 
@@ -140,3 +158,9 @@ const displayDate = formatDate(date);
 		)
 	}
 </article>
+
+<script>
+	import { setupReadAloud } from '../scripts/read-aloud';
+
+	setupReadAloud();
+</script>
