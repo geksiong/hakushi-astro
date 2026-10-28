@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LayoutGrid, List } from 'lucide-react';
 import type { CollectionConfig } from '../lib/collections';
+import { formatDate } from '../lib/dates';
 
 export interface ListingArticle {
 	title: string;
@@ -59,7 +60,7 @@ export default function ArticleListing({ articles, collections, storageKey }: Pr
 						<div className="min-w-0 flex-1">
 							<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
 							{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1">{article.summary}</p>}
-							<p className="text-xs text-[var(--text-muted)] mt-2">{[collectionName(article.collection), article.date].filter(Boolean).join(' · ')}</p>
+							<p className="text-xs text-[var(--text-muted)] mt-2">{[collectionName(article.collection), formatDate(article.date)].filter(Boolean).join(' · ')}</p>
 						</div>
 						{layout === 'list' && article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className="w-24 sm:w-36 aspect-[4/3] shrink-0 object-cover rounded-md" />}
 					</a>

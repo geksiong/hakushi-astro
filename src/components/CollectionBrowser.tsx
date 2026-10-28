@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Search, X, LayoutGrid, List } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
+import { formatDate } from '../lib/dates';
 
 interface CollectionBrowserProps {
 	collection: CollectionConfig;
@@ -226,7 +227,7 @@ export default function CollectionBrowser({
 	// Article metadata line: collection (only when mixing collections),
 	// date and reading time.
 	const metaLine = (article: ArticleMeta) =>
-		[isAll ? getCollectionName(article.collection) : null, article.date, `${article.readingTime.minutes} min read`]
+		[isAll ? getCollectionName(article.collection) : null, formatDate(article.date), `${article.readingTime.minutes} min read`]
 			.filter(Boolean)
 			.join(' · ');
 

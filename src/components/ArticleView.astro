@@ -4,7 +4,7 @@ import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
 import type { ReadingTime, Backlink } from '../lib/articles';
-import config from 'virtual:hakushi/config';
+import { formatDate } from '../lib/dates';
 
 interface Props {
 	entry: any;
@@ -20,10 +20,8 @@ const displayTitle = resolveEntryTitle(entry);
 const colConfig = getCollectionConfig(entry.collection);
 const colName = colConfig?.name ?? entry.collection;
 const toc = headings.filter((h) => h.depth <= 4);
-// Frontmatter dates are calendar days parsed as UTC midnight - format in UTC
-// so the day never shifts with the build machine's timezone.
 const date: Date | undefined = data.date;
-const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+const displayDate = formatDate(date);
 ---
 
 <article class="article-container space-y-6">
@@ -34,7 +32,9 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 		{
 			data.category && (
 				<>
-					<span>{data.category}</span>
+					<a href={`/categories/${taxonomySlug(data.category)}`} class="hover:text-[var(--primary)] transition-colors">
+						{data.category}
+					</a>
 					<ChevronRight class="w-3.5 h-3.5" />
 				</>
 			)

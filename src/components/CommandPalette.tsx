@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, BookOpen, X } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
+import { formatDate } from '../lib/dates';
 
 interface CommandPaletteProps {
 	docs: Array<ArticleMeta & { text?: string }>;
@@ -183,7 +184,7 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 									<span className="px-2 py-0.5 rounded bg-[var(--primary)]/10 text-[var(--primary)] font-semibold capitalize">
 										{note.collection}
 									</span>
-									<span>{note.date}</span>
+									<span>{formatDate(note.date)}</span>
 								</div>
 							</a>
 						))
