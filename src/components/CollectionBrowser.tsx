@@ -205,7 +205,7 @@ export default function CollectionBrowser({
 		totalItems > 0 ? (
 			<nav
 				aria-label={label}
-				className="py-3 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono"
+				className="py-3 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
 			>
 				{/* Status counter */}
 				<div className="text-[var(--text-muted)]">
@@ -272,7 +272,7 @@ export default function CollectionBrowser({
 	return (
 		<div className="collection-browser-container space-y-8 animate-in fade-in">
 			{/* Breadcrumb Path */}
-			<div className="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+			<div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
 				{isAll ? (
 					<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
 						<Layers className="w-3.5 h-3.5" />
@@ -312,7 +312,7 @@ export default function CollectionBrowser({
 						</div>
 					</div>
 
-					<div className="flex items-center gap-2 shrink-0 self-start sm:self-auto font-mono text-xs">
+					<div className="flex items-center gap-2 shrink-0 self-start sm:self-auto text-xs">
 						<span className="px-3 py-1 rounded-full bg-[var(--primary)]/[0.07] text-[var(--primary)] font-medium">
 							{articles.length} {articles.length === 1 ? 'article' : 'articles'}
 						</span>
@@ -370,7 +370,7 @@ export default function CollectionBrowser({
 							<select
 								value={pageSize}
 								onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-								className="py-1.5 px-2 rounded-full bg-transparent border border-[var(--border)] text-[var(--text-main)] font-mono font-medium focus:outline-hidden"
+								className="py-1.5 px-2 rounded-full bg-transparent border border-[var(--border)] text-[var(--text-main)] font-medium focus:outline-hidden"
 								title="Articles per page"
 							>
 								{pageSizeOptions.map((opt) => (
@@ -419,7 +419,7 @@ export default function CollectionBrowser({
 							<div className="min-w-0 p-4 flex-1">
 								<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
 								{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>}
-								<div className="flex flex-wrap justify-between gap-2 text-xs font-mono text-[var(--text-muted)] mt-3"><span>{getCollectionName(article.collection)}</span><span>{article.date}</span></div>
+								<div className="flex flex-wrap justify-between gap-2 text-xs text-[var(--text-muted)] mt-3"><span>{getCollectionName(article.collection)}</span><span>{article.date}</span></div>
 							</div>
 						</a>
 					))}
@@ -437,7 +437,7 @@ export default function CollectionBrowser({
 								</a>
 							)}
 							{/* Top meta row: Category & Date */}
-							<div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[var(--text-muted)]">
+							<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
 								<div className="flex items-center gap-2">
 									{article.category ? (
 										<a
@@ -520,7 +520,7 @@ export default function CollectionBrowser({
 											<a
 												key={tag}
 												href={`/tags/${taxonomySlug(tag)}`}
-												className="inline-flex items-center gap-1 text-[11px] font-mono text-[var(--primary)] hover:underline transition-colors"
+												className="inline-flex items-center gap-1 text-[11px] text-[var(--primary)] hover:underline transition-colors"
 											>
 												<Tag className="w-2.5 h-2.5" />
 												<span>#{tag}</span>

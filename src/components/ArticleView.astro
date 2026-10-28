@@ -28,7 +28,7 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 
 <article class="article-container space-y-6">
 	<!-- Breadcrumb Path -->
-	<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+	<div class="flex items-center gap-2 text-xs text-[var(--text-muted)]">
 		<a href={`/${entry.collection}`} class="capitalize hover:text-[var(--primary)] transition-colors">{colName}</a>
 		<ChevronRight class="w-3.5 h-3.5" />
 		{
@@ -121,7 +121,7 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 				{backlinks.length > 0 && (
 					<section class="space-y-2">
 						<h3 class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
-							Linked References <span class="font-mono normal-case">· {backlinks.length}</span>
+							Linked References <span class="normal-case">· {backlinks.length}</span>
 						</h3>
 						<nav class="space-y-0.5">
 							{backlinks.map((bl) => (

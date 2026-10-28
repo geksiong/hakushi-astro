@@ -211,7 +211,7 @@ export default function ThemeMenu() {
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider">
 								Appearance
 							</span>
-							<span className="text-[10px] text-[var(--text-muted)] font-mono">
+							<span className="text-[10px] text-[var(--text-muted)]">
 								{isDarkEffective ? 'Dark Mode Active' : 'Light Mode Active'}
 							</span>
 						</div>
@@ -244,7 +244,7 @@ export default function ThemeMenu() {
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider">
 								Font Size
 							</span>
-							<span className="text-[10px] font-mono text-[var(--primary)] font-medium">
+							<span className="text-[10px] text-[var(--primary)] font-medium">
 								{FONT_SIZES[fontSizeId].name} · {FONT_SIZES[fontSizeId].badge}
 							</span>
 						</div>
@@ -266,7 +266,7 @@ export default function ThemeMenu() {
 										<span className="font-extrabold text-sm leading-none mb-0.5">
 											{font.label}
 										</span>
-										<span className="text-[10px] opacity-80 font-mono">
+										<span className="text-[10px] opacity-80">
 											{font.badge}
 										</span>
 									</button>
@@ -281,7 +281,7 @@ export default function ThemeMenu() {
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider">
 								Layout Spacing
 							</span>
-							<span className="text-[10px] font-mono text-[var(--primary)] font-medium">
+							<span className="text-[10px] text-[var(--primary)] font-medium">
 								{LAYOUT_SCHEMES[layoutId].name}
 							</span>
 						</div>
@@ -353,7 +353,7 @@ export default function ThemeMenu() {
 												<span className="font-semibold text-xs text-[var(--text-main)] truncate">
 													{preset.name}
 												</span>
-												<span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] shrink-0 font-mono">
+												<span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] shrink-0">
 													{preset.tagline}
 												</span>
 											</div>
@@ -388,7 +388,7 @@ export default function ThemeMenu() {
 											{preset.description}
 										</p>
 
-										<div className="flex items-center gap-2 mt-1.5 text-[9px] text-[var(--text-muted)] font-mono opacity-80">
+										<div className="flex items-center gap-2 mt-1.5 text-[9px] text-[var(--text-muted)] opacity-80">
 											<span className="capitalize">{preset.style} Type</span>
 											<span>•</span>
 											<span className="capitalize">{preset.layout} Layout</span>

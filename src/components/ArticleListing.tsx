@@ -50,7 +50,7 @@ export default function ArticleListing({ articles, collections, storageKey }: Pr
 						<div className="min-w-0 p-4 flex-1">
 							<h2 className="font-semibold text-sm text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
 							{article.summary && <p className="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>}
-							<div className="flex flex-wrap justify-between gap-2 mt-3 text-[11px] font-mono text-[var(--text-muted)]"><span>{collectionName(article.collection)}</span><span>{article.date}</span></div>
+							<div className="flex flex-wrap justify-between gap-2 mt-3 text-[11px] text-[var(--text-muted)]"><span>{collectionName(article.collection)}</span><span>{article.date}</span></div>
 						</div>
 					</a>
 				))}

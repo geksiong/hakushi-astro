@@ -29,9 +29,9 @@ articles.sort((a: any, b: any) => b.date.localeCompare(a.date));
 	<ReaderShell>
 		<main class="flex-1 w-full article-container space-y-6">
 			<div class="space-y-2">
-				<a href="/tags" class="text-xs font-mono text-[var(--text-muted)] hover:text-[var(--primary)]">Tags <ChevronRight class="inline w-3.5 h-3.5" /></a>
+				<a href="/tags" class="text-xs text-[var(--text-muted)] hover:text-[var(--primary)]">Tags <ChevronRight class="inline w-3.5 h-3.5" /></a>
 				<h1 class="flex items-center gap-2 text-3xl font-extrabold text-[var(--text-main)] font-heading"><Tag class="w-5 h-5 text-[var(--secondary)]" />#{name}</h1>
-				<p class="text-xs text-[var(--text-muted)] font-mono">{articles.length} {articles.length === 1 ? 'article' : 'articles'}</p>
+				<p class="text-xs text-[var(--text-muted)]">{articles.length} {articles.length === 1 ? 'article' : 'articles'}</p>
 			</div>
 			<ArticleListing client:load articles={articles} collections={config.collections} storageKey={`hakushi_listing_layout:tag:${Astro.params.tag}`} />
 		</main>

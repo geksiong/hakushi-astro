@@ -383,7 +383,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 							/>
 						</div>
 
-						<div className="flex items-center gap-2 font-mono text-[var(--text-muted)] text-xs">
+						<div className="flex items-center gap-2 text-[var(--text-muted)] text-xs">
 							<span>{nodes.length} Nodes</span>
 							<span>•</span>
 							<span>{links.length} Edges</span>
@@ -399,7 +399,7 @@ export default function GraphBrowser({ graph, focus, isSubGraph = false }: Graph
 			/>
 
 			{nodes.length === 0 && (
-				<div className="absolute inset-0 flex items-center justify-center text-[var(--text-muted)] font-mono text-xs pointer-events-none">
+				<div className="absolute inset-0 flex items-center justify-center text-[var(--text-muted)] text-xs pointer-events-none">
 					No nodes match the current filters.
 				</div>
 			)}

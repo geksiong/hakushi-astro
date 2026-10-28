@@ -144,7 +144,7 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 				{/* Results List */}
 				<div ref={listRef} id="palette-results" role="listbox" className="max-h-96 overflow-y-auto p-2 space-y-1">
 					{results.length === 0 ? (
-						<div className="p-8 text-center text-[var(--text-muted)] font-mono">
+						<div className="p-8 text-center text-[var(--text-muted)]">
 							No matching notes found for "{query}".
 						</div>
 					) : (
@@ -179,7 +179,7 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 									</p>
 								</div>
 
-								<div className="flex flex-col items-end shrink-0 gap-1 font-mono text-[10px] text-[var(--text-muted)]">
+								<div className="flex flex-col items-end shrink-0 gap-1 text-[10px] text-[var(--text-muted)]">
 									<span className="px-2 py-0.5 rounded bg-[var(--primary)]/10 text-[var(--primary)] font-semibold capitalize">
 										{note.collection}
 									</span>
@@ -191,7 +191,7 @@ export default function CommandPalette({ docs }: CommandPaletteProps) {
 				</div>
 
 				{/* Footer info - keyboard hints are irrelevant on touch devices */}
-				<div className="hidden sm:flex p-3 border-t border-[var(--border)] text-[10px] text-[var(--text-muted)] font-mono justify-between items-center">
+				<div className="hidden sm:flex p-3 border-t border-[var(--border)] text-[10px] text-[var(--text-muted)] justify-between items-center">
 					<span>
 						Use{' '}
 						<kbd className="px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--bg-surface)]">↑</kbd>{' '}

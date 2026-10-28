@@ -66,7 +66,7 @@ articles.sort((a, b) => b.date.localeCompare(a.date));
 	<ReaderShell>
 	<main class="flex-1 w-full article-container space-y-6">
 		<div class="space-y-2">
-			<div class="flex items-center gap-2 text-xs font-mono text-[var(--text-muted)]">
+			<div class="flex items-center gap-2 text-xs text-[var(--text-muted)]">
 				<a href="/graph" class="hover:text-[var(--primary)] transition-colors">Knowledge Graph</a>
 				<ChevronRight class="w-3.5 h-3.5" />
 				<span class="text-[var(--text-main)] font-medium">Categories</span>
@@ -82,7 +82,7 @@ articles.sort((a, b) => b.date.localeCompare(a.date));
 					{name}
 				</span>
 			</h1>
-			<p class="text-xs text-[var(--text-muted)] font-mono">
+			<p class="text-xs text-[var(--text-muted)]">
 				{articles.length} {articles.length === 1 ? 'article' : 'articles'}
 			</p>
 		</div>
