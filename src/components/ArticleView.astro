@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, ChevronDown, Calendar, Clock, User, Tag, List } from '@lucide/astro';
+import { ChevronRight, ChevronDown, List } from '@lucide/astro';
 import { getCollectionConfig } from '../lib/collections';
 import { resolveEntryTitle } from '../lib/title';
 import { taxonomySlug } from '../lib/slugs';
@@ -43,7 +43,7 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 	</div>
 
 	<!-- Article Header -->
-	<header class="space-y-4 pb-6 border-b border-[var(--border)]">
+	<header class="space-y-3 pb-6 border-b border-[var(--border)]">
 		<h1
 			class="font-extrabold tracking-tight text-[var(--text-main)] font-heading leading-tight"
 			style="font-size: calc(var(--font-size-h1, 2.15rem) * 1.15);"
@@ -51,57 +51,14 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 			{displayTitle}
 		</h1>
 
-		<!-- Metadata -->
-		<div class="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
-			{
-				date && (
-					<div class="flex items-center gap-1.5">
-						<Calendar class="w-3.5 h-3.5" />
-						<time datetime={date.toISOString().slice(0, 10)}>{displayDate}</time>
-					</div>
-				)
-			}
+		{data.summary && <p class="text-base text-[var(--text-muted)] leading-relaxed">{data.summary}</p>}
 
-			<div class="flex items-center gap-1.5">
-				<Clock class="w-3.5 h-3.5" />
-				<span>{readingTime.minutes} min read ({readingTime.words} words)</span>
-			</div>
-
-			{
-				data.author && (
-					<div class="flex items-center gap-1.5">
-						<User class="w-3.5 h-3.5" />
-						<span>{data.author}</span>
-					</div>
-				)
-			}
-		</div>
-
-		<!-- Summary -->
-		{
-			data.summary && (
-				<p class="pl-4 border-l-2 border-[var(--primary)]/50 text-sm text-[var(--text-muted)] leading-relaxed italic">
-					{data.summary}
-				</p>
-			)
-		}
-
-		<!-- Tags -->
-		{
-			data.tags.length > 0 && (
-				<div class="flex flex-wrap items-center gap-2 pt-2">
-					{data.tags.map((tag) => (
-						<a
-							href={`/tags/${taxonomySlug(tag)}`}
-							class="inline-flex items-center gap-1 text-xs font-mono text-[var(--primary)] hover:underline transition-colors"
-						>
-							<Tag class="w-3 h-3" />
-							#{tag}
-						</a>
-					))}
-				</div>
-			)
-		}
+		<p class="text-xs text-[var(--text-muted)]">
+			{date && <time datetime={date.toISOString().slice(0, 10)}>{displayDate}</time>}
+			{date && ' · '}
+			{readingTime.minutes} min read
+			{data.author && ` · ${data.author}`}
+		</p>
 	</header>
 
 	{data.mainImage && (
@@ -147,25 +104,42 @@ const displayDate = date?.toLocaleDateString(config.lang, { year: 'numeric', mon
 		<Content />
 	</div>
 
-	<!-- Backlinks / Linked References -->
+	<!-- Tags and Linked References -->
 	{
-		backlinks.length > 0 && (
-			<section class="mt-12 pt-6 border-t border-[var(--border)] space-y-2">
-				<h3 class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
-					Linked References <span class="font-mono normal-case">· {backlinks.length}</span>
-				</h3>
-				<nav class="space-y-0.5">
-					{backlinks.map((bl) => (
-						<a
-							href={`/${bl.slug}`}
-							title={bl.title}
-							class="block truncate py-1 text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-						>
-							{bl.title}
-						</a>
-					))}
-				</nav>
-			</section>
+		(data.tags.length > 0 || backlinks.length > 0) && (
+			<footer class="mt-12 pt-6 border-t border-[var(--border)] space-y-6">
+				{data.tags.length > 0 && (
+					<nav aria-label="Tags" class="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+						{data.tags.map((tag) => (
+							<a
+								href={`/tags/${taxonomySlug(tag)}`}
+								class="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+							>
+								#{tag}
+							</a>
+						))}
+					</nav>
+				)}
+
+				{backlinks.length > 0 && (
+					<section class="space-y-2">
+						<h3 class="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+							Linked References <span class="font-mono normal-case">· {backlinks.length}</span>
+						</h3>
+						<nav class="space-y-0.5">
+							{backlinks.map((bl) => (
+								<a
+									href={`/${bl.slug}`}
+									title={bl.title}
+									class="block truncate py-1 text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
+								>
+									{bl.title}
+								</a>
+							))}
+						</nav>
+					</section>
+				)}
+			</footer>
 		)
 	}
 </article>
