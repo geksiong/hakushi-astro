@@ -27,13 +27,13 @@ const CODE_ICON = codeSvg
 	.replace('<svg', '<svg class="code-header-icon"');
 
 const CALLOUT_META = {
-	note: { icon: infoSvg, defaultTitle: 'NOTE' },
-	tip: { icon: lightbulbSvg, defaultTitle: 'TIP' },
-	warning: { icon: triangleAlertSvg, defaultTitle: 'WARNING' },
-	danger: { icon: shieldAlertSvg, defaultTitle: 'DANGER' },
-	info: { icon: circleAlertSvg, defaultTitle: 'INFO' },
-	quote: { icon: messageSquareQuoteSvg, defaultTitle: 'QUOTE' },
-	check: { icon: circleCheckBigSvg, defaultTitle: 'CHECKLIST' },
+	note: { icon: infoSvg, defaultTitle: 'Note' },
+	tip: { icon: lightbulbSvg, defaultTitle: 'Tip' },
+	warning: { icon: triangleAlertSvg, defaultTitle: 'Warning' },
+	danger: { icon: shieldAlertSvg, defaultTitle: 'Danger' },
+	info: { icon: circleAlertSvg, defaultTitle: 'Info' },
+	quote: { icon: messageSquareQuoteSvg, defaultTitle: 'Quote' },
+	check: { icon: circleCheckBigSvg, defaultTitle: 'Checklist' },
 	tab: { icon: null, defaultTitle: null },
 };
 
