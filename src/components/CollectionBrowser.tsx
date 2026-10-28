@@ -1,27 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-	BookOpen,
-	Calendar,
-	Clock,
-	User,
-	Tag,
-	Folder,
-	Microscope,
-	FileText,
-	Share2,
-	ChevronLeft,
-	ChevronRight,
-	ArrowRight,
-	Search,
-	X,
-	SlidersHorizontal,
-	Layers,
-	LayoutGrid,
-	List,
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, Search, X, LayoutGrid, List } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
-import { taxonomySlug } from '../lib/slugs';
 
 interface CollectionBrowserProps {
 	collection: CollectionConfig;
@@ -30,27 +10,16 @@ interface CollectionBrowserProps {
 	collections?: CollectionConfig[];
 }
 
-const COLLECTION_ICONS: Record<string, any> = {
-	BookOpen,
-	Calendar,
-	Microscope,
-	FileText,
-	Share2,
-	Folder,
-	Layers,
-};
-
 type SortOrder = 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 
 export default function CollectionBrowser({
 	collection,
 	articles,
-	articlesPerPage = 5,
+	articlesPerPage = 12,
 	collections = [],
 }: CollectionBrowserProps) {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
-	const [pageSize, setPageSize] = useState<number>(articlesPerPage);
 	const [listingLayout, setListingLayout] = useState<'grid' | 'list'>('grid');
 
 	useEffect(() => {
@@ -66,14 +35,7 @@ export default function CollectionBrowser({
 		try { localStorage.setItem(`hakushi_listing_layout:${collection.id}`, layout); } catch { /* storage can be unavailable */ }
 	};
 
-	useEffect(() => {
-		setPageSize(articlesPerPage);
-	}, [articlesPerPage]);
-
-	const pageSizeOptions = useMemo(() => {
-		const set = new Set([articlesPerPage, 3, 5, 10, 20]);
-		return Array.from(set).sort((a, b) => a - b);
-	}, [articlesPerPage]);
+	const pageSize = Math.max(1, articlesPerPage);
 
 	const [currentPage, setCurrentPage] = useState<number>(() => {
 		if (typeof window !== 'undefined') {
@@ -156,14 +118,9 @@ export default function CollectionBrowser({
 		}
 	};
 
-	// Reset page to 1 when search query, sort order, or pageSize changes
+	// Reset page to 1 when search query or sort order changes
 	const handleSearchChange = (val: string) => {
 		setSearchQuery(val);
-		goToPage(1);
-	};
-
-	const handlePageSizeChange = (newSize: number) => {
-		setPageSize(newSize);
 		goToPage(1);
 	};
 
@@ -172,7 +129,6 @@ export default function CollectionBrowser({
 		goToPage(1);
 	};
 
-	const IconComponent = COLLECTION_ICONS[collection.iconName ?? 'Folder'] || Folder;
 	const isAll = collection.id === 'all';
 
 	const getCollectionName = (id: string) =>
@@ -199,343 +155,189 @@ export default function CollectionBrowser({
 		return pages;
 	};
 
-	// Pagination controls (rendered both above and below the list so users
-	// don't have to scroll to change pages)
-	const renderPagination = (label: string, keyPrefix: string) =>
-		totalItems > 0 ? (
-			<nav
-				aria-label={label}
-				className="py-3 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
-			>
-				{/* Status counter */}
-				<div className="text-[var(--text-muted)]">
-					Showing <span className="font-semibold text-[var(--text-main)]">{startIndex + 1}</span>–
-					<span className="font-semibold text-[var(--text-main)]">{endIndex}</span> of{' '}
-					<span className="font-semibold text-[var(--text-main)]">{totalItems}</span> articles
-				</div>
+	// Pagination controls - only rendered when there is more than one page
+	const pagination =
+		totalPages > 1 ? (
+			<nav aria-label="Collection pagination" className="flex items-center justify-center gap-1 text-xs">
+				<button
+					onClick={() => goToPage(safePage - 1)}
+					disabled={safePage <= 1}
+					className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					aria-label="Previous page"
+				>
+					<ChevronLeft className="w-4 h-4" />
+					<span className="hidden sm:inline">Previous</span>
+				</button>
 
-				{/* Navigation buttons */}
-				<div className="flex items-center gap-1">
-					{/* Previous Button */}
-					<button
-						onClick={() => goToPage(safePage - 1)}
-						disabled={safePage <= 1}
-						className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--text-main)] hover:border-[var(--text-muted)]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-sans font-medium"
-						aria-label="Previous page"
-					>
-						<ChevronLeft className="w-4 h-4" />
-						<span className="hidden sm:inline">Previous</span>
-					</button>
+				{getPageNumbers().map((p, idx) => {
+					if (typeof p === 'string') {
+						return (
+							<span key={`ellipsis-${idx}`} className="px-2 py-1 text-[var(--text-muted)]">
+								…
+							</span>
+						);
+					}
+					const isCurrent = p === safePage;
+					return (
+						<button
+							key={`page-${p}`}
+							onClick={() => goToPage(p)}
+							aria-current={isCurrent ? 'page' : undefined}
+							className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
+								isCurrent
+									? 'text-[var(--text-main)] font-semibold bg-[var(--border)]/40'
+									: 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+							}`}
+						>
+							{p}
+						</button>
+					);
+				})}
 
-					{/* Page number buttons */}
-					<div className="flex items-center gap-1 mx-1">
-						{getPageNumbers().map((p, idx) => {
-							if (typeof p === 'string') {
-								return (
-									<span key={`${keyPrefix}-ellipsis-${idx}`} className="px-2 py-1 text-[var(--text-muted)]">
-										…
-									</span>
-								);
-							}
-							const isCurrent = p === safePage;
-							return (
-								<button
-									key={`${keyPrefix}-page-${p}`}
-									onClick={() => goToPage(p)}
-									aria-current={isCurrent ? 'page' : undefined}
-								className={`w-8 h-8 rounded-full flex items-center justify-center font-medium transition-colors ${
-									isCurrent
-										? 'bg-[var(--text-main)] text-[var(--bg-main)]'
-										: 'text-[var(--text-muted)] hover:bg-[var(--border)]/40 hover:text-[var(--text-main)]'
-								}`}
-								>
-									{p}
-								</button>
-							);
-						})}
-					</div>
-
-					{/* Next Button */}
-					<button
-						onClick={() => goToPage(safePage + 1)}
-						disabled={safePage >= totalPages}
-						className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--text-main)] hover:border-[var(--text-muted)]/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-sans font-medium"
-						aria-label="Next page"
-					>
-						<span className="hidden sm:inline">Next</span>
-						<ChevronRight className="w-4 h-4" />
-					</button>
-				</div>
+				<button
+					onClick={() => goToPage(safePage + 1)}
+					disabled={safePage >= totalPages}
+					className="flex items-center gap-1 px-2 py-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					aria-label="Next page"
+				>
+					<span className="hidden sm:inline">Next</span>
+					<ChevronRight className="w-4 h-4" />
+				</button>
 			</nav>
 		) : null;
 
+	const layoutButton = (layout: 'grid' | 'list', label: string, Icon: typeof List) => (
+		<button
+			type="button"
+			onClick={() => changeListingLayout(layout)}
+			aria-pressed={listingLayout === layout}
+			aria-label={label}
+			title={label}
+			className={`p-1.5 rounded-md transition-colors ${
+				listingLayout === layout
+					? 'text-[var(--text-main)] bg-[var(--border)]/40'
+					: 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+			}`}
+		>
+			<Icon className="w-4 h-4" />
+		</button>
+	);
+
+	// Article metadata line: collection (only when mixing collections),
+	// date and reading time.
+	const metaLine = (article: ArticleMeta) =>
+		[isAll ? getCollectionName(article.collection) : null, article.date, `${article.readingTime.minutes} min read`]
+			.filter(Boolean)
+			.join(' · ');
+
 	return (
 		<div className="collection-browser-container space-y-8 animate-in fade-in">
-			{/* Breadcrumb Path */}
-			<div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-				{isAll ? (
-					<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
-						<Layers className="w-3.5 h-3.5" />
-						{collection.name}
-					</span>
-				) : (
-					<>
-						<a href="/" className="hover:text-[var(--primary)] transition-colors flex items-center gap-1">
-							<Layers className="w-3.5 h-3.5" />
-							<span>Collections</span>
-						</a>
-						<ChevronRight className="w-3.5 h-3.5" />
-						<span className="text-[var(--text-main)] font-semibold flex items-center gap-1.5">
-							<IconComponent className="w-3.5 h-3.5" />
-							{collection.name}
-						</span>
-					</>
-				)}
-			</div>
-
 			{/* Collection Header */}
-			<header className="space-y-4 pb-6 border-b border-[var(--border)]">
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-					<div className="flex items-start sm:items-center gap-3">
-						<div className="p-2 rounded-lg bg-[var(--primary)]/[0.07] text-[var(--primary)] shrink-0">
-							<IconComponent className="w-5 h-5" />
-						</div>
-						<div>
-							<h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
-								{collection.name}
-							</h1>
-							{collection.description && (
-								<p className="text-sm text-[var(--text-muted)] mt-1 max-w-2xl leading-relaxed">
-									{collection.description}
-								</p>
-							)}
-						</div>
-					</div>
-
-					<div className="flex items-center gap-2 shrink-0 self-start sm:self-auto text-xs">
-						<span className="px-3 py-1 rounded-full bg-[var(--primary)]/[0.07] text-[var(--primary)] font-medium">
-							{articles.length} {articles.length === 1 ? 'article' : 'articles'}
-						</span>
-						<span className="px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--text-muted)] capitalize">
-							{isAll ? 'Mixed' : collection.type === 'dated' ? 'Chronological' : 'Folder'}
-						</span>
-					</div>
-				</div>
-
-				{/* Search & Sort Controls Toolbar */}
-				<div className="pt-3 border-t border-[var(--border)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
-					{/* Search input */}
-					<div className="relative flex-1">
-						<Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-						<input
-							type="text"
-							value={searchQuery}
-							onChange={(e) => handleSearchChange(e.target.value)}
-							placeholder={
-								isAll
-									? 'Search across all collections (title, summary, tags, author)...'
-									: 'Search in this collection (title, summary, tags, author)...'
-							}
-							className="w-full pl-9 pr-8 py-2 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-hidden focus:border-[var(--text-muted)]/50 transition-colors"
-						/>
-						{searchQuery && (
-							<button
-								onClick={() => handleSearchChange('')}
-								className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-main)]"
-								title="Clear search"
-							>
-								<X className="w-3.5 h-3.5" />
-							</button>
-						)}
-					</div>
-
-					{/* Sort & PageSize controls */}
-					<div className="flex flex-wrap items-center gap-3">
-						<div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-							<SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
-							<select
-								value={sortOrder}
-								onChange={(e) => handleSortChange(e.target.value as SortOrder)}
-								className="py-1.5 px-2.5 rounded-full bg-transparent border border-[var(--border)] text-[var(--text-main)] font-medium focus:outline-hidden"
-							>
-								<option value="newest">Newest first</option>
-								<option value="oldest">Oldest first</option>
-								<option value="title-asc">Title (A–Z)</option>
-								<option value="title-desc">Title (Z–A)</option>
-							</select>
-						</div>
-
-						<div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-							<span className="hidden sm:inline">Per page:</span>
-							<select
-								value={pageSize}
-								onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-								className="py-1.5 px-2 rounded-full bg-transparent border border-[var(--border)] text-[var(--text-main)] font-medium focus:outline-hidden"
-								title="Articles per page"
-							>
-								{pageSizeOptions.map((opt) => (
-									<option key={opt} value={opt}>
-										{opt} {opt === articlesPerPage ? '(default)' : ''}
-									</option>
-								))}
-							</select>
-						</div>
-						<div className="inline-flex rounded-full border border-[var(--border)] p-0.5" role="group" aria-label="Listing layout">
-							<button type="button" onClick={() => changeListingLayout('grid')} aria-pressed={listingLayout === 'grid'} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 font-medium ${listingLayout === 'grid' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><LayoutGrid className="w-3.5 h-3.5" />Grid</button>
-							<button type="button" onClick={() => changeListingLayout('list')} aria-pressed={listingLayout === 'list'} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 font-medium ${listingLayout === 'list' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><List className="w-3.5 h-3.5" />List</button>
-						</div>
-					</div>
-				</div>
+			<header className="space-y-2">
+				{!isAll && (
+					<a href="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+						All collections
+					</a>
+				)}
+				<h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">
+					{collection.name}
+				</h1>
+				{collection.description && (
+					<p className="text-sm text-[var(--text-muted)] max-w-2xl leading-relaxed">{collection.description}</p>
+				)}
 			</header>
 
-			{/* Pagination Controls (top) */}
-			{renderPagination('Collection pagination top', 'top')}
+			{/* Filter, sort and layout toolbar */}
+			<div className="flex items-center gap-3 pb-4 border-b border-[var(--border)] text-xs">
+				<div className="relative flex-1 min-w-0">
+					<Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none" />
+					<input
+						type="text"
+						value={searchQuery}
+						onChange={(e) => handleSearchChange(e.target.value)}
+						placeholder="Filter articles"
+						aria-label="Filter articles by title, summary, tags or author"
+						className="w-full pl-6 pr-7 py-1.5 bg-transparent text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-hidden"
+					/>
+					{searchQuery && (
+						<button
+							onClick={() => handleSearchChange('')}
+							className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-main)]"
+							title="Clear filter"
+							aria-label="Clear filter"
+						>
+							<X className="w-3.5 h-3.5" />
+						</button>
+					)}
+				</div>
+
+				<select
+					value={sortOrder}
+					onChange={(e) => handleSortChange(e.target.value as SortOrder)}
+					aria-label="Sort articles"
+					className="py-1.5 bg-transparent text-[var(--text-muted)] hover:text-[var(--text-main)] focus:outline-hidden cursor-pointer"
+				>
+					<option value="newest">Newest first</option>
+					<option value="oldest">Oldest first</option>
+					<option value="title-asc">Title (A–Z)</option>
+					<option value="title-desc">Title (Z–A)</option>
+				</select>
+
+				<div className="flex items-center" role="group" aria-label="Listing layout">
+					{layoutButton('grid', 'Grid view', LayoutGrid)}
+					{layoutButton('list', 'List view', List)}
+				</div>
+			</div>
 
 			{/* Articles Listing */}
 			{paginatedArticles.length === 0 ? (
-				<div className="py-12 text-center border border-dashed border-[var(--border)] rounded-lg space-y-3">
-					<Folder className="w-10 h-10 mx-auto text-[var(--text-muted)] opacity-50" />
-					<p className="font-semibold text-[var(--text-main)]">
-						{searchQuery ? 'No articles match your search' : isAll ? 'No articles yet' : 'No articles in this collection'}
+				<div className="py-12 text-center space-y-2 text-sm">
+					<p className="text-[var(--text-main)]">
+						{searchQuery ? 'No articles match your filter.' : isAll ? 'No articles yet.' : 'No articles in this collection yet.'}
 					</p>
 					{searchQuery && (
-						<p className="text-xs text-[var(--text-muted)]">
-							Try searching with different keywords or{' '}
-							<button
-								onClick={() => handleSearchChange('')}
-								className="text-[var(--primary)] underline font-medium"
-							>
-								clear filter
-							</button>
-							.
-						</p>
+						<button onClick={() => handleSearchChange('')} className="text-xs text-[var(--primary)] hover:underline">
+							Clear filter
+						</button>
 					)}
 				</div>
 			) : listingLayout === 'grid' ? (
-				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-10">
 					{paginatedArticles.map((article) => (
-						<a key={article.slug} href={article.url} className="group overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)] transition-colors flex flex-col">
-							{article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className="w-full aspect-[16/10] object-cover" />}
-							<div className="min-w-0 p-4 flex-1">
-								<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
-								{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>}
-								<div className="flex flex-wrap justify-between gap-2 text-xs text-[var(--text-muted)] mt-3"><span>{getCollectionName(article.collection)}</span><span>{article.date}</span></div>
-							</div>
+						<a key={article.slug} href={article.url} className="group flex flex-col">
+							{article.mainImage && (
+								<img src={article.mainImage} alt="" loading="lazy" className="w-full aspect-[16/10] object-cover rounded-lg mb-3" />
+							)}
+							<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">
+								{article.title}
+							</h2>
+							{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1">{article.summary}</p>}
+							<p className="text-xs text-[var(--text-muted)] mt-2">{metaLine(article)}</p>
 						</a>
 					))}
 				</div>
 			) : (
-				<div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+				<div className="divide-y divide-[var(--border)]">
 					{paginatedArticles.map((article) => (
-						<article
-							key={article.slug}
-							className="py-6 group relative space-y-2.5"
-						>
-							{article.mainImage && (
-								<a href={article.url} className="block overflow-hidden rounded-lg">
-									<img src={article.mainImage} alt="" loading="lazy" className="w-full max-h-80 object-cover" />
-								</a>
-							)}
-							{/* Top meta row: Category & Date */}
-							<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
-								<div className="flex items-center gap-2">
-									{article.category ? (
-										<a
-											href={`/categories/${taxonomySlug(article.category)}`}
-											className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wide font-semibold text-[var(--accent)] hover:opacity-80 transition-opacity"
-										>
-											<Folder className="w-3 h-3" />
-											<span>{article.category}</span>
-										</a>
-									) : (
-										<span className="inline-flex items-center gap-1 text-[var(--text-muted)]">
-											<FileText className="w-3 h-3" />
-											<span className="capitalize">
-												{isAll ? getCollectionName(article.collection) : collection.name}
-											</span>
-										</span>
-									)}
-									{isAll && (
-										<a
-											href={`/${article.collection}`}
-											className="inline-flex items-center gap-1 text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
-										>
-											<Layers className="w-3 h-3" />
-											<span className="capitalize">{getCollectionName(article.collection)}</span>
-										</a>
-									)}
-								</div>
-
-								{article.date && (
-									<div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-										<Calendar className="w-3.5 h-3.5" />
-										<span>{article.date}</span>
-									</div>
-								)}
-							</div>
-
-							{/* Article Title */}
-							<div>
-								<h2 className="text-lg sm:text-xl font-bold tracking-tight text-[var(--text-main)] font-heading">
-									<a href={article.url} className="inline-flex items-center gap-2">
-										<span>{article.title}</span>
-										<ArrowRight className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all shrink-0" />
-									</a>
+						<a key={article.slug} href={article.url} className="group flex gap-5 py-5 first:pt-0">
+							<div className="min-w-0 flex-1 space-y-1">
+								<h2 className="text-lg font-semibold tracking-tight text-[var(--text-main)] font-heading group-hover:text-[var(--primary)] transition-colors">
+									{article.title}
 								</h2>
-							</div>
-
-							{/* Summary */}
-							{article.summary ? (
-								<p className="text-sm text-[var(--text-muted)] line-clamp-2 sm:line-clamp-3 leading-relaxed">
-									{article.summary}
-								</p>
-							) : (
-								<p className="text-xs text-[var(--text-muted)] italic">
-									No summary provided for this article.
-								</p>
-							)}
-
-							{/* Bottom meta row: Reading time, Author, Tags, Slug */}
-							<div className="pt-1 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-muted)]">
-								<div className="flex flex-wrap items-center gap-4">
-									{article.readingTime && (
-										<span className="flex items-center gap-1.5 font-medium">
-											<Clock className="w-3.5 h-3.5" />
-											<span>{article.readingTime.minutes} min read</span>
-										</span>
-									)}
-
-									{article.author && (
-										<span className="flex items-center gap-1.5 font-medium">
-											<User className="w-3.5 h-3.5" />
-											<span>{article.author}</span>
-										</span>
-									)}
-								</div>
-
-								{/* Tags */}
-								{article.tags.length > 0 && (
-									<div className="flex flex-wrap items-center gap-1.5">
-										{article.tags.map((tag) => (
-											<a
-												key={tag}
-												href={`/tags/${taxonomySlug(tag)}`}
-												className="inline-flex items-center gap-1 text-[11px] text-[var(--primary)] hover:underline transition-colors"
-											>
-												<Tag className="w-2.5 h-2.5" />
-												<span>#{tag}</span>
-											</a>
-										))}
-									</div>
+								{article.summary && (
+									<p className="text-sm text-[var(--text-muted)] line-clamp-2 leading-relaxed">{article.summary}</p>
 								)}
+								<p className="text-xs text-[var(--text-muted)] pt-1">{metaLine(article)}</p>
 							</div>
-						</article>
+							{article.mainImage && (
+								<img src={article.mainImage} alt="" loading="lazy" className="w-24 sm:w-36 aspect-[4/3] shrink-0 object-cover rounded-md" />
+							)}
+						</a>
 					))}
 				</div>
 			)}
 
-			{/* Pagination Controls (bottom) */}
-			{renderPagination('Collection pagination bottom', 'bottom')}
+			{pagination}
 		</div>
 	);
 }

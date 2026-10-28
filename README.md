@@ -109,7 +109,7 @@ hakushi({
     colorScheme: 'nord',   // hakushi, obsidian, nord, amber, monokai, rose
     style: 'sans',         // sans, serif, mono, editorial
   },
-  articlesPerPage: 5,     // default articles per page when browsing a collection
+  articlesPerPage: 12,    // articles per page when browsing a collection (default 12)
   collections: [
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },

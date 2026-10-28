@@ -57,7 +57,7 @@ function normalizeOptions(options) {
 		about: { ...DEFAULT_ABOUT, ...options.about },
 		sidebarLinks: normalizeLinkList(options.sidebarLinks, DEFAULT_SIDEBAR_LINKS, 'sidebarLinks'),
 		headerLinks: normalizeLinkList(options.headerLinks, DEFAULT_HEADER_LINKS, 'headerLinks'),
-		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 5,
+		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 12,
 		theme: { ...DEFAULT_CONFIG.theme, ...options.theme },
 	};
 	delete config.components;

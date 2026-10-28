@@ -36,22 +36,32 @@ export default function ArticleListing({ articles, collections, storageKey }: Pr
 	const collectionName = (id: string) => collections.find((collection) => collection.id === id)?.name ?? id;
 
 	return (
-		<section aria-label="Articles" className="space-y-4">
-			<div className="flex justify-end">
-				<div className="inline-flex rounded-lg border border-[var(--border)] p-1" role="group" aria-label="Listing layout">
-					<button type="button" onClick={() => changeLayout('grid')} aria-pressed={layout === 'grid'} className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium ${layout === 'grid' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><LayoutGrid className="w-4 h-4" />Grid</button>
-					<button type="button" onClick={() => changeLayout('list')} aria-pressed={layout === 'list'} className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium ${layout === 'list' ? 'bg-[var(--bg-surface)] text-[var(--text-main)]' : 'text-[var(--text-muted)]'}`}><List className="w-4 h-4" />List</button>
-				</div>
+		<section aria-label="Articles" className="space-y-6">
+			<div className="flex justify-end pb-4 border-b border-[var(--border)]" role="group" aria-label="Listing layout">
+				{([['grid', 'Grid view', LayoutGrid], ['list', 'List view', List]] as const).map(([value, label, Icon]) => (
+					<button
+						key={value}
+						type="button"
+						onClick={() => changeLayout(value)}
+						aria-pressed={layout === value}
+						aria-label={label}
+						title={label}
+						className={`p-1.5 rounded-md transition-colors ${layout === value ? 'text-[var(--text-main)] bg-[var(--border)]/40' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+					>
+						<Icon className="w-4 h-4" />
+					</button>
+				))}
 			</div>
-			<div className={layout === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'flex flex-col gap-3'}>
+			<div className={layout === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-10' : 'divide-y divide-[var(--border)]'}>
 				{articles.map((article) => (
-					<a key={article.url} href={article.url} className={`group overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--primary)] transition-colors shadow-2xs ${layout === 'list' ? 'flex items-stretch' : 'flex flex-col'}`}>
-						{article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className={layout === 'grid' ? 'w-full aspect-[16/10] object-cover' : 'w-24 sm:w-40 shrink-0 object-cover'} />}
-						<div className="min-w-0 p-4 flex-1">
-							<h2 className="font-semibold text-sm text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
-							{article.summary && <p className="text-xs text-[var(--text-muted)] line-clamp-2 mt-1.5">{article.summary}</p>}
-							<div className="flex flex-wrap justify-between gap-2 mt-3 text-[11px] text-[var(--text-muted)]"><span>{collectionName(article.collection)}</span><span>{article.date}</span></div>
+					<a key={article.url} href={article.url} className={`group ${layout === 'list' ? 'flex gap-5 py-5 first:pt-0' : 'flex flex-col'}`}>
+						{layout === 'grid' && article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className="w-full aspect-[16/10] object-cover rounded-lg mb-3" />}
+						<div className="min-w-0 flex-1">
+							<h2 className="font-heading font-semibold text-[var(--text-main)] group-hover:text-[var(--primary)] transition-colors">{article.title}</h2>
+							{article.summary && <p className="text-sm text-[var(--text-muted)] line-clamp-2 mt-1">{article.summary}</p>}
+							<p className="text-xs text-[var(--text-muted)] mt-2">{[collectionName(article.collection), article.date].filter(Boolean).join(' · ')}</p>
 						</div>
+						{layout === 'list' && article.mainImage && <img src={article.mainImage} alt="" loading="lazy" className="w-24 sm:w-36 aspect-[4/3] shrink-0 object-cover rounded-md" />}
 					</a>
 				))}
 			</div>

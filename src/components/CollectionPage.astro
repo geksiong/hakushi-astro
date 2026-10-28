@@ -12,7 +12,7 @@ export interface Props {
 
 const { collection, articles } = Astro.props;
 const title = `${collection.name} · ${config.title}`;
-const articlesPerPage = (collection as any).articlesPerPage ?? (config as any).articlesPerPage ?? 5;
+const articlesPerPage = (collection as any).articlesPerPage ?? (config as any).articlesPerPage ?? 12;
 const allCollections = (config as any).collections ?? [];
 ---
 

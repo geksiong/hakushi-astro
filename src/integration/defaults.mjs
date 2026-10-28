@@ -73,7 +73,7 @@ export const DEFAULT_CONFIG = {
 	about: DEFAULT_ABOUT,
 	sidebarLinks: DEFAULT_SIDEBAR_LINKS,
 	headerLinks: DEFAULT_HEADER_LINKS,
-	articlesPerPage: 5,
+	articlesPerPage: 12,
 	theme: {
 		mode: 'dark',
 		colorScheme: 'hakushi',
