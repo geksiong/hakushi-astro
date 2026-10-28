@@ -57,10 +57,12 @@ export default function SidebarContent({
 		setCurrentPath(normalizePath(window.location.pathname));
 	}, []);
 	const isAboutPage = aboutPageProp || currentPath === '/about';
+	const isTagsPage = currentPath === '/tags' || currentPath.startsWith('/tags/');
 	// Any non-collection, non-graph internal link also deselects collections.
 	const noCollectionSelected =
 		isGraphPage ||
 		isAboutPage ||
+		isTagsPage ||
 		links.some((l) => !l.external && normalizePath(l.href) === currentPath);
 	const isLinkActive = (link: SidebarLink) =>
 		!link.external && currentPath !== '' && normalizePath(link.href) === currentPath;
@@ -145,7 +147,7 @@ export default function SidebarContent({
 				})}
 			</nav>
 
-			{/* Graph and configurable pages & external sites */}
+			{/* Graph, tags and configurable pages & external sites */}
 			<nav aria-label="Pages" className="p-3 space-y-0.5 border-t border-[var(--border)]">
 				<a
 					href="/graph"
@@ -155,6 +157,15 @@ export default function SidebarContent({
 					className={`${ROW} px-2 py-1.5 ${isGraphPage ? ACTIVE : IDLE}`}
 				>
 					Knowledge Graph
+				</a>
+				<a
+					href="/tags"
+					onClick={() => onNavigate?.()}
+					aria-current={isTagsPage ? 'page' : undefined}
+					title="Browse every tag"
+					className={`${ROW} px-2 py-1.5 ${isTagsPage ? ACTIVE : IDLE}`}
+				>
+					Tags
 				</a>
 				{links.map((link) => {
 					const isActive = isLinkActive(link);

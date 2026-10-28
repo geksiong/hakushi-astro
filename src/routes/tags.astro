@@ -1,0 +1,49 @@
+---
+import config from 'virtual:hakushi/config';
+import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
+import { getArticleIndex } from '../lib/articles';
+import { taxonomySlug } from '../lib/slugs';
+
+// One entry per tag slug, so spelling variants of a tag share its page.
+const counts = new Map<string, { name: string; count: number }>();
+for (const article of await getArticleIndex()) {
+	for (const tag of article.tags) {
+		const slug = taxonomySlug(tag);
+		if (!slug) continue;
+		const entry = counts.get(slug) ?? { name: tag, count: 0 };
+		entry.count++;
+		counts.set(slug, entry);
+	}
+}
+const tags = [...counts].sort(([, a], [, b]) => a.name.localeCompare(b.name, config.lang));
+---
+
+<BaseLayout title={`Tags · ${config.title}`} description="Every tag used across the knowledge base.">
+	<Header view="reader" />
+	<ReaderShell>
+		<main class="flex-1 w-full article-container space-y-6">
+			<header class="space-y-2 pb-6 border-b border-[var(--border)]">
+				<h1 class="text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">Tags</h1>
+				<p class="text-xs text-[var(--text-muted)]">{tags.length} {tags.length === 1 ? 'tag' : 'tags'}</p>
+			</header>
+
+			{
+				tags.length === 0 ? (
+					<p class="text-sm text-[var(--text-muted)]">No tags yet.</p>
+				) : (
+					<nav aria-label="Tags" class="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+						{tags.map(([slug, { name, count }]) => (
+							<a
+								href={`/tags/${slug}`}
+								class="text-[var(--text-main)] hover:text-[var(--primary)] transition-colors"
+							>
+								#{name}
+								<span class="ml-1 text-xs text-[var(--text-muted)]">{count}</span>
+							</a>
+						))}
+					</nav>
+				)
+			}
+		</main>
+	</ReaderShell>
+</BaseLayout>

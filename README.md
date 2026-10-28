@@ -45,7 +45,7 @@ tags: [guide]
 Link to another note with [[another-note]].
 ```
 
-Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, tag/category pages, and `/404`.
+Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, a `/tags` index, tag/category pages, and `/404`.
 
 ## Frontmatter and schema
 
@@ -131,7 +131,7 @@ hakushi({
 })
 ```
 
-`sidebarLinks` are listed as plain text links at the bottom of the sidebar (desktop and mobile drawer), below the collection tree and the Knowledge Graph link. Each entry needs a `label` and an `href`; `iconName`, `description`, and `external` are optional. `external` defaults to `true` for absolute URLs, which open in a new tab. `headerLinks` use the same entry shape and render as icon-only buttons on the right side of the header, before the theme picker — intended for social media and contact links. They default to none. Header link icons support `Info`, `Link`, `Globe`, `Mail`, `Github`, `GitFork`, `ExternalLink`, `Home`, `Rss`, `MessageCircle`, and the collection icons; `Github` is aliased to `GitFork` because lucide no longer ships brand icons. The built-in `/about` route renders `about` and can be replaced with a custom `AboutPage` component (see below) or disabled with `routes: { about: false }`.
+`sidebarLinks` are listed as plain text links at the bottom of the sidebar (desktop and mobile drawer), below the collection tree and the Knowledge Graph and Tags links. Each entry needs a `label` and an `href`; `iconName`, `description`, and `external` are optional. `external` defaults to `true` for absolute URLs, which open in a new tab. `headerLinks` use the same entry shape and render as icon-only buttons on the right side of the header, before the theme picker — intended for social media and contact links. They default to none. Header link icons support `Info`, `Link`, `Globe`, `Mail`, `Github`, `GitFork`, `ExternalLink`, `Home`, `Rss`, `MessageCircle`, and the collection icons; `Github` is aliased to `GitFork` because lucide no longer ships brand icons. The built-in `/about` route renders `about` and can be replaced with a custom `AboutPage` component (see below) or disabled with `routes: { about: false }`.
 
 When changing collections, give the loader the same IDs:
 

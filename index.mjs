@@ -144,6 +144,7 @@ function coreIntegration(options = {}) {
 				add(routes.collections, '/[collection]', './src/routes/collection.astro');
 				add(routes.aliases, '/[slug]', './src/routes/alias.astro');
 				add(routes.graph, '/graph', './src/routes/graph.astro');
+				add(routes.tags, '/tags', './src/routes/tags.astro');
 				add(routes.tags, '/tags/[tag]', './src/routes/tag.astro');
 				add(routes.categories, '/categories/[category]', './src/routes/category.astro');
 				add(routes.notFound, '/404', './src/routes/404.astro');
