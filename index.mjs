@@ -60,12 +60,26 @@ function normalizeOptions(options) {
 		headerLinks: normalizeLinkList(options.headerLinks, DEFAULT_HEADER_LINKS, 'headerLinks'),
 		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 12,
 		theme: resolveTheme(options.theme, DEFAULT_CONFIG.theme),
+		googleAnalytics: normalizeGoogleAnalytics(options.googleAnalytics),
 	};
 	delete config.components;
 	delete config.customCss;
 	delete config.routes;
 	if (!ids.has(config.defaultCollection)) config.defaultCollection = collections[0].id;
 	return config;
+}
+
+/**
+ * `googleAnalytics` accepts a measurement ID string or `{ measurementId }`.
+ * Returns the validated ID, or null when analytics is off.
+ */
+function normalizeGoogleAnalytics(value) {
+	if (value === undefined || value === null || value === false) return null;
+	const id = typeof value === 'string' ? value : value?.measurementId;
+	if (typeof id !== 'string' || !/^(G|GT|AW|DC)-[A-Z0-9]+$/i.test(id.trim())) {
+		throw new Error('[hakushi] `googleAnalytics` must be a Google tag ID such as "G-XXXXXXXXXX" (or `{ measurementId: "G-XXXXXXXXXX" }`).');
+	}
+	return id.trim();
 }
 
 function isExternalHref(href) {

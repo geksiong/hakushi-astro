@@ -151,6 +151,8 @@ export interface HakushiOptions {
 	articlesPerPage?: number;
 	/** Show a Listen control on articles that reads them aloud with the browser's speech synthesis. Defaults to `true`; hidden where unsupported. */
 	readAloud?: boolean;
+	/** Google Analytics 4 measurement ID (e.g. `'G-XXXXXXXXXX'`). The tag is added to production builds only. Off by default. */
+	googleAnalytics?: string | { measurementId: string } | null;
 	theme?: HakushiThemeOptions;
 	customCss?: (string | URL)[];
 	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage', string | URL>>;
@@ -167,6 +169,7 @@ declare module 'virtual:hakushi/config' {
 	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'favicon' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
 		articlesPerPage: number;
 		readAloud: boolean;
+		googleAnalytics: string | null;
 		/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
 		theme: {
 			mode: 'light' | 'dark' | 'auto';

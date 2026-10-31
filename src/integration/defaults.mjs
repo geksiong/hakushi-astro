@@ -75,6 +75,7 @@ export const DEFAULT_CONFIG = {
 	headerLinks: DEFAULT_HEADER_LINKS,
 	articlesPerPage: 12,
 	readAloud: true,
+	googleAnalytics: null,
 	theme: {
 		mode: 'dark',
 		colorScheme: 'hakushi',

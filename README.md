@@ -111,6 +111,7 @@ hakushi({
   },
   articlesPerPage: 12,    // articles per page when browsing a collection (default 12)
   readAloud: true,        // Listen control that reads articles aloud (default true)
+  googleAnalytics: 'G-XXXXXXXXXX', // optional Google Analytics 4 measurement ID
   collections: [
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
@@ -300,6 +301,16 @@ Hakushi owns the unified Markdown processor. Take care not to replace `markdown.
 ## Read aloud
 
 Articles show a **Listen** control in their metadata line. It reads the title, summary and body aloud using the browser's built-in speech synthesis (the Web Speech API), in the site's `lang`, highlighting each block as it is spoken. While reading, it turns into pause/resume and stop icons, and the same controls appear beside the scroll-to-top button, which sits at the bottom of the screen in line with the article's right edge once the page is scrolled down. Reading follows along by scrolling until you scroll yourself, and picks up again when the spoken block is back on screen. Code blocks, diagrams, charts, music notation, tables and display math are skipped; inline math is read as "formula". The control only appears in browsers that support speech synthesis. Set `readAloud: false` to remove it.
+
+## Google Analytics
+
+Set `googleAnalytics` to a Google Analytics 4 measurement ID to add the Google tag (`gtag.js`) to every page:
+
+```js
+hakushi({ googleAnalytics: 'G-XXXXXXXXXX' })
+```
+
+It is off by default. The tag is only added to production builds (`astro build`), so `astro dev` traffic isn't counted. Each page load is reported as a page view. An ID that isn't a Google tag ID (`G-…`) stops the build with an error. Hakushi doesn't show a cookie-consent banner; if your audience requires one, add it with a custom header or component and configure [Google consent mode](https://developers.google.com/tag-platform/security/guides/consent).
 
 ## Keyboard shortcuts
 

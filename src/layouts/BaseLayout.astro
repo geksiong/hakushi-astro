@@ -27,6 +27,12 @@ const fontStylesheets = [
 	),
 ];
 
+// Google Analytics loads in production builds only, so dev traffic isn't counted.
+const gaId = import.meta.env.PROD ? config.googleAnalytics : null;
+const gaInit = gaId
+	? `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',${JSON.stringify(gaId)});`
+	: '';
+
 const searchDocs = await getSearchDocs();
 const articles = await getArticleIndex();
 ---
@@ -48,6 +54,8 @@ const articles = await getArticleIndex();
 		{fontStylesheets.map((href) => <link rel="stylesheet" href={href} />)}
 		<script is:inline set:html={createThemeInitScript(config.theme)} />
 		<script is:inline set:html={createSidebarInitScript()} />
+		{gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`} />}
+		{gaId && <script is:inline set:html={gaInit} />}
 	</head>
 	<body class="min-h-screen flex flex-col antialiased">
 		<slot />
