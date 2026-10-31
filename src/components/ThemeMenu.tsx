@@ -14,6 +14,7 @@ import {
 	RotateCcw,
 	ChevronDown,
 	ChevronUp,
+	LayoutTemplate,
 	type LucideIcon,
 } from 'lucide-react';
 import {
@@ -22,6 +23,8 @@ import {
 	LAYOUT_SCHEMES,
 	FONT_SIZES,
 	PRESET_THEMES,
+	THEME_DEFAULTS,
+	THEME_STORAGE_KEYS,
 	applyTheme,
 	readStoredTheme,
 	resolveIsDark,
@@ -39,7 +42,8 @@ const MODE_ICONS: Record<ThemeMode, LucideIcon> = {
 	auto: Monitor,
 };
 
-const LAYOUT_ICONS: Record<LayoutSchemeId, LucideIcon> = {
+/** Icons for the built-in layouts; custom layouts use LayoutTemplate. */
+const LAYOUT_ICONS: Record<string, LucideIcon> = {
 	compact: Minimize2,
 	comfortable: BookOpen,
 	spacious: Maximize2,
@@ -133,7 +137,7 @@ export default function ThemeMenu() {
 		setActivePreset(undefined);
 		try {
 			localStorage.setItem('hakushi_scheme', id);
-			localStorage.removeItem('hakushi_preset');
+			localStorage.setItem('hakushi_preset', '');
 		} catch {}
 		applyTheme(mode, id, styleId, layoutId, fontSizeId, undefined);
 	};
@@ -143,15 +147,24 @@ export default function ThemeMenu() {
 		setActivePreset(undefined);
 		try {
 			localStorage.setItem('hakushi_style', id);
-			localStorage.removeItem('hakushi_preset');
+			localStorage.setItem('hakushi_preset', '');
 		} catch {}
 		applyTheme(mode, schemeId, id, layoutId, fontSizeId, undefined);
 	};
 
+	// Back to the site's configured defaults (including custom ones).
 	const handleReset = () => {
-		selectPreset('hakushi');
-		selectFontSize('md');
-		selectMode('dark');
+		const d = THEME_DEFAULTS;
+		setMode(d.mode);
+		setSchemeId(d.schemeId);
+		setStyleId(d.styleId);
+		setLayoutId(d.layoutId);
+		setFontSizeId(d.fontSizeId);
+		setActivePreset(d.presetId);
+		try {
+			for (const key of THEME_STORAGE_KEYS) localStorage.removeItem(key);
+		} catch {}
+		applyTheme(d.mode, d.schemeId, d.styleId, d.layoutId, d.fontSizeId, d.presetId);
 	};
 
 	useEffect(() => {
@@ -245,10 +258,11 @@ export default function ThemeMenu() {
 								Font Size
 							</span>
 							<span className="text-[10px] text-[var(--primary)] font-medium">
-								{FONT_SIZES[fontSizeId].name} · {FONT_SIZES[fontSizeId].badge}
+								{FONT_SIZES[fontSizeId].name}
+								{FONT_SIZES[fontSizeId].badge && ` · ${FONT_SIZES[fontSizeId].badge}`}
 							</span>
 						</div>
-						<div className="grid grid-cols-4 gap-1 p-1 bg-[var(--bg-sidebar)]/80 rounded-lg border border-[var(--border)]/70">
+						<div className="grid grid-cols-[repeat(auto-fit,minmax(4.5rem,1fr))] gap-1 p-1 bg-[var(--bg-sidebar)]/80 rounded-lg border border-[var(--border)]/70">
 							{(Object.keys(FONT_SIZES) as FontSizeId[]).map((fid) => {
 								const font = FONT_SIZES[fid];
 								const isSelected = fontSizeId === fid;
@@ -288,7 +302,7 @@ export default function ThemeMenu() {
 						<div className="grid grid-cols-3 gap-1.5">
 							{(Object.keys(LAYOUT_SCHEMES) as LayoutSchemeId[]).map((lid) => {
 								const lay = LAYOUT_SCHEMES[lid];
-								const Icon = LAYOUT_ICONS[lid];
+								const Icon = LAYOUT_ICONS[lid] ?? LayoutTemplate;
 								const isSelected = layoutId === lid;
 								return (
 									<button
@@ -306,7 +320,7 @@ export default function ThemeMenu() {
 											{lay.name}
 										</div>
 										<p className="text-[9px] text-[var(--text-muted)] leading-tight">
-											{lay.badge} · {lay.contentMaxWidth}
+											{lay.badge ? `${lay.badge} · ${lay.contentMaxWidth}` : lay.contentMaxWidth}
 										</p>
 									</button>
 								);
@@ -315,6 +329,7 @@ export default function ThemeMenu() {
 					</div>
 
 					{/* 4. Curated Preset Themes */}
+					{Object.keys(PRESET_THEMES).length > 0 && (
 					<div>
 						<div className="flex items-center justify-between mb-1.5">
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider flex items-center gap-1">
@@ -330,11 +345,11 @@ export default function ThemeMenu() {
 							{(Object.keys(PRESET_THEMES) as PresetThemeId[]).map((key) => {
 								const preset = PRESET_THEMES[key];
 								const scheme = COLOR_SCHEMES[preset.colorScheme as ColorSchemeId];
-								const isSelected =
-									activePreset === key ||
-									(schemeId === preset.colorScheme &&
+								const isSelected = activePreset
+									? activePreset === key
+									: schemeId === preset.colorScheme &&
 										styleId === preset.style &&
-										layoutId === preset.layout);
+										layoutId === preset.layout;
 								const activePalette = isDarkEffective ? scheme.darkColors : scheme.colors;
 
 								return (
@@ -353,9 +368,11 @@ export default function ThemeMenu() {
 												<span className="font-semibold text-xs text-[var(--text-main)] truncate">
 													{preset.name}
 												</span>
-												<span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] shrink-0">
-													{preset.tagline}
-												</span>
+												{preset.tagline && (
+													<span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] shrink-0">
+														{preset.tagline}
+													</span>
+												)}
 											</div>
 
 											<div className="flex items-center gap-2 shrink-0">
@@ -384,20 +401,23 @@ export default function ThemeMenu() {
 											</div>
 										</div>
 
-										<p className="text-[10px] text-[var(--text-muted)] mt-1 leading-snug">
-											{preset.description}
-										</p>
+										{preset.description && (
+											<p className="text-[10px] text-[var(--text-muted)] mt-1 leading-snug">
+												{preset.description}
+											</p>
+										)}
 
 										<div className="flex items-center gap-2 mt-1.5 text-[9px] text-[var(--text-muted)] opacity-80">
-											<span className="capitalize">{preset.style} Type</span>
+											<span>{THEME_STYLES[preset.style]?.name ?? preset.style}</span>
 											<span>•</span>
-											<span className="capitalize">{preset.layout} Layout</span>
+											<span>{LAYOUT_SCHEMES[preset.layout]?.name ?? preset.layout} Layout</span>
 										</div>
 									</button>
 								);
 							})}
 						</div>
 					</div>
+					)}
 
 					{/* 5. Collapsible Fine-Tuning (Independent Colors & Typography) */}
 					<div className="pt-1 border-t border-[var(--border)]">
@@ -438,10 +458,10 @@ export default function ThemeMenu() {
 												>
 													<div className="min-w-0 pr-1">
 														<p className="text-[11px] font-medium text-[var(--text-main)] truncate">
-															{scheme.badge}
+															{scheme.badge ?? scheme.name}
 														</p>
 														<p className="text-[9px] text-[var(--text-muted)] truncate">
-															{scheme.name}
+															{scheme.badge ? scheme.name : scheme.description}
 														</p>
 													</div>
 
@@ -484,15 +504,14 @@ export default function ThemeMenu() {
 															: 'border-[var(--border)] hover:border-[var(--text-muted)]/40 bg-[var(--bg-sidebar)]/20'
 													}`}
 												>
-													<p className="text-[11px] text-[var(--text-main)] font-semibold">
+													<p className="text-[11px] text-[var(--text-main)] font-semibold" style={{ fontFamily: st.fontHeading }}>
 														{st.name}
 													</p>
-													<p className="text-[9px] text-[var(--text-muted)] truncate mt-0.5">
-														{st.id === 'sans' && 'Modern Sans'}
-														{st.id === 'serif' && 'Classic Serif'}
-														{st.id === 'mono' && 'Code Monospace'}
-														{st.id === 'editorial' && 'Editorial Modern'}
-													</p>
+													{st.description && (
+														<p className="text-[9px] text-[var(--text-muted)] truncate mt-0.5">
+															{st.description}
+														</p>
+													)}
 												</button>
 											);
 										})}

@@ -12,6 +12,7 @@ import remarkCharts from './src/plugins/remark-charts.mjs';
 import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
+import { resolveTheme } from './src/lib/theme-catalog.mjs';
 import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS } from './src/integration/defaults.mjs';
 
 const VIRTUAL_CONFIG = 'virtual:hakushi/config';
@@ -58,7 +59,7 @@ function normalizeOptions(options) {
 		sidebarLinks: normalizeLinkList(options.sidebarLinks, DEFAULT_SIDEBAR_LINKS, 'sidebarLinks'),
 		headerLinks: normalizeLinkList(options.headerLinks, DEFAULT_HEADER_LINKS, 'headerLinks'),
 		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 12,
-		theme: { ...DEFAULT_CONFIG.theme, ...options.theme },
+		theme: resolveTheme(options.theme, DEFAULT_CONFIG.theme),
 	};
 	delete config.components;
 	delete config.customCss;

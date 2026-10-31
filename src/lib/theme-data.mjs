@@ -341,6 +341,7 @@ export const THEME_STYLES = {
 	sans: {
 		id: 'sans',
 		name: 'Hakushi Sans',
+		description: 'Modern Sans',
 		fontHeading: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 		fontBody: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 		fontCode: '"Fira Code", monospace',
@@ -350,6 +351,7 @@ export const THEME_STYLES = {
 	serif: {
 		id: 'serif',
 		name: 'Academic Serif',
+		description: 'Classic Serif',
 		fontHeading: '"Playfair Display", Georgia, "Source Serif 4", serif',
 		fontBody: '"Source Serif 4", Georgia, Cambria, serif',
 		fontCode: '"JetBrains Mono", monospace',
@@ -359,6 +361,7 @@ export const THEME_STYLES = {
 	mono: {
 		id: 'mono',
 		name: 'Developer Mono',
+		description: 'Code Monospace',
 		fontHeading: '"JetBrains Mono", monospace',
 		fontBody: '"JetBrains Mono", monospace',
 		fontCode: '"JetBrains Mono", monospace',
@@ -368,6 +371,7 @@ export const THEME_STYLES = {
 	editorial: {
 		id: 'editorial',
 		name: 'Editorial Modern',
+		description: 'Editorial Modern',
 		fontHeading: '"Playfair Display", "Plus Jakarta Sans", Georgia, serif',
 		fontBody: '"Source Serif 4", Georgia, serif',
 		fontCode: '"Fira Code", monospace',

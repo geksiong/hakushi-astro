@@ -106,8 +106,8 @@ hakushi({
   defaultCollection: 'handbook',
   theme: {
     mode: 'auto',          // light, dark, auto
-    colorScheme: 'nord',   // hakushi, obsidian, nord, amber, monokai, rose
-    style: 'sans',         // sans, serif, mono, editorial
+    colorScheme: 'nord',   // default palette (see "Custom themes" below)
+    style: 'sans',         // default typography
   },
   articlesPerPage: 12,    // articles per page when browsing a collection (default 12)
   readAloud: true,        // Listen control that reads articles aloud (default true)
@@ -145,6 +145,69 @@ export const collections = createHakushiCollections({ collections: navigation })
 
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. A `dated` collection gets date-oriented navigation; `folder` is the default.
 
+## Custom themes
+
+The theme picker offers presets (themes), color palettes, typography styles, layouts, and font sizes. Configure any of them under `theme`:
+
+```js
+hakushi({
+  theme: {
+    preset: 'acme',                  // default for new visitors
+    colorSchemes: {
+      ocean: {
+        name: 'Ocean',
+        badge: '🌊 Ocean',
+        colors: { primary: '#0369a1', primaryHover: '#075985', accent: '#0d9488', bgMain: '#f5fafd' },
+        darkColors: { primary: '#38bdf8', primaryHover: '#7dd3fc', accent: '#2dd4bf', bgMain: '#06141f' },
+      },
+      nord: { colors: { primary: '#2e5d8a' } },  // adjust a built-in
+      monokai: false,                            // hide a built-in
+    },
+    styles: {
+      brand: {
+        name: 'Acme Sans',
+        description: 'Lexend body, Fraunces headings',
+        fontHeading: 'Fraunces, Georgia, serif',
+        fontBody: 'Lexend, system-ui, sans-serif',
+        fontCode: '"JetBrains Mono", monospace',
+        radius: '0.75rem',
+        stylesheet: 'https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Lexend:wght@400;600&display=swap',
+      },
+    },
+    layouts: {
+      wide: { name: 'Wide', badge: 'Roomy', contentMaxWidth: '72rem', shellMaxWidth: '104rem' },
+    },
+    fontSizes: {
+      xxl: { name: 'Huge', label: 'A+++', badge: '22px', rootSize: '22px', fontSizeBase: '1.375rem' },
+    },
+    presets: {
+      acme: { name: 'Acme', tagline: 'House style', description: 'Ocean palette with Acme Sans', colorScheme: 'ocean', style: 'brand', layout: 'wide' },
+    },
+  },
+})
+```
+
+Each catalog is keyed by id:
+
+- **A new id** adds an entry. Fields you leave out come from the default built-in (`hakushi`, `sans`, `comfortable`, `md`). A new palette without `darkColors` uses its `colors` in both modes. Custom entries are listed before the built-ins in the picker.
+- **A built-in id** merges your fields over the built-in entry. For palettes this applies per color, so `nord: { colors: { primary } }` changes only the light-mode primary.
+- **`false`** hides a built-in. Built-in presets that use a hidden palette, style, layout, or font size are hidden too.
+- **`builtIns: false`** shows only the configured entries. Use `builtIns: { presets: false }` to switch off a single catalog. With built-ins off, a built-in id such as `nord: {}` still brings that entry back.
+
+The ids are `hakushi`, `paper`, `academic`, `refined`, `social`, `earth`, `obsidian`, `nord`, `amber`, `monokai`, `rose` (palettes); `sans`, `serif`, `mono`, `editorial` (styles); `compact`, `comfortable`, `spacious` (layouts); `sm`, `md`, `lg`, `xl` (font sizes); and `paper`, `academic`, `refined`, `social`, `earth`, `hakushi` (presets).
+
+| Catalog | Fields |
+| --- | --- |
+| `colorSchemes` | `name`, `description`, `badge`; `colors` and `darkColors` with `primary`, `primaryHover`, `accent`, `secondary`, `bgMain`, `bgSurface`, `bgSidebar`, `border`, `textMain`, `textMuted` |
+| `styles` | `name`, `description`, `fontHeading`, `fontBody`, `fontCode`, `radius`, `stylesheet` (URL or list of URLs that load the fonts) |
+| `layouts` | `name`, `description`, `badge`, `shellMaxWidth`, `contentMaxWidth`, `contentPaddingX`, `contentPaddingY`, `lineHeightBody`, `lineHeightHeading`, `spacingParagraph`, `cardPadding` |
+| `fontSizes` | `name`, `label`, `badge`, `rootSize`, `fontSizeBase`, `fontSizeH1`, `fontSizeH2`, `fontSizeH3` |
+| `presets` | `name`, `badge`, `tagline`, `description`, `colorScheme`, `style`, `layout`, `fontSize` |
+
+`theme.colorScheme`, `style`, `layout`, and `fontSize` choose the defaults for new visitors. `theme.preset` applies a preset's choices as defaults; an explicit default overrides the preset's value. A preset field you leave out uses the default. An unknown id or color name stops the build with an error that lists the valid choices. If a visitor saved a choice that has since been removed, the configured default is used instead. **Reset** in the picker returns to the configured defaults.
+
+The page root carries `data-scheme`, `data-style`, `data-layout`, `data-font-size`, and `data-preset` attributes, so `customCss` can target a choice, for example `html[data-preset="acme"] .md-body h1 { letter-spacing: -0.02em; }`.
+
 ## Override styles
 
 Custom styles load after Hakushi's CSS:
@@ -174,7 +237,7 @@ Override the design tokens in that file:
 }
 ```
 
-The interactive theme picker writes these tokens inline. For a permanent brand theme, hide the picker with a custom header or use a higher-specificity override.
+The interactive theme picker writes the color, font, and layout tokens inline, so they take precedence over this file. To change those, configure a [custom theme](#custom-themes). To lock the site to one look, set `builtIns: false` with a single entry in each catalog, or hide the picker with a custom header.
 
 ## Override components
 

@@ -1,20 +1,101 @@
-import {
-	COLOR_SCHEMES,
-	THEME_STYLES,
-	LAYOUT_SCHEMES,
-	FONT_SIZES,
-	PRESET_THEMES,
-} from './theme-data.mjs';
 import config from 'virtual:hakushi/config';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
-export type ColorSchemeId = keyof typeof COLOR_SCHEMES;
-export type ThemeStyleId = keyof typeof THEME_STYLES;
-export type LayoutSchemeId = keyof typeof LAYOUT_SCHEMES;
-export type FontSizeId = keyof typeof FONT_SIZES;
-export type PresetThemeId = keyof typeof PRESET_THEMES;
+export type ColorSchemeId = string;
+export type ThemeStyleId = string;
+export type LayoutSchemeId = string;
+export type FontSizeId = string;
+export type PresetThemeId = string;
 
-export { COLOR_SCHEMES, THEME_STYLES, LAYOUT_SCHEMES, FONT_SIZES, PRESET_THEMES };
+export interface ThemeColors {
+	primary: string;
+	primaryHover: string;
+	accent: string;
+	secondary: string;
+	bgMain: string;
+	bgSurface: string;
+	bgSidebar: string;
+	border: string;
+	textMain: string;
+	textMuted: string;
+}
+export interface ColorScheme {
+	id: string;
+	name: string;
+	description?: string;
+	badge?: string;
+	colors: ThemeColors;
+	darkColors: ThemeColors;
+}
+export interface ThemeStyle {
+	id: string;
+	name: string;
+	description?: string;
+	fontHeading: string;
+	fontBody: string;
+	fontCode: string;
+	radius: string;
+	stylesheet?: string | string[];
+}
+export interface LayoutScheme {
+	id: string;
+	name: string;
+	description?: string;
+	badge?: string;
+	shellMaxWidth: string;
+	contentMaxWidth: string;
+	contentPaddingX: string;
+	contentPaddingY: string;
+	lineHeightBody: string;
+	lineHeightHeading: string;
+	spacingParagraph: string;
+	cardPadding: string;
+}
+export interface FontSize {
+	id: string;
+	name: string;
+	label: string;
+	badge?: string;
+	rootSize: string;
+	fontSizeBase: string;
+	fontSizeH1: string;
+	fontSizeH2: string;
+	fontSizeH3: string;
+}
+export interface PresetTheme {
+	id: string;
+	name: string;
+	badge?: string;
+	tagline?: string;
+	description?: string;
+	colorScheme: ColorSchemeId;
+	style: ThemeStyleId;
+	layout: LayoutSchemeId;
+	fontSize: FontSizeId;
+}
+
+/**
+ * Resolved catalogs: built-ins merged with the site's `theme` configuration
+ * (see src/lib/theme-catalog.mjs), in picker order.
+ */
+export const COLOR_SCHEMES = config.theme.colorSchemes as Record<ColorSchemeId, ColorScheme>;
+export const THEME_STYLES = config.theme.styles as Record<ThemeStyleId, ThemeStyle>;
+export const LAYOUT_SCHEMES = config.theme.layouts as Record<LayoutSchemeId, LayoutScheme>;
+export const FONT_SIZES = config.theme.fontSizes as Record<FontSizeId, FontSize>;
+export const PRESET_THEMES = config.theme.presets as Record<PresetThemeId, PresetTheme>;
+
+/** The site's configured default appearance. */
+export const THEME_DEFAULTS = {
+	mode: config.theme.mode as ThemeMode,
+	schemeId: config.theme.colorScheme as ColorSchemeId,
+	styleId: config.theme.style as ThemeStyleId,
+	layoutId: config.theme.layout as LayoutSchemeId,
+	fontSizeId: config.theme.fontSize as FontSizeId,
+	presetId: (config.theme.preset || undefined) as PresetThemeId | undefined,
+};
+
+const has = (table: object, id: string | null | undefined): id is string =>
+	!!id && Object.prototype.hasOwnProperty.call(table, id);
 
 export function resolveIsDark(mode: ThemeMode, prefersDark: boolean): boolean {
 	return mode === 'dark' || (mode === 'auto' && prefersDark);
@@ -28,8 +109,8 @@ export function applyTheme(
 	mode: ThemeMode,
 	schemeId: ColorSchemeId,
 	styleId: ThemeStyleId,
-	layoutId: LayoutSchemeId = 'comfortable',
-	fontSizeId: FontSizeId = 'md',
+	layoutId: LayoutSchemeId = THEME_DEFAULTS.layoutId,
+	fontSizeId: FontSizeId = THEME_DEFAULTS.fontSizeId,
 	presetId?: PresetThemeId
 ) {
 	if (typeof document === 'undefined') return;
@@ -45,7 +126,8 @@ export function applyTheme(
 	}
 
 	// 1. Color Palette
-	const scheme = COLOR_SCHEMES[schemeId] ?? COLOR_SCHEMES.hakushi;
+	if (!has(COLOR_SCHEMES, schemeId)) schemeId = THEME_DEFAULTS.schemeId;
+	const scheme = COLOR_SCHEMES[schemeId];
 	const activeColors = isDark ? scheme.darkColors : scheme.colors;
 
 	root.style.setProperty('--primary', activeColors.primary);
@@ -58,16 +140,20 @@ export function applyTheme(
 	root.style.setProperty('--border', activeColors.border);
 	root.style.setProperty('--text-main', activeColors.textMain);
 	root.style.setProperty('--text-muted', activeColors.textMuted);
+	root.dataset.scheme = schemeId;
 
 	// 2. Typography Fonts & Radius
-	const style = THEME_STYLES[styleId] ?? THEME_STYLES.sans;
+	if (!has(THEME_STYLES, styleId)) styleId = THEME_DEFAULTS.styleId;
+	const style = THEME_STYLES[styleId];
 	root.style.setProperty('--font-heading', style.fontHeading);
 	root.style.setProperty('--font-body', style.fontBody);
 	root.style.setProperty('--font-code', style.fontCode);
 	root.style.setProperty('--radius', style.radius);
+	root.dataset.style = styleId;
 
 	// 3. Layout Dimensions & Rhythm
-	const layout = LAYOUT_SCHEMES[layoutId] ?? LAYOUT_SCHEMES.comfortable;
+	if (!has(LAYOUT_SCHEMES, layoutId)) layoutId = THEME_DEFAULTS.layoutId;
+	const layout = LAYOUT_SCHEMES[layoutId];
 	root.style.setProperty('--shell-max-width', layout.shellMaxWidth);
 	root.style.setProperty('--content-max-width', layout.contentMaxWidth);
 	root.style.setProperty('--content-padding-x', layout.contentPaddingX);
@@ -79,7 +165,8 @@ export function applyTheme(
 	root.dataset.layout = layoutId;
 
 	// 4. Font Size Scale - sets root font-size directly to guarantee instant rem-scaling
-	const font = FONT_SIZES[fontSizeId] ?? FONT_SIZES.md;
+	if (!has(FONT_SIZES, fontSizeId)) fontSizeId = THEME_DEFAULTS.fontSizeId;
+	const font = FONT_SIZES[fontSizeId];
 	root.style.fontSize = font.rootSize;
 	root.style.setProperty('--font-size-base', font.fontSizeBase);
 	root.style.setProperty('--font-size-h1', font.fontSizeH1);
@@ -88,13 +175,17 @@ export function applyTheme(
 	root.dataset.fontSize = fontSizeId;
 
 	// 5. Preset Identifier
-	if (presetId) {
+	if (has(PRESET_THEMES, presetId)) {
 		root.dataset.preset = presetId;
 	} else {
 		delete root.dataset.preset;
 	}
 }
 
+/**
+ * Reads the saved appearance, falling back to the configured defaults for
+ * anything unset or no longer configured (e.g. a removed custom scheme).
+ */
 export function readStoredTheme(): {
 	mode: ThemeMode;
 	schemeId: ColorSchemeId;
@@ -103,23 +194,32 @@ export function readStoredTheme(): {
 	fontSizeId: FontSizeId;
 	presetId?: PresetThemeId;
 } {
-	const themeCfg = config.theme as any;
-	let mode: ThemeMode = themeCfg.mode ?? 'dark';
-	let schemeId: ColorSchemeId = (themeCfg.colorScheme as ColorSchemeId) ?? 'hakushi';
-	let styleId: ThemeStyleId = (themeCfg.style as ThemeStyleId) ?? 'sans';
-	let layoutId: LayoutSchemeId = (themeCfg.layout as LayoutSchemeId) ?? 'comfortable';
-	let fontSizeId: FontSizeId = (themeCfg.fontSize as FontSizeId) ?? 'md';
-	let presetId: PresetThemeId | undefined = (themeCfg.preset as PresetThemeId) || undefined;
-
+	const result = { ...THEME_DEFAULTS };
 	try {
-		mode = (localStorage.getItem('hakushi_mode') as ThemeMode) || mode;
-		schemeId = (localStorage.getItem('hakushi_scheme') as ColorSchemeId) || schemeId;
-		styleId = (localStorage.getItem('hakushi_style') as ThemeStyleId) || styleId;
-		layoutId = (localStorage.getItem('hakushi_layout') as LayoutSchemeId) || layoutId;
-		fontSizeId = (localStorage.getItem('hakushi_font_size') as FontSizeId) || fontSizeId;
-		presetId = (localStorage.getItem('hakushi_preset') as PresetThemeId) || presetId;
+		const read = (key: string, table: object, fallback: string) => {
+			const id = localStorage.getItem(key);
+			return has(table, id) ? id : fallback;
+		};
+		const mode = localStorage.getItem('hakushi_mode');
+		if (mode === 'light' || mode === 'dark' || mode === 'auto') result.mode = mode;
+		result.schemeId = read('hakushi_scheme', COLOR_SCHEMES, result.schemeId);
+		result.styleId = read('hakushi_style', THEME_STYLES, result.styleId);
+		result.layoutId = read('hakushi_layout', LAYOUT_SCHEMES, result.layoutId);
+		result.fontSizeId = read('hakushi_font_size', FONT_SIZES, result.fontSizeId);
+		const preset = localStorage.getItem('hakushi_preset');
+		if (preset !== null) result.presetId = has(PRESET_THEMES, preset) ? preset : undefined;
 	} catch {
 		/* ignore */
 	}
-	return { mode, schemeId, styleId, layoutId, fontSizeId, presetId };
+	return result;
 }
+
+/** localStorage keys holding the reader's appearance choices. */
+export const THEME_STORAGE_KEYS = [
+	'hakushi_mode',
+	'hakushi_scheme',
+	'hakushi_style',
+	'hakushi_layout',
+	'hakushi_font_size',
+	'hakushi_preset',
+];
