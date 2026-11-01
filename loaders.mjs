@@ -23,12 +23,17 @@ export function hakushiLoader({ base, pattern = '**/*.md' }) {
 }
 
 /**
- * Create the default content collections. Individual definitions can be
- * replaced by spreading this result in `src/content.config.ts`.
+ * Create the default content collections. Each collection loads from
+ * `${base}/${id}` unless it sets its own `base` folder (and optionally a
+ * `pattern`). Individual definitions can be replaced by spreading this result
+ * in `src/content.config.ts`.
  */
 export function createHakushiCollections({ base = './src/content', schema = hakushiSchema(), collections = DEFAULT_COLLECTIONS } = {}) {
-	return Object.fromEntries(collections.map(({ id }) => [
+	return Object.fromEntries(collections.map(({ id, base: folder, pattern }) => [
 		id,
-		defineCollection({ loader: hakushiLoader({ base: `${base}/${id}` }), schema }),
+		defineCollection({
+			loader: hakushiLoader({ base: folder ?? `${base}/${id}`, ...(pattern ? { pattern } : {}) }),
+			schema,
+		}),
 	]));
 }

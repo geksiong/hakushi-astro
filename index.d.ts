@@ -8,6 +8,13 @@ export interface HakushiCollection {
 	iconName?: HakushiIconName;
 	type?: 'folder' | 'dated';
 	articlesPerPage?: number;
+	/**
+	 * Content folder read by `createHakushiCollections`, relative to the project root.
+	 * Defaults to `src/content/<id>`. Ignored by the integration itself.
+	 */
+	base?: string | URL;
+	/** Glob pattern(s) for `createHakushiCollections`. Defaults to `'**\/*.md'`. */
+	pattern?: string | string[];
 }
 export interface HakushiSidebarLink {
 	/** Link text shown in the sidebar. */

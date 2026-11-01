@@ -155,6 +155,20 @@ const navigation = [{ id: 'handbook' }, { id: 'updates' }];
 export const collections = createHakushiCollections({ collections: navigation });
 ```
 
+Each collection reads Markdown from `src/content/<id>` by default. Set `base` on a collection to read it from another folder (relative to the project root), and optionally `pattern` to change which files are matched (default `**/*.md`). Change the parent folder for every collection with the top-level `base` option:
+
+```ts
+export const collections = createHakushiCollections({
+  base: './content', // collections without their own base read ./content/<id>
+  collections: [
+    { id: 'handbook', base: './docs/handbook' },
+    { id: 'updates', base: '../shared-notes/updates', pattern: ['**/*.md', '!drafts/**'] },
+  ],
+});
+```
+
+You can pass the same array to the integration's `collections` option; it ignores `base` and `pattern` and leaves them out of the browser bundle.
+
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. A `dated` collection gets date-oriented navigation; `folder` is the default.
 
 ## Custom themes
