@@ -34,7 +34,8 @@ interface Props {
 }
 
 // Icon-only links on the right side of the header (social/contact links).
-// 'Github' maps to a git stand-in - lucide dropped brand icons.
+// Links with `iconSvg` (a brand icon or a custom `icon`, resolved at config
+// time) draw that SVG; the rest use these lucide icons.
 const HEADER_ICONS: Record<string, any> = {
 	BookOpen,
 	Calendar,
@@ -48,7 +49,6 @@ const HEADER_ICONS: Record<string, any> = {
 	Globe,
 	Mail,
 	GitFork,
-	Github: GitFork,
 	ExternalLink,
 	Home,
 	Rss,
@@ -114,7 +114,7 @@ const headerLinks = config.headerLinks ?? [];
 		<!-- Right: configurable icon links + Theme Customizer -->
 		<div class="flex items-center gap-1">
 			{headerLinks.map((link) => {
-				const IconComponent = HEADER_ICONS[link.iconName ?? 'Link'] || LinkIcon;
+				const IconComponent = link.iconSvg ? null : HEADER_ICONS[link.iconName ?? 'Link'] || LinkIcon;
 				return (
 					<a
 						href={link.href}
@@ -124,7 +124,11 @@ const headerLinks = config.headerLinks ?? [];
 						rel={link.external ? 'noopener noreferrer' : undefined}
 						class="p-2 rounded-md text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-sidebar)] transition-colors"
 					>
-						<IconComponent class="w-4 h-4" />
+						{IconComponent ? (
+							<IconComponent class="w-4 h-4" />
+						) : (
+							<span class="block w-4 h-4 [&>svg]:block [&>svg]:w-full [&>svg]:h-full" set:html={link.iconSvg} />
+						)}
 					</a>
 				);
 			})}

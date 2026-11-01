@@ -6,6 +6,7 @@ import rehypeMathjax from 'rehype-mathjax';
 import { unified } from '@astrojs/markdown-remark';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
 import remarkWikilinks from './src/plugins/remark-wikilinks.mjs';
 import remarkFirstH1Title from './src/plugins/remark-first-h1-title.mjs';
 import remarkCharts from './src/plugins/remark-charts.mjs';
@@ -15,6 +16,7 @@ import remarkMermaid from './src/plugins/remark-mermaid.mjs';
 import { resolveTheme } from './src/lib/theme-catalog.mjs';
 import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_FOOTER, DEFAULT_NOT_FOUND } from './src/integration/defaults.mjs';
 import { DEFAULT_FAVICON_HREF } from './src/integration/favicon.mjs';
+import { BRAND_ICONS, brandIconSvg } from './src/integration/brand-icons.mjs';
 
 const VIRTUAL_CONFIG = 'virtual:hakushi/config';
 const RESOLVED_CONFIG = `\0${VIRTUAL_CONFIG}`;
@@ -168,6 +170,53 @@ function normalizeLinkList(links, fallback, optionName) {
 		}));
 }
 
+// Brand icon names, matched case-insensitively; `Twitter` is an alias for X.
+const BRAND_ICON_NAMES = new Map([
+	...Object.keys(BRAND_ICONS).map((name) => [name.toLowerCase(), name]),
+	['twitter', 'X'],
+]);
+
+/**
+ * Give each header link the SVG markup it is drawn with (`iconSvg`), if any:
+ * its custom `icon` (SVG markup, or a path to an .svg file relative to the
+ * project), else a built-in brand icon named by `iconName`. Other links keep
+ * their lucide `iconName`.
+ */
+function resolveHeaderLinkIcons(links, root) {
+	for (const link of links) {
+		const { icon } = link;
+		delete link.icon;
+		if (icon !== undefined && icon !== null && icon !== '') {
+			link.iconSvg = readIconSvg(icon, root, link.label);
+			continue;
+		}
+		const brand = BRAND_ICON_NAMES.get(String(link.iconName ?? '').toLowerCase());
+		if (brand) {
+			link.iconName = brand;
+			link.iconSvg = brandIconSvg(brand);
+		}
+	}
+}
+
+function readIconSvg(icon, root, label) {
+	const where = `[hakushi] Header link "${label}": \`icon\``;
+	let markup = icon;
+	if (icon instanceof URL || (typeof icon === 'string' && !icon.trim().startsWith('<'))) {
+		const file = resolveUserSpecifier(icon, root);
+		try {
+			markup = readFileSync(file, 'utf8');
+		} catch {
+			throw new Error(`${where} file not found: ${file}`);
+		}
+	} else if (typeof icon !== 'string') {
+		throw new Error(`${where} must be SVG markup or a path to an .svg file.`);
+	}
+	// Keep the <svg> element itself, dropping any XML prolog, doctype or comments around it.
+	const svg = markup.match(/<svg[\s>][\s\S]*<\/svg>/i)?.[0];
+	if (!svg) throw new Error(`${where} doesn't contain an <svg> element.`);
+	return svg;
+}
+
 function resolveUserSpecifier(specifier, root) {
 	if (specifier instanceof URL) return fileURLToPath(specifier);
 	if (specifier.startsWith('.') || specifier.startsWith('/')) {
@@ -213,6 +262,7 @@ function coreIntegration(options = {}) {
 		name: 'hakushi',
 		hooks: {
 			'astro:config:setup': ({ config: astroConfig, updateConfig, injectRoute }) => {
+				resolveHeaderLinkIcons(config.headerLinks, astroConfig.root);
 				const add = (enabled, pattern, file) => enabled && injectRoute({ pattern, entrypoint: new URL(file, import.meta.url) });
 				add(routes.home, '/', './src/routes/index.astro');
 				add(routes.about, '/about', './src/routes/about.astro');

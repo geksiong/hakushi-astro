@@ -52,8 +52,18 @@ export interface HakushiNotFound {
 	/** Message below the heading; blank lines separate paragraphs. */
 	text?: string;
 }
-/** A configurable header icon link; same shape as a sidebar link. */
-export type HakushiHeaderLink = HakushiSidebarLink;
+/** Built-in brand icons for header links (matched case-insensitively; `Twitter` is an alias for `X`). */
+export type HakushiBrandIconName = 'GitHub' | 'LinkedIn' | 'X' | 'Twitter' | 'Bluesky' | 'Mastodon' | 'YouTube' | 'Instagram';
+/** A configurable header icon link. */
+export interface HakushiHeaderLink extends Omit<HakushiSidebarLink, 'iconName'> {
+	/** A lucide icon or a built-in brand icon. */
+	iconName?: HakushiIconName | HakushiBrandIconName;
+	/**
+	 * A custom icon: SVG markup, or a path to an .svg file relative to the project
+	 * root. Overrides `iconName`. Use `fill="currentColor"` to follow the theme color.
+	 */
+	icon?: string | URL;
+}
 /** Theme colors; each is any CSS color. */
 export interface HakushiThemeColors {
 	primary?: string;

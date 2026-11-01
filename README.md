@@ -136,13 +136,15 @@ hakushi({
     { label: 'GitHub', href: 'https://github.com/acme/docs', iconName: 'Github' },
   ],
   headerLinks: [
-    { label: 'GitHub', href: 'https://github.com/acme/docs', iconName: 'Github' },
+    { label: 'GitHub', href: 'https://github.com/acme/docs', iconName: 'GitHub' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/acme', iconName: 'LinkedIn' },
+    { label: 'Codeberg', href: 'https://codeberg.org/acme', icon: './src/icons/codeberg.svg' },
     { label: 'Contact', href: 'mailto:hello@acme.com', iconName: 'Mail' },
   ],
 })
 ```
 
-`sidebarLinks` are listed as plain text links at the bottom of the sidebar (desktop and mobile drawer), below the collection tree and the Knowledge Graph and Tags links. Each entry needs a `label` and an `href`; `iconName`, `description`, and `external` are optional. `external` defaults to `true` for absolute URLs, which open in a new tab. `headerLinks` use the same entry shape and render as icon-only buttons on the right side of the header, before the theme picker — intended for social media and contact links. They default to none. Header link icons support `Info`, `Link`, `Globe`, `Mail`, `Github`, `GitFork`, `ExternalLink`, `Home`, `Rss`, `MessageCircle`, and the collection icons; `Github` is aliased to `GitFork` because lucide no longer ships brand icons. The built-in `/about` route renders `about` and can be replaced with a custom `AboutPage` component (see below) or disabled with `routes: { about: false }`.
+`sidebarLinks` are listed as plain text links at the bottom of the sidebar (desktop and mobile drawer), below the collection tree and the Knowledge Graph and Tags links. Each entry needs a `label` and an `href`; `iconName`, `description`, and `external` are optional. `external` defaults to `true` for absolute URLs, which open in a new tab. `headerLinks` use the same entry shape and render as icon-only buttons on the right side of the header, before the theme picker — intended for social media and contact links. They default to none. Header link icons support `Info`, `Link`, `Globe`, `Mail`, `GitFork`, `ExternalLink`, `Home`, `Rss`, `MessageCircle`, and the collection icons, plus the brand icons `GitHub`, `LinkedIn`, `X` (alias `Twitter`), `Bluesky`, `Mastodon`, `YouTube` and `Instagram` (brand names are case-insensitive). Brand icons are drawn in the header's icon color rather than brand colors. For any other icon, set `icon` to SVG markup or the path of an `.svg` file relative to the project root; it overrides `iconName` and is inlined at build time, so use `fill="currentColor"` (or `stroke="currentColor"`) for it to follow the theme. A missing file or one without an `<svg>` stops the build with an error. The built-in `/about` route renders `about` and can be replaced with a custom `AboutPage` component (see below) or disabled with `routes: { about: false }`.
 
 When changing collections, give the loader the same IDs:
 
