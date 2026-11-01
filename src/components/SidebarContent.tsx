@@ -1,5 +1,26 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, ExternalLink } from 'lucide-react';
+import {
+	BookOpen,
+	Calendar,
+	ChevronRight,
+	ExternalLink,
+	FileText,
+	Folder,
+	GitFork,
+	Globe,
+	Home,
+	Info,
+	Layers,
+	Link as LinkIcon,
+	Mail,
+	MessageCircle,
+	Microscope,
+	Network,
+	Rss,
+	Share2,
+	Tag,
+	type LucideIcon,
+} from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
 import type { CollectionConfig } from '../lib/collections';
 import type { SidebarLink } from '../lib/sidebar';
@@ -18,6 +39,30 @@ interface SidebarContentProps {
 	/** Configurable pages/sites listed below the collections. */
 	links?: SidebarLink[];
 }
+
+/** Icons a collection or sidebar link can name via `iconName`. */
+const ICONS: Record<string, LucideIcon> = {
+	BookOpen,
+	Calendar,
+	Microscope,
+	FileText,
+	Share2,
+	Folder,
+	Layers,
+	Info,
+	Link: LinkIcon,
+	Globe,
+	Mail,
+	GitFork,
+	// lucide dropped brand icons - 'Github' maps to a git stand-in.
+	Github: GitFork,
+	ExternalLink,
+	Home,
+	Rss,
+	MessageCircle,
+	Network,
+};
+const ICON = 'w-3.5 h-3.5 shrink-0';
 
 const ROW = 'flex items-center rounded-md transition-colors';
 const ACTIVE = 'bg-[var(--primary)]/[0.08] text-[var(--primary)] font-medium';
@@ -160,6 +205,7 @@ export default function SidebarContent({
 						selectedCollectionId === col.id &&
 						!noCollectionSelected &&
 						!items.some((n) => n.slug === currentSlug);
+					const ColIcon = ICONS[col.iconName ?? 'Folder'] ?? Folder;
 
 					return (
 						<div key={col.id}>
@@ -180,9 +226,10 @@ export default function SidebarContent({
 									onClick={() => onNavigate?.()}
 									aria-current={isSelected ? 'page' : undefined}
 									title={col.description}
-									className={`flex-1 truncate py-1.5 pr-2 ${isSelected ? '' : 'text-[var(--text-main)]'}`}
+									className={`flex-1 min-w-0 flex items-center gap-2 py-1.5 pr-2 ${isSelected ? '' : 'text-[var(--text-main)]'}`}
 								>
-									{col.name}
+									<ColIcon className={ICON} />
+									<span className="truncate">{col.name}</span>
 								</a>
 							</div>
 
@@ -235,8 +282,9 @@ export default function SidebarContent({
 					onClick={() => onNavigate?.()}
 					aria-current={isGraphPage ? 'page' : undefined}
 					title="Visualize article connections"
-					className={`${ROW} px-2 py-1.5 ${isGraphPage ? ACTIVE : IDLE}`}
+					className={`${ROW} gap-2 px-2 py-1.5 ${isGraphPage ? ACTIVE : IDLE}`}
 				>
+					<Network className={ICON} />
 					Knowledge Graph
 				</a>
 				<a
@@ -244,12 +292,14 @@ export default function SidebarContent({
 					onClick={() => onNavigate?.()}
 					aria-current={isTagsPage ? 'page' : undefined}
 					title="Browse every tag"
-					className={`${ROW} px-2 py-1.5 ${isTagsPage ? ACTIVE : IDLE}`}
+					className={`${ROW} gap-2 px-2 py-1.5 ${isTagsPage ? ACTIVE : IDLE}`}
 				>
+					<Tag className={ICON} />
 					Tags
 				</a>
 				{links.map((link) => {
 					const isActive = isLinkActive(link);
+					const Icon = ICONS[link.iconName ?? 'Link'] ?? LinkIcon;
 					return (
 						<a
 							key={link.href}
@@ -259,10 +309,11 @@ export default function SidebarContent({
 							title={link.description || link.label}
 							target={link.external ? '_blank' : undefined}
 							rel={link.external ? 'noopener noreferrer' : undefined}
-							className={`${ROW} justify-between gap-2 px-2 py-1.5 ${isActive ? ACTIVE : IDLE}`}
+							className={`${ROW} gap-2 px-2 py-1.5 ${isActive ? ACTIVE : IDLE}`}
 						>
+							<Icon className={ICON} />
 							<span className="truncate">{link.label}</span>
-							{link.external && <ExternalLink className="w-3 h-3 shrink-0 opacity-60" />}
+							{link.external && <ExternalLink className="ml-auto w-3 h-3 shrink-0 opacity-60" />}
 						</a>
 					);
 				})}
