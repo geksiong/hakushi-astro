@@ -288,7 +288,7 @@ function coreIntegration(options = {}) {
 				add(routes.about, '/about', './src/routes/about.astro');
 				add(routes.articles, '/[collection]/[...slug]', './src/routes/article.astro');
 				add(routes.collections, '/[collection]', './src/routes/collection.astro');
-				add(routes.aliases, '/[slug]', './src/routes/alias.astro');
+				add(routes.aliases, '/[...slug]', './src/routes/alias.astro');
 				add(routes.graph, '/graph', './src/routes/graph.astro');
 				add(routes.tags, '/tags', './src/routes/tags.astro');
 				add(routes.tags, '/tags/[tag]', './src/routes/tag.astro');

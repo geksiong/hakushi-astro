@@ -44,7 +44,7 @@ export interface ArticleMeta {
 function toMeta(entry: ArticleEntry): ArticleMeta {
 	return {
 		slug: entry.id,
-		url: `/${entry.id}`,
+		url: `/${entry.collection}/${entry.id}`,
 		collection: entry.collection,
 		title: resolveEntryTitle(entry),
 		category: entry.data.category,
@@ -98,6 +98,7 @@ export function resolveArticleRef(index: ArticleMeta[], ref: string): ArticleMet
 
 export interface Backlink {
 	slug: string;
+	url: string;
 	title: string;
 	summary?: string;
 }
@@ -112,7 +113,7 @@ export function getBacklinkMap(): Promise<Map<string, Backlink[]>> {
 	backlinkCache ??= (async () => {
 		const [index, groups] = await Promise.all([
 			getArticleIndex(),
-			Promise.all(COLLECTION_IDS.map((id) => (getCollection as any)(id))),
+			Promise.all(COLLECTION_IDS.map((id) => (getCollection as any)(id, ({ data }: any) => !data.draft))),
 		]);
 		const map = new Map<string, Backlink[]>();
 
@@ -129,7 +130,7 @@ export function getBacklinkMap(): Promise<Map<string, Backlink[]>> {
 					if (!resolved || resolved.slug === doc.id) continue;
 					const list = map.get(resolved.slug) ?? [];
 					if (!list.some((b) => b.slug === doc.id)) {
-						list.push({ slug: doc.id, title: resolveEntryTitle(doc), summary: doc.data.summary });
+						list.push({ slug: doc.id, url: `/${doc.collection}/${doc.id}`, title: resolveEntryTitle(doc), summary: doc.data.summary });
 						map.set(resolved.slug, list);
 					}
 				}

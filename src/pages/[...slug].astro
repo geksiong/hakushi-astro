@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 			.replace(/\.(md|mdx)$/, '')
 			.split('#')[0];
 
-	const groups = await Promise.all(IDS.map((id) => getCollection(id as 'docs')));
+	const groups = await Promise.all(IDS.map((id) => getCollection(id as 'docs', ({ data }) => !data.draft)));
 	const entries = groups.flat();
 	const index = await getArticleIndex();
 

@@ -82,7 +82,7 @@ export async function getGraphData(): Promise<GraphJSON> {
 				name: resolveEntryTitle(doc),
 				type: 'article',
 				collection: id,
-				url: `/${doc.id}`,
+				url: `/${id}/${doc.id}`,
 				val: 10,
 			});
 			nodeIds.add(doc.id);

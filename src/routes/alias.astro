@@ -8,7 +8,7 @@ export async function getStaticPaths() {
 	const config = (await import('virtual:hakushi/config')).default;
 	const wikilink = /\[\[([^\]|\n]+)(?:\|[^\]\n]*)?\]\]/g;
 	const normalize = (raw: string) => raw.trim().toLowerCase().replace(/^\/+/, '').replace(/\.(md|mdx)$/, '').split('#')[0];
-	const groups = await Promise.all(config.collections.map(({ id }) => (getCollection as any)(id)));
+	const groups = await Promise.all(config.collections.map(({ id }) => (getCollection as any)(id, ({ data }: any) => !data.draft)));
 	const entries = groups.flat();
 	const index = await getArticleIndex();
 	const aliases = new Map<string, any>();

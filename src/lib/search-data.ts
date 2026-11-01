@@ -23,7 +23,7 @@ export function getSearchDocs(): Promise<SearchDoc[]> {
 			const title = resolveEntryTitle(entry);
 			return {
 				slug: entry.id,
-				url: `/${entry.id}`,
+				url: `/${entry.collection}/${entry.id}`,
 				collection: entry.collection,
 				title,
 				category: entry.data.category,

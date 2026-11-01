@@ -159,7 +159,7 @@ const displayDate = formatDate(date);
 						<nav class="space-y-0.5">
 							{backlinks.map((bl) => (
 								<a
-									href={`/${bl.slug}`}
+									href={bl.url}
 									title={bl.title}
 									class="block truncate py-1 text-sm text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 								>
