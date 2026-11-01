@@ -180,7 +180,7 @@ export const collections = createHakushiCollections({
 
 You can pass the same array to the integration's `collections` option; it ignores `base`, `pattern` and `folderCategories` and leaves them out of the browser bundle.
 
-Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. A `dated` collection gets date-oriented navigation; `folder` is the default.
+Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. In the sidebar, a `folder` collection (the default) groups its articles into one sub-folder per category, A–Z, followed by uncategorized articles. A `dated` collection groups them by year, newest first, and shows each article's date (`YYYY-MM-DD`) before its title. Within a group, articles are listed newest first.
 
 ## Custom themes
 
