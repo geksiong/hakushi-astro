@@ -167,7 +167,18 @@ export const collections = createHakushiCollections({
 });
 ```
 
-You can pass the same array to the integration's `collections` option; it ignores `base` and `pattern` and leaves them out of the browser bundle.
+Subfolders become categories. A note in a subfolder of its collection's folder that has no frontmatter `category` gets the name of its **top-level** subfolder as its category: `Projects/Website/launch.md` is in `Projects`. Notes directly in the collection folder get none, and a frontmatter `category` always wins. Turn this off with `folderCategories: false`, for every collection or for a single one:
+
+```ts
+export const collections = createHakushiCollections({
+  collections: [
+    { id: 'notes', base: '../vault' },
+    { id: 'journal', folderCategories: false }, // subfolders here aren't categories
+  ],
+});
+```
+
+You can pass the same array to the integration's `collections` option; it ignores `base`, `pattern` and `folderCategories` and leaves them out of the browser bundle.
 
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. A `dated` collection gets date-oriented navigation; `folder` is the default.
 

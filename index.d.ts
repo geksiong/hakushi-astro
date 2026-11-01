@@ -15,6 +15,8 @@ export interface HakushiCollection {
 	base?: string | URL;
 	/** Glob pattern(s) for `createHakushiCollections`. Defaults to `'**\/*.md'`. */
 	pattern?: string | string[];
+	/** Per-collection override of `createHakushiCollections({ folderCategories })`. Ignored by the integration itself. */
+	folderCategories?: boolean;
 }
 export interface HakushiSidebarLink {
 	/** Link text shown in the sidebar. */
