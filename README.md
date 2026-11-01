@@ -165,6 +165,7 @@ The theme picker offers presets (themes), color palettes, typography styles, lay
 hakushi({
   theme: {
     preset: 'acme',                  // default for new visitors
+    builtIns: { colorSchemes: true }, // also offer the built-in palettes (see below)
     colorSchemes: {
       ocean: {
         name: 'Ocean',
@@ -199,12 +200,23 @@ hakushi({
 })
 ```
 
+**What the picker offers.** Light/dark/auto and the font sizes are always available. Presets, palettes, typography and layouts offer only what you configure, plus the default choice, so a site that configures nothing is locked to its defaults. To offer Hakushi's built-in entries as well, switch them on with `builtIns`:
+
+```js
+theme: {
+  builtIns: { presets: true, layouts: true }, // built-in presets and layout spacings
+  // builtIns: true                           // every built-in
+}
+```
+
+The keys are `presets`, `colorSchemes`, `styles`, `layouts` and `fontSizes`. They default to `false`, except `fontSizes`, which defaults to `true`; only `builtIns: { fontSizes: false }` removes the built-in font sizes. The picker shows a section only when it has more than one choice, so a single palette, typography style, layout or preset doesn't appear at all. Built-in presets bring the palettes, styles and layouts they use, but those aren't listed in their own sections unless switched on too.
+
 Each catalog is keyed by id:
 
 - **A new id** adds an entry. Fields you leave out come from the default built-in (`hakushi`, `sans`, `comfortable`, `md`). A new palette without `darkColors` uses its `colors` in both modes. Custom entries are listed before the built-ins in the picker.
 - **A built-in id** merges your fields over the built-in entry. For palettes this applies per color, so `nord: { colors: { primary } }` changes only the light-mode primary.
 - **`false`** hides a built-in. Built-in presets that use a hidden palette, style, layout, or font size are hidden too.
-- **`builtIns: false`** shows only the configured entries. Use `builtIns: { presets: false }` to switch off a single catalog. With built-ins off, a built-in id such as `nord: {}` still brings that entry back.
+- **A built-in id with built-ins off**, such as `nord: {}`, offers that one entry.
 
 The ids are `hakushi`, `paper`, `academic`, `refined`, `social`, `earth`, `obsidian`, `nord`, `amber`, `monokai`, `rose` (palettes); `sans`, `serif`, `mono`, `editorial`, `literary`, `monograph`, `organic`, `geometric` (styles); `compact`, `comfortable`, `spacious` (layouts); `sm`, `md`, `lg`, `xl` (font sizes); and `paper`, `academic`, `refined`, `social`, `earth`, `hakushi` (presets).
 
@@ -262,7 +274,7 @@ Override the design tokens in that file:
 }
 ```
 
-The interactive theme picker writes the color, font, and layout tokens inline, so they take precedence over this file. To change those, configure a [custom theme](#custom-themes). To lock the site to one look, set `builtIns: false` with a single entry in each catalog, or hide the picker with a custom header.
+The interactive theme picker writes the color, font, and layout tokens inline, so they take precedence over this file. To change those, configure a [custom theme](#custom-themes). The site is locked to one look unless you offer more choices (see [What the picker offers](#custom-themes)); to remove the picker entirely, use a custom header.
 
 ## Override components
 

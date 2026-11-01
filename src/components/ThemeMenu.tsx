@@ -26,6 +26,7 @@ import {
 	THEME_DEFAULTS,
 	THEME_STORAGE_KEYS,
 	applyTheme,
+	listed,
 	loadAllStyleFonts,
 	readStoredTheme,
 	resolveIsDark,
@@ -48,6 +49,21 @@ const LAYOUT_ICONS: Record<string, LucideIcon> = {
 	compact: Minimize2,
 	comfortable: BookOpen,
 	spacious: Maximize2,
+};
+
+// What the picker offers. A section is shown only when it has a real choice
+// (more than one entry); light/dark/auto is always shown.
+const SCHEME_CHOICES = listed(COLOR_SCHEMES);
+const STYLE_CHOICES = listed(THEME_STYLES);
+const LAYOUT_CHOICES = listed(LAYOUT_SCHEMES);
+const FONT_SIZE_CHOICES = listed(FONT_SIZES);
+const PRESET_CHOICES = Object.values(PRESET_THEMES);
+const SHOW = {
+	presets: PRESET_CHOICES.length > 1,
+	schemes: SCHEME_CHOICES.length > 1,
+	styles: STYLE_CHOICES.length > 1,
+	layouts: LAYOUT_CHOICES.length > 1,
+	fontSizes: FONT_SIZE_CHOICES.length > 1,
 };
 
 export default function ThemeMenu() {
@@ -258,6 +274,7 @@ export default function ThemeMenu() {
 					</div>
 
 					{/* 2. Font Size Customisation (Interactive Stepper) */}
+					{SHOW.fontSizes && (
 					<div>
 						<div className="flex items-center justify-between mb-1.5">
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider">
@@ -269,8 +286,8 @@ export default function ThemeMenu() {
 							</span>
 						</div>
 						<div className="grid grid-cols-[repeat(auto-fit,minmax(4.5rem,1fr))] gap-1 p-1 bg-[var(--bg-sidebar)]/80 rounded-lg border border-[var(--border)]/70">
-							{(Object.keys(FONT_SIZES) as FontSizeId[]).map((fid) => {
-								const font = FONT_SIZES[fid];
+							{FONT_SIZE_CHOICES.map((font) => {
+								const fid = font.id as FontSizeId;
 								const isSelected = fontSizeId === fid;
 								return (
 									<button
@@ -295,7 +312,10 @@ export default function ThemeMenu() {
 						</div>
 					</div>
 
+					)}
+
 					{/* 3. Layout Options (Compact, Comfortable, Spacious) */}
+					{SHOW.layouts && (
 					<div>
 						<div className="flex items-center justify-between mb-1.5">
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider">
@@ -306,8 +326,8 @@ export default function ThemeMenu() {
 							</span>
 						</div>
 						<div className="grid grid-cols-3 gap-1.5">
-							{(Object.keys(LAYOUT_SCHEMES) as LayoutSchemeId[]).map((lid) => {
-								const lay = LAYOUT_SCHEMES[lid];
+							{LAYOUT_CHOICES.map((lay) => {
+								const lid = lay.id as LayoutSchemeId;
 								const Icon = LAYOUT_ICONS[lid] ?? LayoutTemplate;
 								const isSelected = layoutId === lid;
 								return (
@@ -334,8 +354,10 @@ export default function ThemeMenu() {
 						</div>
 					</div>
 
+					)}
+
 					{/* 4. Curated Preset Themes */}
-					{Object.keys(PRESET_THEMES).length > 0 && (
+					{SHOW.presets && (
 					<div>
 						<div className="flex items-center justify-between mb-1.5">
 							<span className="font-semibold text-[var(--text-muted)] text-[11px] uppercase tracking-wider flex items-center gap-1">
@@ -348,8 +370,8 @@ export default function ThemeMenu() {
 						</div>
 
 						<div className="space-y-1.5">
-							{(Object.keys(PRESET_THEMES) as PresetThemeId[]).map((key) => {
-								const preset = PRESET_THEMES[key];
+							{PRESET_CHOICES.map((preset) => {
+								const key = preset.id as PresetThemeId;
 								const scheme = COLOR_SCHEMES[preset.colorScheme as ColorSchemeId];
 								const isSelected = activePreset
 									? activePreset === key
@@ -426,13 +448,14 @@ export default function ThemeMenu() {
 					)}
 
 					{/* 5. Collapsible Fine-Tuning (Independent Colors & Typography) */}
+					{(SHOW.schemes || SHOW.styles) && (
 					<div className="pt-1 border-t border-[var(--border)]">
 						<button
 							type="button"
 							onClick={() => setShowAdvanced(!showAdvanced)}
 							className="w-full flex items-center justify-between py-1 text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors"
 						>
-							<span>Fine-Tune Palette & Typography</span>
+							<span>{SHOW.schemes && SHOW.styles ? 'Fine-Tune Palette & Typography' : SHOW.schemes ? 'Fine-Tune Palette' : 'Fine-Tune Typography'}</span>
 							{showAdvanced ? (
 								<ChevronUp className="w-3.5 h-3.5" />
 							) : (
@@ -443,12 +466,13 @@ export default function ThemeMenu() {
 						{showAdvanced && (
 							<div className="space-y-3 pt-2">
 								{/* Color Schemes */}
+								{SHOW.schemes && (
 								<div>
 									<p className="font-semibold text-[var(--text-muted)] text-[10px] uppercase tracking-wider mb-1.5">
-										Color Palettes ({Object.keys(COLOR_SCHEMES).length})
+										Color Palettes ({SCHEME_CHOICES.length})
 									</p>
 									<div className="grid grid-cols-2 gap-1.5">
-										{Object.values(COLOR_SCHEMES).map((scheme) => {
+										{SCHEME_CHOICES.map((scheme) => {
 											const isSelected = schemeId === scheme.id;
 											const activePalette = isDarkEffective ? scheme.darkColors : scheme.colors;
 											return (
@@ -491,13 +515,16 @@ export default function ThemeMenu() {
 									</div>
 								</div>
 
+								)}
+
 								{/* Typography Theme */}
+								{SHOW.styles && (
 								<div>
 									<p className="font-semibold text-[var(--text-muted)] text-[10px] uppercase tracking-wider mb-1.5">
 										Typography Family
 									</p>
 									<div className="grid grid-cols-2 gap-1.5">
-										{Object.values(THEME_STYLES).map((st) => {
+										{STYLE_CHOICES.map((st) => {
 											const isSelected = styleId === st.id;
 											return (
 												<button
@@ -523,9 +550,11 @@ export default function ThemeMenu() {
 										})}
 									</div>
 								</div>
+								)}
 							</div>
 						)}
 					</div>
+					)}
 				</div>
 			)}
 		</div>

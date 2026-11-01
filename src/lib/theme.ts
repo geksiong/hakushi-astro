@@ -22,6 +22,8 @@ export interface ThemeColors {
 export interface ColorScheme {
 	id: string;
 	name: string;
+	/** Only used by a preset; not offered in the picker on its own. */
+	hidden?: boolean;
 	description?: string;
 	badge?: string;
 	colors: ThemeColors;
@@ -30,6 +32,8 @@ export interface ColorScheme {
 export interface ThemeStyle {
 	id: string;
 	name: string;
+	/** Only used by a preset; not offered in the picker on its own. */
+	hidden?: boolean;
 	description?: string;
 	fontHeading: string;
 	fontBody: string;
@@ -40,6 +44,8 @@ export interface ThemeStyle {
 export interface LayoutScheme {
 	id: string;
 	name: string;
+	/** Only used by a preset; not offered in the picker on its own. */
+	hidden?: boolean;
 	description?: string;
 	badge?: string;
 	shellMaxWidth: string;
@@ -54,6 +60,8 @@ export interface LayoutScheme {
 export interface FontSize {
 	id: string;
 	name: string;
+	/** Only used by a preset; not offered in the picker on its own. */
+	hidden?: boolean;
 	label: string;
 	badge?: string;
 	rootSize: string;
@@ -83,6 +91,11 @@ export const THEME_STYLES = config.theme.styles as Record<ThemeStyleId, ThemeSty
 export const LAYOUT_SCHEMES = config.theme.layouts as Record<LayoutSchemeId, LayoutScheme>;
 export const FONT_SIZES = config.theme.fontSizes as Record<FontSizeId, FontSize>;
 export const PRESET_THEMES = config.theme.presets as Record<PresetThemeId, PresetTheme>;
+
+/** The entries the picker offers in a catalog, in order (hidden preset-only entries left out). */
+export function listed<T extends { hidden?: boolean }>(catalog: Record<string, T>): T[] {
+	return Object.values(catalog).filter((entry) => !entry.hidden);
+}
 
 /** The site's configured default appearance. */
 export const THEME_DEFAULTS = {
@@ -118,9 +131,9 @@ export function loadStylesheets(hrefs: string | string[] | undefined) {
 	}
 }
 
-/** Loads the fonts of every typography style, e.g. for previews in the theme picker. */
+/** Loads the fonts of every typography style the picker lists, for its previews. */
 export function loadAllStyleFonts() {
-	for (const style of Object.values(THEME_STYLES)) loadStylesheets(style.stylesheet);
+	for (const style of listed(THEME_STYLES)) loadStylesheets(style.stylesheet);
 }
 
 export function resolveIsDark(mode: ThemeMode, prefersDark: boolean): boolean {

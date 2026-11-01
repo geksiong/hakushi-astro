@@ -164,9 +164,13 @@ export interface HakushiThemeOptions {
 	fontSizes?: HakushiThemeCatalog<HakushiFontSize>;
 	presets?: HakushiThemeCatalog<HakushiPresetTheme>;
 	/**
-	 * Include the built-in entries (default `true`). `false` keeps only configured
-	 * entries in every catalog; an object switches catalogs individually.
-	 * With built-ins off, naming a built-in id in a catalog still includes it.
+	 * Offer the built-in entries in the theme picker. Defaults to only `fontSizes`;
+	 * everything else offers just the configured entries and the default choice,
+	 * so an unconfigured site is locked to its defaults. `true` offers every
+	 * built-in; `false` none except font sizes; an object switches catalogs
+	 * individually (`{ fontSizes: false }` removes the built-in font sizes).
+	 * With built-ins off, naming a built-in id in a catalog still offers it.
+	 * The picker hides any section with fewer than two choices.
 	 */
 	builtIns?: boolean | Partial<Record<HakushiThemeCatalogName, boolean>>;
 }

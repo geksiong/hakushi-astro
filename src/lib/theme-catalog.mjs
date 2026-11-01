@@ -10,7 +10,16 @@ import { COLOR_SCHEMES, THEME_STYLES, LAYOUT_SCHEMES, FONT_SIZES, PRESET_THEMES 
  * Per catalog: a built-in id merges the given fields over the built-in entry,
  * `false` removes a built-in, and a new id adds an entry (missing fields are
  * filled from the fallback built-in). New entries are listed before built-ins.
+ *
+ * Built-in entries are only offered where `theme.builtIns` turns them on (by
+ * default just the font sizes), so an unconfigured site is locked to its
+ * defaults. The default selection is always available. Entries a preset needs
+ * but that aren't offered on their own are included with `hidden: true`: they
+ * can be applied, but the picker doesn't list them.
  */
+
+/** Which catalogs include their built-in entries when `theme.builtIns` doesn't say. */
+export const DEFAULT_BUILT_INS = { presets: false, colorSchemes: false, styles: false, layouts: false, fontSizes: true };
 
 export const COLOR_KEYS = ['primary', 'primaryHover', 'accent', 'secondary', 'bgMain', 'bgSurface', 'bgSidebar', 'border', 'textMain', 'textMuted'];
 
@@ -114,16 +123,7 @@ function resolveCatalog(catalog, entries, includeBuiltIns) {
 		if (catalog.key === 'fontSizes' && !entry.label) added[id].label = added[id].name;
 	}
 
-	const resolved = { ...added, ...builtIn };
-	// Presets are optional; every other catalog needs at least one entry to apply.
-	if (catalog.key !== 'presets' && Object.keys(resolved).length === 0) {
-		fail(
-			includeBuiltIns
-				? `\`theme.${catalog.key}\` removes every ${catalog.label}; at least one is required.`
-				: `Built-in ${catalog.label}s are turned off by \`theme.builtIns\`, so \`theme.${catalog.key}\` must define at least one.`
-		);
-	}
-	return resolved;
+	return { ...added, ...builtIn };
 }
 
 /**
@@ -132,26 +132,63 @@ function resolveCatalog(catalog, entries, includeBuiltIns) {
  */
 export function resolveTheme(themeOptions = {}, defaults = {}) {
 	if (!isPlainObject(themeOptions)) fail('`theme` must be an object.');
-	const builtInsOption = themeOptions.builtIns ?? true;
+	const builtInsOption = themeOptions.builtIns ?? {};
+	if (typeof builtInsOption !== 'boolean' && !isPlainObject(builtInsOption)) {
+		fail('`theme.builtIns` must be `true`, `false`, or an object such as `{ presets: true, colorSchemes: true }`.');
+	}
+	// Font sizes keep their built-ins unless switched off by name.
 	const includeBuiltIns = (key) =>
-		typeof builtInsOption === 'boolean' ? builtInsOption : builtInsOption[key] !== false;
+		typeof builtInsOption === 'boolean'
+			? key === 'fontSizes' || builtInsOption
+			: (builtInsOption[key] ?? DEFAULT_BUILT_INS[key]) !== false;
 
 	const catalogs = {};
+	const removed = {};
 	for (const catalog of CATALOGS) {
-		catalogs[catalog.key] = resolveCatalog(catalog, themeOptions[catalog.key], includeBuiltIns(catalog.key));
+		const entries = themeOptions[catalog.key];
+		catalogs[catalog.key] = resolveCatalog(catalog, entries, includeBuiltIns(catalog.key));
+		removed[catalog.key] = new Set(
+			Object.entries(isPlainObject(entries) ? entries : {})
+				.filter(([, entry]) => entry === false)
+				.map(([id]) => id)
+		);
 	}
 
-	// Presets reference the other catalogs; unset fields use the default selection.
-	const firstId = (key) => Object.keys(catalogs[key])[0];
+	/**
+	 * Makes `id` available in a catalog, adding the built-in entry if it isn't
+	 * there yet (unless configured away with `false`). `listed` entries appear
+	 * in the picker; others are added as hidden. Returns false if unknown.
+	 */
+	const ensure = (catalog, id, listed) => {
+		const entries = catalogs[catalog.key];
+		if (id in entries) {
+			if (listed && entries[id].hidden) {
+				const { hidden, ...entry } = entries[id];
+				entries[id] = entry;
+			}
+			return true;
+		}
+		if (!(id in catalog.builtIns) || removed[catalog.key].has(id)) return false;
+		entries[id] = listed ? catalog.builtIns[id] : { ...catalog.builtIns[id], hidden: true };
+		return true;
+	};
+	const known = (catalog) => Object.keys(catalogs[catalog.key]).join(', ') || '(none)';
+
 	const pick = (catalog, explicit, source = `\`theme.${catalog.selection}\``) => {
 		if (explicit !== undefined && explicit !== null && explicit !== '') {
-			if (!(explicit in catalogs[catalog.key])) {
-				fail(`Unknown ${catalog.label} "${explicit}" in ${source}. Available: ${Object.keys(catalogs[catalog.key]).join(', ')}.`);
+			if (!ensure(catalog, explicit, true)) {
+				fail(`Unknown ${catalog.label} "${explicit}" in ${source}. Available: ${known(catalog)}.`);
 			}
 			return explicit;
 		}
+		// No choice made: the built-in default if offered, else the first configured entry,
+		// else the built-in default on its own.
 		const fallback = defaults[catalog.selection] ?? catalog.fallback;
-		return fallback in catalogs[catalog.key] ? fallback : firstId(catalog.key);
+		if (fallback in catalogs[catalog.key]) return fallback;
+		const first = Object.keys(catalogs[catalog.key])[0];
+		if (first) return first;
+		if (ensure(catalog, fallback, true)) return fallback;
+		fail(`\`theme.${catalog.key}\` removes every ${catalog.label}; at least one is required.`);
 	};
 
 	const presetCatalog = CATALOGS.find((catalog) => catalog.key === 'presets');
@@ -176,13 +213,15 @@ export function resolveTheme(themeOptions = {}, defaults = {}) {
 		const untouchedBuiltIn = entry === PRESET_THEMES[id];
 		for (const [field, key] of PRESET_REFS) {
 			if (filled[field] === undefined) filled[field] = selection[field];
-			if (!(filled[field] in catalogs[key])) {
+			const catalog = CATALOGS.find((c) => c.key === key);
+			// A preset can use entries the picker doesn't offer on their own.
+			if (!ensure(catalog, filled[field], false)) {
 				// A built-in preset whose scheme/style/layout was removed simply drops out.
 				if (untouchedBuiltIn && preset !== id) {
 					delete catalogs.presets[id];
 					break;
 				}
-				fail(`Preset theme "${id}" uses unknown ${field} "${filled[field]}". Available: ${Object.keys(catalogs[key]).join(', ')}.`);
+				fail(`Preset theme "${id}" uses unknown ${field} "${filled[field]}". Available: ${known(catalog)}.`);
 			}
 		}
 		if (id in catalogs.presets) catalogs.presets[id] = filled;
