@@ -217,6 +217,24 @@ function readIconSvg(icon, root, label) {
 	return svg;
 }
 
+/** Third-party packages Hakushi's browser code imports. */
+const CLIENT_DEPENDENCIES = ['recharts', 'd3', 'abcjs', 'lucide-react'];
+
+/**
+ * Pre-bundle Hakushi's browser dependencies in dev. Installed as a package,
+ * Hakushi is served from node_modules, where Vite neither discovers nor
+ * converts its dependencies, so CommonJS modules inside them (such as
+ * recharts' use-sync-external-store) fail to load. Listing them also avoids a
+ * full page reload when they are discovered on first visit. In a site,
+ * they're named through Hakushi (`hakushi > recharts`) because they aren't
+ * resolvable from the site's root; in this repository they are.
+ */
+function clientDependencies(root) {
+	const packageDir = fileURLToPath(new URL('.', import.meta.url));
+	const isOwnRepo = resolve(packageDir) === resolve(fileURLToPath(root));
+	return CLIENT_DEPENDENCIES.map((name) => (isOwnRepo ? name : `hakushi > ${name}`));
+}
+
 function resolveUserSpecifier(specifier, root) {
 	if (specifier instanceof URL) return fileURLToPath(specifier);
 	if (specifier.startsWith('.') || specifier.startsWith('/')) {
@@ -293,7 +311,10 @@ function coreIntegration(options = {}) {
 							}],
 						},
 					},
-					vite: { plugins: [virtualModules(options, config, astroConfig.root), tailwindcss()] },
+					vite: {
+						plugins: [virtualModules(options, config, astroConfig.root), tailwindcss()],
+						optimizeDeps: { include: clientDependencies(astroConfig.root) },
+					},
 				});
 			},
 		},
