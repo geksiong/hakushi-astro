@@ -85,7 +85,10 @@ export default function SidebarContent({
 		<>
 			<nav aria-label="Collections" className="flex-1 p-3 space-y-0.5">
 				{collections.map((col) => {
-					const items = articles.filter((n) => n.collection === col.id);
+					// Newest first, undated last: the collection page's default order.
+					const items = articles
+						.filter((n) => n.collection === col.id)
+						.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
 					const isOpen = openFolders[col.id] ?? false;
 					// The collection row is active on its index page; on one of
 					// its articles the article row carries the highlight instead.
