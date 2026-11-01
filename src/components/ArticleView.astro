@@ -140,7 +140,7 @@ const displayDate = formatDate(date);
 			<footer class="mt-12 pt-6 border-t border-[var(--border)] space-y-6">
 				{data.tags.length > 0 && (
 					<nav aria-label="Tags" class="flex flex-wrap gap-x-3 gap-y-1 text-sm">
-						{data.tags.map((tag) => (
+						{data.tags.map((tag: string) => (
 							<a
 								href={`/tags/${taxonomySlug(tag)}`}
 								class="text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"

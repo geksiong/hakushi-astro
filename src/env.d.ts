@@ -1,5 +1,13 @@
 /// <reference types="astro/client" />
 
+// Astro's SVG attribute types omit the global `hidden` attribute. Lucide icons
+// use it (via their SVG props) for play/pause states toggled by scripts.
+declare namespace astroHTML.JSX {
+	interface SVGAttributes {
+		hidden?: boolean | string | undefined | null;
+	}
+}
+
 // The shape lives in index.d.ts (shared with consuming sites) so the two can't drift apart.
 declare module 'virtual:hakushi/config' {
 	const config: import('../index').HakushiResolvedConfig;
