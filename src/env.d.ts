@@ -1,20 +1,8 @@
 /// <reference types="astro/client" />
 
+// The shape lives in index.d.ts (shared with consuming sites) so the two can't drift apart.
 declare module 'virtual:hakushi/config' {
-	const config: {
-		title: string;
-		description: string;
-		versionLabel: string;
-		lang: string;
-		favicon: string | null;
-		favicons: { rel: string; href: string; type?: string; sizes?: string }[];
-		footer: { left: string; middle: string; right: string } | null;
-		notFound: { title: string; text: string };
-		defaultCollection: string;
-		readAloud: boolean;
-		collections: import('./lib/collections').CollectionConfig[];
-		theme: { mode: 'light' | 'dark' | 'auto'; colorScheme: string; style: string };
-	};
+	const config: import('../index').HakushiResolvedConfig;
 	export default config;
 }
 

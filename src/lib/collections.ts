@@ -4,7 +4,7 @@ export interface CollectionConfig {
 	id: string;
 	name: string;
 	description: string;
-	iconName?: 'BookOpen' | 'Calendar' | 'Microscope' | 'FileText' | 'Share2' | 'Folder' | 'Layers';
+	iconName?: import('../../index').HakushiIconName;
 	type?: 'folder' | 'dated';
 	articlesPerPage?: number;
 }

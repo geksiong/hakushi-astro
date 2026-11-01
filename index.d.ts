@@ -225,32 +225,56 @@ export const DEFAULT_HEADER_LINKS: HakushiHeaderLink[];
 export const DEFAULT_NOT_FOUND: Required<HakushiNotFound>;
 export default function hakushi(options?: HakushiOptions): AstroIntegration[];
 
-declare module 'virtual:hakushi/config' {
-	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
-		articlesPerPage: number;
-		readAloud: boolean;
-		googleAnalytics: string | null;
-		/** href of the first favicon, or null. */
-		favicon: string | null;
-		favicons: (Required<Pick<HakushiFavicon, 'rel' | 'href'>> & Pick<HakushiFavicon, 'type' | 'sizes'>)[];
-		/** null when the footer is off or empty. */
-		footer: Required<HakushiFooter> | null;
-		notFound: Required<HakushiNotFound>;
-		/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
-		theme: {
-			mode: 'light' | 'dark' | 'auto';
-			colorScheme: string;
-			style: string;
-			layout: string;
-			fontSize: string;
-			preset?: string;
-			colorSchemes: Record<string, unknown>;
-			styles: Record<string, unknown>;
-			layouts: Record<string, unknown>;
-			fontSizes: Record<string, unknown>;
-			presets: Record<string, unknown>;
-		};
+/** A collection as the site sees it: loader-only options removed, defaults filled in. */
+export type HakushiResolvedCollection = Omit<HakushiCollection, 'base' | 'pattern' | 'folderCategories' | 'filenameDates'> &
+	Required<Pick<HakushiCollection, 'description' | 'iconName' | 'type'>>;
+/** A sidebar link with its defaults filled in. */
+export type HakushiResolvedSidebarLink = HakushiSidebarLink & Required<Pick<HakushiSidebarLink, 'description' | 'iconName' | 'external'>>;
+/** A header link with its defaults filled in. */
+export type HakushiResolvedHeaderLink = HakushiHeaderLink &
+	Required<Pick<HakushiHeaderLink, 'description' | 'iconName' | 'external'>> & {
+		/** SVG markup for a brand icon or custom `icon`; unset for lucide icons. */
+		iconSvg?: string;
 	};
+
+/** The normalized options the integration exports as `virtual:hakushi/config`. */
+export interface HakushiResolvedConfig {
+	title: string;
+	description: string;
+	versionLabel: string;
+	lang: string;
+	defaultCollection: string;
+	collections: HakushiResolvedCollection[];
+	about: Required<HakushiAbout>;
+	sidebarLinks: HakushiResolvedSidebarLink[];
+	headerLinks: HakushiResolvedHeaderLink[];
+	articlesPerPage: number;
+	readAloud: boolean;
+	googleAnalytics: string | null;
+	/** href of the first favicon, or null. */
+	favicon: string | null;
+	favicons: (Required<Pick<HakushiFavicon, 'rel' | 'href'>> & Pick<HakushiFavicon, 'type' | 'sizes'>)[];
+	/** null when the footer is off or empty. */
+	footer: Required<HakushiFooter> | null;
+	notFound: Required<HakushiNotFound>;
+	/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
+	theme: {
+		mode: 'light' | 'dark' | 'auto';
+		colorScheme: string;
+		style: string;
+		layout: string;
+		fontSize: string;
+		preset?: string;
+		colorSchemes: Record<string, unknown>;
+		styles: Record<string, unknown>;
+		layouts: Record<string, unknown>;
+		fontSizes: Record<string, unknown>;
+		presets: Record<string, unknown>;
+	};
+}
+
+declare module 'virtual:hakushi/config' {
+	const config: HakushiResolvedConfig;
 	export default config;
 }
 
