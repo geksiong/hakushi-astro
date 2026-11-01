@@ -23,15 +23,19 @@ export default function MobileNav({ collections, articles, links = [] }: MobileN
 	const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
-		const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
-		setCurrentSlug(cleanPath);
+		const cleanPath = decodeURIComponent(window.location.pathname).replace(/^\/+|\/+$/g, '');
 		if (cleanPath === '') {
 			setSelectedCollectionId('all');
 			return;
 		}
-		const firstSegment = cleanPath.split('/')[0];
+		// Articles live at /<collection>/<id>; anything else (a short alias
+		// such as /<id>) is matched against article ids as-is.
+		const [firstSegment, ...rest] = cleanPath.split('/');
 		if (collections.some((c) => c.id === firstSegment)) {
 			setSelectedCollectionId(firstSegment);
+			setCurrentSlug(rest.join('/'));
+		} else {
+			setCurrentSlug(cleanPath);
 		}
 	}, [collections]);
 
