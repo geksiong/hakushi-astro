@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 		for (const doc of entries) for (const tag of doc.data.tags ?? []) {
 			const slug = taxonomySlug(tag);
 			if (!byTag.has(slug)) byTag.set(slug, { name: tag, articles: [] });
-			byTag.get(slug)!.articles.push({ title: resolveEntryTitle(doc), summary: doc.data.summary ?? '', date: doc.data.date?.toISOString().slice(0, 10) ?? '', url: `/${doc.id}`, collection: id, mainImage: doc.data.mainImage });
+			byTag.get(slug)!.articles.push({ title: resolveEntryTitle(doc), summary: doc.data.summary ?? '', date: doc.data.date?.toISOString().slice(0, 10) ?? '', url: `/${id}/${doc.id}`, collection: id, mainImage: doc.data.mainImage });
 		}
 	}
 	return [...byTag].map(([tag, props]) => ({ params: { tag }, props }));

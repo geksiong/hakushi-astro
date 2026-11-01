@@ -43,7 +43,7 @@ export async function getStaticPaths() {
 				title: resolveEntryTitle(doc),
 				summary: doc.data.summary ?? '',
 				date: doc.data.date?.toISOString().slice(0, 10) ?? '',
-				url: `/${doc.id}`,
+				url: `/${id}/${doc.id}`,
 				collection: id,
 				mainImage: doc.data.mainImage,
 			});
