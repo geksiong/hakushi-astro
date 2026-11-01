@@ -62,7 +62,8 @@ const groupId = (collectionId: string, key: string) => `${collectionId}/${key}`;
 /**
  * The browse UI shared by the desktop inline sidebar (Sidebar.tsx) and the
  * mobile drawer (MobileNav.tsx): one tree of collections, each expanding to
- * its articles, with the graph and configurable links pinned below.
+ * its articles, with the graph and configurable links pinned below. Only the
+ * collection tree scrolls, so the links stay visible however long it gets.
  */
 export default function SidebarContent({
 	collections,
@@ -125,7 +126,7 @@ export default function SidebarContent({
 
 	return (
 		<>
-			<nav aria-label="Collections" className="flex-1 p-3 space-y-0.5">
+			<nav aria-label="Collections" className="flex-1 min-h-0 overflow-y-auto p-3 space-y-0.5">
 				{collections.map((col) => {
 					// Newest first, undated last: the collection page's default order.
 					const items = articles
@@ -228,7 +229,7 @@ export default function SidebarContent({
 			</nav>
 
 			{/* Graph, tags and configurable pages & external sites */}
-			<nav aria-label="Pages" className="p-3 space-y-0.5 border-t border-[var(--border)]">
+			<nav aria-label="Pages" className="shrink-0 p-3 space-y-0.5 border-t border-[var(--border)]">
 				<a
 					href="/graph"
 					onClick={() => onNavigate?.()}

@@ -25,7 +25,7 @@ export default function Sidebar(props: SidebarProps) {
 		<aside
 			id="left-sidebar"
 			data-sidebar
-			className="shrink-0 w-64 border-r border-[var(--border)] h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto hidden lg:flex flex-col text-xs"
+			className="shrink-0 w-64 border-r border-[var(--border)] h-[calc(100vh-4rem)] sticky top-16 overflow-hidden hidden lg:flex flex-col text-xs"
 		>
 			<SidebarContent {...props} />
 		</aside>
