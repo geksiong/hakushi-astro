@@ -4,7 +4,7 @@ import { BaseLayout, Header, ReaderShell, ArticleView } from 'virtual:hakushi/co
 import { render } from 'astro:content';
 import { calculateReadingTime, getBacklinks, type ReadingTime, type Backlink } from '../lib/articles';
 import { resolveEntryTitle } from '../lib/title';
-import { getCachedGraph, getSubgraph } from '../lib/graph-data';
+import { getSubgraph } from '../lib/graph-data';
 
 export interface ArticlePageProps {
 	entry: any;

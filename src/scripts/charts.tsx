@@ -10,7 +10,6 @@ import {
 	Area,
 	PieChart,
 	Pie,
-	Cell,
 	XAxis,
 	YAxis,
 	Tooltip,
@@ -48,11 +47,16 @@ function Chart({ config }: { config: ChartConfig }) {
 	if (type === 'pie') {
 		return (
 			<PieChart>
-				<Pie data={data} dataKey="value" nameKey={xKey} cx="50%" cy="50%" outerRadius={80} label>
-					{data.map((_, index) => (
-						<Cell key={index} fill={DEFAULT_COLORS[index % DEFAULT_COLORS.length]} />
-					))}
-				</Pie>
+				{/* Recharts colors each slice, and its legend swatch, from the entry's `fill`. */}
+				<Pie
+					data={data.map((entry, index) => ({ ...entry, fill: DEFAULT_COLORS[index % DEFAULT_COLORS.length] }))}
+					dataKey="value"
+					nameKey={xKey}
+					cx="50%"
+					cy="50%"
+					outerRadius={80}
+					label
+				/>
 				<Tooltip contentStyle={tooltipStyle()} />
 				<Legend />
 			</PieChart>
