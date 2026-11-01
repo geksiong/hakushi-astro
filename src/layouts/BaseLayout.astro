@@ -6,6 +6,7 @@ import { createSidebarInitScript } from '../lib/sidebar-init.mjs';
 import CommandPalette from '../components/CommandPalette';
 import MobileNav from '../components/MobileNav';
 import FloatingControls from '../components/FloatingControls.astro';
+import { Footer } from 'virtual:hakushi/components';
 import { getSearchDocs } from '../lib/search-data';
 import { getArticleIndex } from '../lib/articles';
 import { COLLECTIONS } from '../lib/collections';
@@ -44,7 +45,7 @@ const articles = await getArticleIndex();
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
-		{config.favicon && <link rel="icon" href={config.favicon} />}
+		{config.favicons.map((icon) => <link rel={icon.rel} href={icon.href} type={icon.type} sizes={icon.sizes} />)}
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -59,6 +60,7 @@ const articles = await getArticleIndex();
 	</head>
 	<body class="min-h-screen flex flex-col antialiased">
 		<slot />
+		<Footer />
 
 		<MobileNav client:load collections={COLLECTIONS} articles={articles} links={SIDEBAR_LINKS} />
 		<CommandPalette client:load docs={searchDocs} />

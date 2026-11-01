@@ -26,6 +26,32 @@ export interface HakushiAbout {
 	/** Plain text shown on the About page; blank lines separate paragraphs. */
 	content?: string;
 }
+/** A favicon `<link>`. */
+export interface HakushiFavicon {
+	href: string;
+	/** MIME type; inferred from the file extension when omitted. */
+	type?: string;
+	/** e.g. `'32x32'` or `'any'`. */
+	sizes?: string;
+	/** Defaults to `'icon'`; use `'apple-touch-icon'` for iOS home-screen icons. */
+	rel?: string;
+}
+/**
+ * Footer text, one string per column. `[label](href)` makes a link, `{year}` is the
+ * build year and `{title}` the site title; other text (including HTML) is shown as written.
+ */
+export interface HakushiFooter {
+	left?: string;
+	middle?: string;
+	right?: string;
+}
+/** Content of the built-in 404 page. */
+export interface HakushiNotFound {
+	/** Large heading, also used in the page title. Defaults to `'404'`. */
+	title?: string;
+	/** Message below the heading; blank lines separate paragraphs. */
+	text?: string;
+}
 /** A configurable header icon link; same shape as a sidebar link. */
 export type HakushiHeaderLink = HakushiSidebarLink;
 /** Theme colors; each is any CSS color. */
@@ -139,7 +165,8 @@ export interface HakushiOptions {
 	description?: string;
 	versionLabel?: string;
 	lang?: string;
-	favicon?: string | null;
+	/** Favicon URL(s). Defaults to the built-in Hakushi icon; `false` or `null` adds none. */
+	favicon?: string | HakushiFavicon | (string | HakushiFavicon)[] | false | null;
 	defaultCollection?: string;
 	collections?: HakushiCollection[];
 	/** Content rendered by the built-in `/about` route. */
@@ -153,9 +180,13 @@ export interface HakushiOptions {
 	readAloud?: boolean;
 	/** Google Analytics 4 measurement ID (e.g. `'G-XXXXXXXXXX'`). The tag is added to production builds only. Off by default. */
 	googleAnalytics?: string | { measurementId: string } | null;
+	/** Site footer with left, middle and right text. Off by default. */
+	footer?: HakushiFooter | false | null;
+	/** Title and text of the built-in 404 page. */
+	notFound?: HakushiNotFound;
 	theme?: HakushiThemeOptions;
 	customCss?: (string | URL)[];
-	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage', string | URL>>;
+	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage' | 'Footer', string | URL>>;
 	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'categories' | 'about' | 'notFound', boolean>>;
 	mermaid?: Record<string, unknown>;
 }
@@ -163,13 +194,20 @@ export const DEFAULT_COLLECTIONS: HakushiCollection[];
 export const DEFAULT_ABOUT: Required<HakushiAbout>;
 export const DEFAULT_SIDEBAR_LINKS: HakushiSidebarLink[];
 export const DEFAULT_HEADER_LINKS: HakushiHeaderLink[];
+export const DEFAULT_NOT_FOUND: Required<HakushiNotFound>;
 export default function hakushi(options?: HakushiOptions): AstroIntegration[];
 
 declare module 'virtual:hakushi/config' {
-	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'favicon' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
+	const config: Required<Pick<HakushiOptions, 'title' | 'description' | 'versionLabel' | 'lang' | 'defaultCollection' | 'collections' | 'about' | 'sidebarLinks' | 'headerLinks'>> & {
 		articlesPerPage: number;
 		readAloud: boolean;
 		googleAnalytics: string | null;
+		/** href of the first favicon, or null. */
+		favicon: string | null;
+		favicons: (Required<Pick<HakushiFavicon, 'rel' | 'href'>> & Pick<HakushiFavicon, 'type' | 'sizes'>)[];
+		/** null when the footer is off or empty. */
+		footer: Required<HakushiFooter> | null;
+		notFound: Required<HakushiNotFound>;
 		/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
 		theme: {
 			mode: 'light' | 'dark' | 'auto';
@@ -196,4 +234,5 @@ declare module 'virtual:hakushi/components' {
 	export const ReaderShell: any;
 	export const ArticleView: any;
 	export const CollectionPage: any;
+	export const Footer: any;
 }

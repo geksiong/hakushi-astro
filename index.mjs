@@ -13,7 +13,8 @@ import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
 import { resolveTheme } from './src/lib/theme-catalog.mjs';
-import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS } from './src/integration/defaults.mjs';
+import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_FOOTER, DEFAULT_NOT_FOUND } from './src/integration/defaults.mjs';
+import { DEFAULT_FAVICON_HREF } from './src/integration/favicon.mjs';
 
 const VIRTUAL_CONFIG = 'virtual:hakushi/config';
 const RESOLVED_CONFIG = `\0${VIRTUAL_CONFIG}`;
@@ -30,6 +31,7 @@ const defaultComponents = {
 	ReaderShell: new URL('./src/layouts/ReaderShell.astro', import.meta.url),
 	ArticleView: new URL('./src/components/ArticleView.astro', import.meta.url),
 	CollectionPage: new URL('./src/components/CollectionPage.astro', import.meta.url),
+	Footer: new URL('./src/components/Footer.astro', import.meta.url),
 };
 
 function normalizeOptions(options) {
@@ -61,7 +63,11 @@ function normalizeOptions(options) {
 		articlesPerPage: options.articlesPerPage ?? DEFAULT_CONFIG.articlesPerPage ?? 12,
 		theme: resolveTheme(options.theme, DEFAULT_CONFIG.theme),
 		googleAnalytics: normalizeGoogleAnalytics(options.googleAnalytics),
+		footer: normalizeFooter(options.footer),
+		notFound: normalizeNotFound(options.notFound),
 	};
+	config.favicons = normalizeFavicons(options.favicon);
+	config.favicon = config.favicons[0]?.href ?? null;
 	delete config.components;
 	delete config.customCss;
 	delete config.routes;
@@ -80,6 +86,61 @@ function normalizeGoogleAnalytics(value) {
 		throw new Error('[hakushi] `googleAnalytics` must be a Google tag ID such as "G-XXXXXXXXXX" (or `{ measurementId: "G-XXXXXXXXXX" }`).');
 	}
 	return id.trim();
+}
+
+const FAVICON_TYPES = { svg: 'image/svg+xml', png: 'image/png', ico: 'image/x-icon', gif: 'image/gif', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif' };
+
+/**
+ * `favicon` accepts a URL, `{ href, type?, sizes?, rel? }`, or an array of
+ * either (e.g. an SVG icon plus a PNG apple-touch-icon). Unset uses the
+ * built-in Hakushi icon; `false` or `null` adds no icon link.
+ * Returns the list of `<link>` attributes.
+ */
+function normalizeFavicons(value) {
+	if (value === undefined) return [{ rel: 'icon', href: DEFAULT_FAVICON_HREF, type: 'image/svg+xml' }];
+	if (value === null || value === false) return [];
+	return (Array.isArray(value) ? value : [value]).map((item) => {
+		const icon = typeof item === 'string' ? { href: item } : item;
+		if (!icon || typeof icon.href !== 'string' || !icon.href.trim()) {
+			throw new Error('[hakushi] `favicon` must be a URL, `{ href, type?, sizes?, rel? }`, or an array of them.');
+		}
+		const href = icon.href.trim();
+		const ext = href.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+		const dataType = href.match(/^data:([^;,]+)/i)?.[1];
+		const type = icon.type ?? dataType ?? FAVICON_TYPES[ext];
+		return { rel: icon.rel ?? 'icon', href, ...(type && { type }), ...(icon.sizes && { sizes: icon.sizes }) };
+	});
+}
+
+/**
+ * `footer` takes `{ left?, middle?, right? }` text. Returns null (no footer)
+ * when it is off or every slot is empty.
+ */
+function normalizeFooter(value) {
+	if (value === undefined || value === null || value === false) return null;
+	if (typeof value !== 'object' || Array.isArray(value)) {
+		throw new Error('[hakushi] `footer` must be an object such as `{ left: "© {year} Acme", right: "[GitHub](https://github.com/acme)" }`.');
+	}
+	const footer = { ...DEFAULT_FOOTER };
+	for (const slot of ['left', 'middle', 'right']) {
+		const text = value[slot];
+		if (text === undefined || text === null || text === false) continue;
+		if (typeof text !== 'string') throw new Error(`[hakushi] \`footer.${slot}\` must be a string.`);
+		footer[slot] = text.trim();
+	}
+	return footer.left || footer.middle || footer.right ? footer : null;
+}
+
+/** `notFound` customizes the built-in 404 page's `title` and `text`. */
+function normalizeNotFound(value) {
+	const notFound = { ...DEFAULT_NOT_FOUND };
+	for (const key of ['title', 'text']) {
+		const text = value?.[key];
+		if (text === undefined || text === null) continue;
+		if (typeof text !== 'string') throw new Error(`[hakushi] \`notFound.${key}\` must be a string.`);
+		notFound[key] = text;
+	}
+	return notFound;
 }
 
 function isExternalHref(href) {
@@ -197,4 +258,4 @@ export default function hakushi(options = {}) {
 	return [react(), mermaid(options.mermaid), coreIntegration(options)];
 }
 
-export { DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS };
+export { DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_NOT_FOUND };

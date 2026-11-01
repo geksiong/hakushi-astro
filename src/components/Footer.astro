@@ -1,0 +1,38 @@
+---
+import config from 'virtual:hakushi/config';
+import { parseFooterText } from '../lib/footer';
+
+// `footer` is null when it is off or every slot is empty.
+const footer = config.footer;
+const slots = footer
+	? (['left', 'middle', 'right'] as const).map((slot) => ({
+			slot,
+			segments: parseFooterText(footer[slot], { title: config.title }),
+		}))
+	: [];
+const ALIGN = { left: 'sm:text-left', middle: 'sm:text-center', right: 'sm:text-right' };
+---
+
+{footer && (
+	<footer class="site-footer w-full border-t border-[var(--border)] bg-[var(--bg-main)] px-4 py-6 text-xs text-[var(--text-muted)] transition-colors duration-200">
+		<div class="header-container mx-auto grid gap-2 text-center sm:grid-cols-3 sm:gap-4 sm:items-center">
+			{slots.map(({ slot, segments }) => (
+				<p class:list={['min-w-0 break-words', ALIGN[slot], !segments.length && 'hidden sm:block']} data-footer-slot={slot}>
+					{segments.map((segment) =>
+						'href' in segment ? (
+							<a
+								href={segment.href}
+								class="underline-offset-2 hover:underline hover:text-[var(--text-main)] transition-colors"
+								{...(segment.external && { target: '_blank', rel: 'noopener noreferrer' })}
+							>
+								{segment.text}
+							</a>
+						) : (
+							segment.text
+						)
+					)}
+				</p>
+			))}
+		</div>
+	</footer>
+)}

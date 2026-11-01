@@ -14,6 +14,15 @@ export const DEFAULT_SIDEBAR_LINKS = [
 	},
 ];
 
+/** Footer text slots; an all-empty footer isn't rendered. */
+export const DEFAULT_FOOTER = { left: '', middle: '', right: '' };
+
+/** Content of the built-in 404 page. */
+export const DEFAULT_NOT_FOUND = {
+	title: '404',
+	text: 'No note found at this path.',
+};
+
 /** Right-side header icons (social/contact links). Empty by default. */
 export const DEFAULT_HEADER_LINKS = [];
 export const DEFAULT_COLLECTIONS = [
@@ -76,6 +85,8 @@ export const DEFAULT_CONFIG = {
 	articlesPerPage: 12,
 	readAloud: true,
 	googleAnalytics: null,
+	footer: DEFAULT_FOOTER,
+	notFound: DEFAULT_NOT_FOUND,
 	theme: {
 		mode: 'dark',
 		colorScheme: 'hakushi',

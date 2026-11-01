@@ -7,6 +7,9 @@ export default defineConfig({
 		description: 'A package-boundary test site',
 		versionLabel: 'custom',
 		defaultCollection: 'handbook',
+		favicon: ['/portfolio-preview.svg', { href: '/apple-touch-icon.png', rel: 'apple-touch-icon', sizes: '180x180' }],
+		footer: { left: '© {year} {title}', middle: '<b>not html</b>', right: '[Docs](/handbook) · [GitHub](https://github.com/acme)' },
+		notFound: { title: 'Lost?', text: 'Nothing here.\n\nTry the search.' },
 		theme: {
 			mode: 'light',
 			preset: 'consumer',

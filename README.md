@@ -112,6 +112,15 @@ hakushi({
   articlesPerPage: 12,    // articles per page when browsing a collection (default 12)
   readAloud: true,        // Listen control that reads articles aloud (default true)
   googleAnalytics: 'G-XXXXXXXXXX', // optional Google Analytics 4 measurement ID
+  footer: {               // optional site footer (see "Footer" below)
+    left: '© {year} Acme',
+    middle: 'Built with [Hakushi](https://github.com/acme/hakushi)',
+    right: '[Privacy](/privacy)',
+  },
+  notFound: {             // built-in 404 page
+    title: 'Lost?',
+    text: 'That page has moved or never existed.',
+  },
   collections: [
     { id: 'handbook', name: 'Team Handbook', iconName: 'BookOpen', type: 'folder', articlesPerPage: 5 },
     { id: 'updates', name: 'Updates', iconName: 'Calendar', type: 'dated' },
@@ -264,6 +273,7 @@ hakushi({
 | `ReaderShell` | `entry?`, `currentCollection?`, `headings?`, `subgraph?`, `isGraphPage?`, `isAboutPage?`, default slot |
 | `ArticleView` | `entry`, `Content`, `headings`, `readingTime`, `backlinks` |
 | `CollectionPage` | `collection`, `articles` |
+| `Footer` | none; read `footer` from `virtual:hakushi/config` |
 
 Example header:
 
@@ -301,6 +311,24 @@ Hakushi owns the unified Markdown processor. Take care not to replace `markdown.
 ## Read aloud
 
 Articles show a **Listen** control in their metadata line. It reads the title, summary and body aloud using the browser's built-in speech synthesis (the Web Speech API), in the site's `lang`, highlighting each block as it is spoken. While reading, it turns into pause/resume and stop icons, and the same controls appear beside the scroll-to-top button, which sits at the bottom of the screen in line with the article's right edge once the page is scrolled down. Reading follows along by scrolling until you scroll yourself, and picks up again when the spoken block is back on screen. Code blocks, diagrams, charts, music notation, tables and display math are skipped; inline math is read as "formula". The control only appears in browsers that support speech synthesis. Set `readAloud: false` to remove it.
+
+## Favicon, footer and 404 page
+
+**Favicon.** Without a `favicon` option, pages use the built-in Hakushi icon. Set it to a URL (usually a file in your `public/` folder), an object with `href` and optional `type`, `sizes` and `rel`, or an array of them. The MIME type is inferred from the file extension. `favicon: false` adds no icon link.
+
+```js
+hakushi({
+  favicon: [
+    '/favicon.svg',
+    { href: '/favicon-32.png', sizes: '32x32' },
+    { href: '/apple-touch-icon.png', rel: 'apple-touch-icon', sizes: '180x180' },
+  ],
+})
+```
+
+**Footer.** `footer` adds a bar at the bottom of every page with `left`, `middle` and `right` text. On narrow screens the three columns stack, centered. Inside the text, `[label](href)` makes a link (absolute URLs open in a new tab), `{year}` is replaced with the build year and `{title}` with the site title. Any other text, HTML included, is shown as written. The footer is off by default, and isn't shown when all three are empty. To change its markup, replace the `Footer` component (see "Override components").
+
+**404 page.** `notFound.title` is the large heading on the built-in 404 page and is also used in its browser title (default `404`); `notFound.text` is the message below it, with blank lines separating paragraphs (default `No note found at this path.`).
 
 ## Google Analytics
 
