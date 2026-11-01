@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { relative, sep } from 'node:path';
+import { basename, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_COLLECTIONS } from './src/integration/defaults.mjs';
 
@@ -20,13 +20,16 @@ export function hakushiSchema({ extend = {} } = {}) {
 }
 
 /**
- * Create a glob loader for one Hakushi Markdown collection. Unless
- * `folderCategories` is false, a note in a subfolder of `base` that has no frontmatter
- * `category` gets the name of its top-level subfolder as its category.
+ * Create a glob loader for one Hakushi Markdown collection. Frontmatter always
+ * wins; otherwise:
+ * - unless `folderCategories` is false, a note in a subfolder of `base` gets
+ *   the name of its top-level subfolder as its `category`;
+ * - with `filenameDates`, a note whose filename starts with a date
+ *   (`2026-09-01-title.md`, `2026_09_01`, `2026.09.01` or `20260901`) gets it as its `date`.
  */
-export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = true }) {
+export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = true, filenameDates = false }) {
 	const loader = glob({ base, pattern });
-	if (!folderCategories) return loader;
+	if (!folderCategories && !filenameDates) return loader;
 	return {
 		...loader,
 		load: (context) => {
@@ -34,8 +37,13 @@ export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = tr
 			return loader.load({
 				...context,
 				parseData: (props) => {
-					const category = props.data?.category == null && props.filePath ? folderCategory(baseDir, props.filePath) : undefined;
-					return context.parseData(category ? { ...props, data: { ...props.data, category } } : props);
+					const data = { ...props.data };
+					if (props.filePath) {
+						if (folderCategories && data.category == null) data.category = folderCategory(baseDir, props.filePath);
+						if (filenameDates && data.date == null) data.date = filenameDate(props.filePath);
+					}
+					for (const key of ['category', 'date']) if (data[key] === undefined) delete data[key];
+					return context.parseData({ ...props, data });
 				},
 			});
 		},
@@ -49,20 +57,35 @@ function folderCategory(baseDir, filePath) {
 }
 
 /**
+ * ISO date (`YYYY-MM-DD`) at the start of a filename, or undefined. Accepts
+ * `-`, `_` or `.` separators or none, and rejects impossible dates (2026-02-30).
+ */
+function filenameDate(filePath) {
+	const match = basename(filePath).match(/^(\d{4})([-_.]?)(\d{2})\2(\d{2})(?!\d)/);
+	if (!match) return undefined;
+	const [, year, , month, day] = match;
+	const iso = `${year}-${month}-${day}`;
+	const parsed = new Date(`${iso}T00:00:00Z`);
+	return !Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(iso) ? iso : undefined;
+}
+
+/**
  * Create the default content collections. Each collection loads from
  * `${base}/${id}` unless it sets its own `base` folder (and optionally a
  * `pattern`). `folderCategories` applies to every collection unless one sets
- * its own. Individual definitions can be replaced by spreading this result in
- * `src/content.config.ts`.
+ * its own. Collections with `type: 'dated'` take missing dates from their
+ * filenames unless they set `filenameDates: false`. Individual definitions
+ * can be replaced by spreading this result in `src/content.config.ts`.
  */
 export function createHakushiCollections({ base = './src/content', schema = hakushiSchema(), collections = DEFAULT_COLLECTIONS, folderCategories = true } = {}) {
-	return Object.fromEntries(collections.map(({ id, base: folder, pattern, folderCategories: own }) => [
+	return Object.fromEntries(collections.map(({ id, type, base: folder, pattern, folderCategories: own, filenameDates }) => [
 		id,
 		defineCollection({
 			loader: hakushiLoader({
 				base: folder ?? `${base}/${id}`,
 				...(pattern ? { pattern } : {}),
 				folderCategories: own ?? folderCategories,
+				filenameDates: filenameDates ?? type === 'dated',
 			}),
 			schema,
 		}),

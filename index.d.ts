@@ -17,6 +17,11 @@ export interface HakushiCollection {
 	pattern?: string | string[];
 	/** Per-collection override of `createHakushiCollections({ folderCategories })`. Ignored by the integration itself. */
 	folderCategories?: boolean;
+	/**
+	 * Take a missing frontmatter `date` from the filename (`2026-09-01-title.md`) in
+	 * `createHakushiCollections`. Defaults to `true` for `type: 'dated'`. Ignored by the integration itself.
+	 */
+	filenameDates?: boolean;
 }
 export interface HakushiSidebarLink {
 	/** Link text shown in the sidebar. */

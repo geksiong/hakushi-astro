@@ -37,9 +37,9 @@ const defaultComponents = {
 };
 
 function normalizeOptions(options) {
-	// `base`, `pattern` and `folderCategories` only configure the content loader; keep filesystem
+	// `base`, `pattern`, `folderCategories` and `filenameDates` only configure the content loader; keep filesystem
 	// paths out of the config that's bundled for the browser.
-	const collections = (options.collections ?? DEFAULT_COLLECTIONS).map(({ base, pattern, folderCategories, ...collection }) => ({
+	const collections = (options.collections ?? DEFAULT_COLLECTIONS).map(({ base, pattern, folderCategories, filenameDates, ...collection }) => ({
 		description: '',
 		iconName: 'BookOpen',
 		type: 'folder',

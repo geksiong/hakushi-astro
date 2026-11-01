@@ -182,6 +182,8 @@ You can pass the same array to the integration's `collections` option; it ignore
 
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. In the sidebar, a `folder` collection (the default) groups its articles into one sub-folder per category, A–Z, followed by uncategorized articles. A `dated` collection groups them by year, newest first, and shows each article's date (`YYYY-MM-DD`) before its title. Within a group, articles are listed newest first.
 
+In a `dated` collection, an article without a frontmatter `date` takes it from the start of its filename: `2026-09-01-release-notes.md`, `2026_09_01`, `2026.09.01` and `20260901` all mean 1 September 2026. Impossible dates such as `2026-02-30` are ignored. The loader learns which collections are dated from the array passed to `createHakushiCollections`, so include `type: 'dated'` there too (the defaults already do). Set `filenameDates: false` on a collection to turn this off, or `true` to use it for a `folder` collection.
+
 ## Custom themes
 
 The theme picker offers presets (themes), color palettes, typography styles, layouts, and font sizes. Configure any of them under `theme`:
