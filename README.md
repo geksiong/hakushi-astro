@@ -204,7 +204,7 @@ Each catalog is keyed by id:
 - **`false`** hides a built-in. Built-in presets that use a hidden palette, style, layout, or font size are hidden too.
 - **`builtIns: false`** shows only the configured entries. Use `builtIns: { presets: false }` to switch off a single catalog. With built-ins off, a built-in id such as `nord: {}` still brings that entry back.
 
-The ids are `hakushi`, `paper`, `academic`, `refined`, `social`, `earth`, `obsidian`, `nord`, `amber`, `monokai`, `rose` (palettes); `sans`, `serif`, `mono`, `editorial` (styles); `compact`, `comfortable`, `spacious` (layouts); `sm`, `md`, `lg`, `xl` (font sizes); and `paper`, `academic`, `refined`, `social`, `earth`, `hakushi` (presets).
+The ids are `hakushi`, `paper`, `academic`, `refined`, `social`, `earth`, `obsidian`, `nord`, `amber`, `monokai`, `rose` (palettes); `sans`, `serif`, `mono`, `editorial`, `literary`, `monograph`, `organic`, `geometric` (styles); `compact`, `comfortable`, `spacious` (layouts); `sm`, `md`, `lg`, `xl` (font sizes); and `paper`, `academic`, `refined`, `social`, `earth`, `hakushi` (presets).
 
 | Catalog | Fields |
 | --- | --- |
@@ -213,6 +213,19 @@ The ids are `hakushi`, `paper`, `academic`, `refined`, `social`, `earth`, `obsid
 | `layouts` | `name`, `description`, `badge`, `shellMaxWidth`, `contentMaxWidth`, `contentPaddingX`, `contentPaddingY`, `lineHeightBody`, `lineHeightHeading`, `spacingParagraph`, `cardPadding` |
 | `fontSizes` | `name`, `label`, `badge`, `rootSize`, `fontSizeBase`, `fontSizeH1`, `fontSizeH2`, `fontSizeH3` |
 | `presets` | `name`, `badge`, `tagline`, `description`, `colorScheme`, `style`, `layout`, `fontSize` |
+
+Each built-in preset has its own typography style:
+
+| Preset | Style | Headings / body |
+| --- | --- | --- |
+| `hakushi` | `sans` | Plus Jakarta Sans / Inter |
+| `paper` | `literary` | Fraunces / Lora |
+| `academic` | `monograph` | Source Sans 3 / Source Serif 4 |
+| `refined` | `editorial` | Playfair Display / Source Serif 4 |
+| `earth` | `organic` | Alegreya / Alegreya Sans |
+| `social` | `geometric` | Space Grotesk / DM Sans |
+
+Fonts load only when they're used. A style's `stylesheet` is linked when the style is active (the page's no-flash script adds it before first paint), and every style's fonts load when the reader opens the theme picker's advanced options, so the typography cards can preview them. Fonts named in `fontHeading`, `fontBody` or `fontCode` must be loaded by the style's `stylesheet` (or be installed locally). Font fields you leave out are inherited from the base style (`sans` for a new style), and so is that style's stylesheet, which is kept alongside yours.
 
 `theme.colorScheme`, `style`, `layout`, and `fontSize` choose the defaults for new visitors. `theme.preset` applies a preset's choices as defaults; an explicit default overrides the preset's value. A preset field you leave out uses the default. An unknown id or color name stops the build with an error that lists the valid choices. If a visitor saved a choice that has since been removed, the configured default is used instead. **Reset** in the picker returns to the configured defaults.
 

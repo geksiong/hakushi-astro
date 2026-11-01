@@ -32,6 +32,16 @@ export function createThemeInitScript(theme = {}) {
   var FONTS = ${JSON.stringify(FONTS)};
   var PRESET_IDS = ${JSON.stringify(Object.keys(PRESETS))};
   var D = ${JSON.stringify(defaults)};
+  var fontsLoaded = false;
+  function loadFonts(style) {
+    [].concat((style && style.stylesheet) || []).forEach(function (href) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.setAttribute('data-hakushi-font', '');
+      document.head.appendChild(link);
+    });
+  }
   function stored(key, table, fallback) {
     var id = localStorage.getItem(key);
     return id && (!table || Object.prototype.hasOwnProperty.call(table, id)) ? id : fallback;
@@ -71,6 +81,9 @@ export function createThemeInitScript(theme = {}) {
     root.style.setProperty('--font-code', st.fontCode);
     root.style.setProperty('--radius', st.radius);
     root.dataset.style = styleId;
+    // Load only the active style's webfonts; applyTheme() adds others on demand.
+    fontsLoaded = true;
+    loadFonts(st);
 
     var lay = LAYOUTS[layoutId];
     root.style.setProperty('--shell-max-width', lay.shellMaxWidth);
@@ -93,7 +106,10 @@ export function createThemeInitScript(theme = {}) {
 
     root.dataset.scheme = schemeId;
     if (presetId) root.dataset.preset = presetId;
-  } catch (e) {}
+  } catch (e) {
+    // Storage unavailable: still load the default style's fonts.
+    if (!fontsLoaded) loadFonts(STYLES[D.style]);
+  }
 })();
 `;
 }

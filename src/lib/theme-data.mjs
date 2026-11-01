@@ -337,6 +337,31 @@ export const COLOR_SCHEMES = {
 	},
 };
 
+/** A Google Fonts stylesheet URL for the given `family=` values. */
+const googleFonts = (...families) =>
+	`https://fonts.googleapis.com/css2?${families.map((family) => `family=${family.replace(/ /g, '+')}`).join('&')}&display=swap`;
+
+const FONT = {
+	inter: 'Inter:wght@400;500;600;700',
+	jakarta: 'Plus Jakarta Sans:wght@600;700;800',
+	sourceSerif: 'Source Serif 4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600',
+	sourceSans: 'Source Sans 3:wght@600;700;800',
+	sourceCode: 'Source Code Pro:wght@400;500;600',
+	playfair: 'Playfair Display:ital,wght@0,600;0,700;0,800;1,600;1,700',
+	jetbrains: 'JetBrains Mono:wght@400;500;600;700;800',
+	fira: 'Fira Code:wght@400;500',
+	fraunces: 'Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600',
+	lora: 'Lora:ital,wght@0,400;0,600;0,700;1,400;1,600',
+	alegreya: 'Alegreya:ital,wght@0,500;0,700;0,800;1,500',
+	alegreyaSans: 'Alegreya Sans:ital,wght@0,400;0,500;0,700;1,400',
+	spaceGrotesk: 'Space Grotesk:wght@500;600;700',
+	dmSans: 'DM Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400',
+};
+
+/**
+ * Typography styles. Each loads its own webfonts through `stylesheet`; only
+ * the active style's fonts are requested (see src/lib/theme-fonts.mjs).
+ */
 export const THEME_STYLES = {
 	sans: {
 		id: 'sans',
@@ -346,7 +371,7 @@ export const THEME_STYLES = {
 		fontBody: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 		fontCode: '"Fira Code", monospace',
 		radius: '0.5rem',
-		cardStyle: 'shadow-sm border',
+		stylesheet: googleFonts(FONT.jakarta, FONT.inter, FONT.fira),
 	},
 	serif: {
 		id: 'serif',
@@ -356,7 +381,7 @@ export const THEME_STYLES = {
 		fontBody: '"Source Serif 4", Georgia, Cambria, serif',
 		fontCode: '"JetBrains Mono", monospace',
 		radius: '0.25rem',
-		cardStyle: 'border border-dashed',
+		stylesheet: googleFonts(FONT.playfair, FONT.sourceSerif, FONT.jetbrains),
 	},
 	mono: {
 		id: 'mono',
@@ -366,7 +391,7 @@ export const THEME_STYLES = {
 		fontBody: '"JetBrains Mono", monospace',
 		fontCode: '"JetBrains Mono", monospace',
 		radius: '0.25rem',
-		cardStyle: 'border-2',
+		stylesheet: googleFonts(FONT.jetbrains),
 	},
 	editorial: {
 		id: 'editorial',
@@ -376,7 +401,47 @@ export const THEME_STYLES = {
 		fontBody: '"Source Serif 4", Georgia, serif',
 		fontCode: '"Fira Code", monospace',
 		radius: '0.625rem',
-		cardStyle: 'shadow-md border-0 bg-opacity-80',
+		stylesheet: googleFonts(FONT.playfair, FONT.sourceSerif, FONT.fira),
+	},
+	literary: {
+		id: 'literary',
+		name: 'Literary',
+		description: 'Soft Warm Serif',
+		fontHeading: '"Fraunces", Georgia, serif',
+		fontBody: '"Lora", Georgia, Cambria, serif',
+		fontCode: '"JetBrains Mono", monospace',
+		radius: '0.375rem',
+		stylesheet: googleFonts(FONT.fraunces, FONT.lora, FONT.jetbrains),
+	},
+	monograph: {
+		id: 'monograph',
+		name: 'Monograph',
+		description: 'Journal Sans & Serif',
+		fontHeading: '"Source Sans 3", -apple-system, "Segoe UI", sans-serif',
+		fontBody: '"Source Serif 4", Georgia, Cambria, serif',
+		fontCode: '"Source Code Pro", monospace',
+		radius: '0.2rem',
+		stylesheet: googleFonts(FONT.sourceSans, FONT.sourceSerif, FONT.sourceCode),
+	},
+	organic: {
+		id: 'organic',
+		name: 'Organic',
+		description: 'Calligraphic Humanist',
+		fontHeading: '"Alegreya", Georgia, serif',
+		fontBody: '"Alegreya Sans", "Segoe UI", sans-serif',
+		fontCode: '"Fira Code", monospace',
+		radius: '0.5rem',
+		stylesheet: googleFonts(FONT.alegreya, FONT.alegreyaSans, FONT.fira),
+	},
+	geometric: {
+		id: 'geometric',
+		name: 'Geometric',
+		description: 'Bold Geometric Sans',
+		fontHeading: '"Space Grotesk", -apple-system, "Segoe UI", sans-serif',
+		fontBody: '"DM Sans", -apple-system, "Segoe UI", sans-serif',
+		fontCode: '"Fira Code", monospace',
+		radius: '0.875rem',
+		stylesheet: googleFonts(FONT.spaceGrotesk, FONT.dmSans, FONT.fira),
 	},
 };
 
@@ -480,7 +545,7 @@ export const PRESET_THEMES = {
 		tagline: 'Personal & Natural',
 		description: 'Warm unbleached paper, sepia ink, terracotta ember, and pressed sage',
 		colorScheme: 'paper',
-		style: 'serif',
+		style: 'literary',
 		layout: 'comfortable',
 		fontSize: 'md',
 	},
@@ -491,7 +556,7 @@ export const PRESET_THEMES = {
 		tagline: 'Academic & Technical',
 		description: 'Archival slate, peer-reviewed deep cobalt, and compact analytical density',
 		colorScheme: 'academic',
-		style: 'serif',
+		style: 'monograph',
 		layout: 'compact',
 		fontSize: 'md',
 	},
@@ -513,7 +578,7 @@ export const PRESET_THEMES = {
 		tagline: 'Exciting & Social',
 		description: 'High-energy electric violet, radiant punchy coral, and modern geometric sans',
 		colorScheme: 'social',
-		style: 'sans',
+		style: 'geometric',
 		layout: 'comfortable',
 		fontSize: 'md',
 	},
@@ -524,7 +589,7 @@ export const PRESET_THEMES = {
 		tagline: 'Down-to-Earth & Nature',
 		description: 'Grounded in nature: deep forest pine, damp cedar loam, warm amber, and dewy moss',
 		colorScheme: 'earth',
-		style: 'editorial',
+		style: 'organic',
 		layout: 'comfortable',
 		fontSize: 'md',
 	},

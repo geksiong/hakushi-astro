@@ -17,6 +17,8 @@ export const COLOR_KEYS = ['primary', 'primaryHover', 'accent', 'secondary', 'bg
 /** Fields only describing an entry in the picker; never inherited by a new entry. */
 const DISPLAY_FIELDS = ['name', 'description', 'badge', 'label', 'tagline'];
 
+const FONT_FIELDS = ['fontHeading', 'fontBody', 'fontCode'];
+
 const CATALOGS = [
 	{ key: 'colorSchemes', selection: 'colorScheme', label: 'color scheme', builtIns: COLOR_SCHEMES, fallback: 'hakushi' },
 	{ key: 'styles', selection: 'style', label: 'typography style', builtIns: THEME_STYLES, fallback: 'sans' },
@@ -73,6 +75,10 @@ function mergeEntry(catalog, id, base, override, isNew) {
 		const sheets = [].concat(override.stylesheet);
 		if (!sheets.every((href) => typeof href === 'string' && href)) {
 			fail(`Typography style "${id}": \`stylesheet\` must be a URL string or an array of them.`);
+		}
+		// Fonts inherited from the base entry still need the base's stylesheet.
+		if (FONT_FIELDS.some((field) => override[field] === undefined)) {
+			return { ...base, ...override, id, stylesheet: [...new Set([...[].concat(base.stylesheet ?? []), ...sheets])] };
 		}
 	}
 	return { ...base, ...override, id };

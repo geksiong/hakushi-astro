@@ -209,6 +209,12 @@ body {
 		color 200ms ease;
 }
 
+/* Titles outside article bodies (header brand, article and page titles,
+ * listing cards) opt into the typography style's heading font. */
+.font-heading {
+	font-family: var(--font-heading);
+}
+
 ::selection {
 	background: var(--primary);
 	color: #fff;

@@ -52,7 +52,11 @@ We have crafted 6 distinct color schemes engineered to meet **WCAG 2.1 AA contra
 - **Hakushi Sans**: Modern geometric sans-serif for developer speed.
 - **Academic Serif**: High-elegance display headings paired with math-focused body text.
 - **Developer Mono**: Pure monospaced aesthetic for code-heavy documentation.
-- **Editorial Modern**: High-contrast sans headings with warm editorial serif body text.
+- **Editorial Modern**: High-contrast Playfair Display headings with warm editorial serif body text.
+- **Literary**: Soft Fraunces headings over Lora, for personal writing.
+- **Monograph**: Source Sans headings over Source Serif body, like a journal article.
+- **Organic**: Calligraphic Alegreya headings with humanist Alegreya Sans body text.
+- **Geometric**: Bold Space Grotesk headings with clean DM Sans body text.
 :::
 
 ## Related Reading

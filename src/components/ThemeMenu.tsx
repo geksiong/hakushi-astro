@@ -26,6 +26,7 @@ import {
 	THEME_DEFAULTS,
 	THEME_STORAGE_KEYS,
 	applyTheme,
+	loadAllStyleFonts,
 	readStoredTheme,
 	resolveIsDark,
 	type ThemeMode,
@@ -166,6 +167,11 @@ export default function ThemeMenu() {
 		} catch {}
 		applyTheme(d.mode, d.schemeId, d.styleId, d.layoutId, d.fontSizeId, d.presetId);
 	};
+
+	// The typography cards preview each style in its own heading font.
+	useEffect(() => {
+		if (showMenu && showAdvanced) loadAllStyleFonts();
+	}, [showMenu, showAdvanced]);
 
 	useEffect(() => {
 		if (!showMenu) return;

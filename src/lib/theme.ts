@@ -97,6 +97,32 @@ export const THEME_DEFAULTS = {
 const has = (table: object, id: string | null | undefined): id is string =>
 	!!id && Object.prototype.hasOwnProperty.call(table, id);
 
+/**
+ * Adds `<link rel="stylesheet">` tags for webfont stylesheets that aren't on
+ * the page yet. Typography styles load their fonts this way only once they
+ * are used, so visitors don't download every style's fonts.
+ */
+export function loadStylesheets(hrefs: string | string[] | undefined) {
+	if (typeof document === 'undefined' || !hrefs) return;
+	const loaded = new Set(
+		Array.from(document.querySelectorAll<HTMLLinkElement>('link[data-hakushi-font]'), (link) => link.getAttribute('href'))
+	);
+	for (const href of ([] as string[]).concat(hrefs)) {
+		if (!href || loaded.has(href)) continue;
+		const link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = href;
+		link.dataset.hakushiFont = '';
+		document.head.appendChild(link);
+		loaded.add(href);
+	}
+}
+
+/** Loads the fonts of every typography style, e.g. for previews in the theme picker. */
+export function loadAllStyleFonts() {
+	for (const style of Object.values(THEME_STYLES)) loadStylesheets(style.stylesheet);
+}
+
 export function resolveIsDark(mode: ThemeMode, prefersDark: boolean): boolean {
 	return mode === 'dark' || (mode === 'auto' && prefersDark);
 }
@@ -150,6 +176,7 @@ export function applyTheme(
 	root.style.setProperty('--font-code', style.fontCode);
 	root.style.setProperty('--radius', style.radius);
 	root.dataset.style = styleId;
+	loadStylesheets(style.stylesheet);
 
 	// 3. Layout Dimensions & Rhythm
 	if (!has(LAYOUT_SCHEMES, layoutId)) layoutId = THEME_DEFAULTS.layoutId;
