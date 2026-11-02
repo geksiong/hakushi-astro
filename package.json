@@ -33,7 +33,7 @@
     "src/scripts",
     "src/styles"
   ],
-  "sideEffects": ["**/*.css"],
+  "sideEffects": ["**/*.css", "./src/scripts/*"],
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
