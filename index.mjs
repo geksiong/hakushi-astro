@@ -1,6 +1,5 @@
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
-import mermaid from 'astro-mermaid';
 import remarkMath from 'remark-math';
 import rehypeMathjax from 'rehype-mathjax';
 import { unified } from '@astrojs/markdown-remark';
@@ -69,6 +68,7 @@ function normalizeOptions(options) {
 		googleAnalytics: normalizeGoogleAnalytics(options.googleAnalytics),
 		footer: normalizeFooter(options.footer),
 		notFound: normalizeNotFound(options.notFound),
+		mermaid: normalizeMermaid(options.mermaid),
 	};
 	config.favicons = normalizeFavicons(options.favicon);
 	config.favicon = config.favicons[0]?.href ?? null;
@@ -147,6 +147,44 @@ function normalizeNotFound(value) {
 	return notFound;
 }
 
+const MERMAID_THEMES = new Set(['default', 'base', 'dark', 'forest', 'neutral', 'neo', 'neo-dark', 'redux', 'redux-dark', 'redux-color', 'redux-dark-color', 'null']);
+
+const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+
+/**
+ * `mermaid` sets the diagram `theme` (light mode) and `darkTheme`, extra
+ * `mermaidConfig` for `mermaid.initialize()`, and `iconPacks`. Diagrams are
+ * rendered by src/scripts/mermaid.ts, which follows the site's dark mode.
+ */
+function normalizeMermaid(value = {}) {
+	if (!isPlainObject(value)) throw new Error('[hakushi] `mermaid` must be an object.');
+	for (const key of Object.keys(value)) {
+		if (key === 'autoTheme') {
+			throw new Error('[hakushi] `mermaid.autoTheme` is no longer supported: diagrams follow the site\'s dark mode. Set `mermaid.darkTheme` to the same value as `mermaid.theme` to use one theme.');
+		}
+		if (!['theme', 'darkTheme', 'mermaidConfig', 'iconPacks'].includes(key)) {
+			throw new Error(`[hakushi] Unknown \`mermaid.${key}\` option. Use \`theme\`, \`darkTheme\`, \`mermaidConfig\` or \`iconPacks\`.`);
+		}
+	}
+	const { theme = 'redux-color', darkTheme = 'redux-dark-color', mermaidConfig = {}, iconPacks = [] } = value;
+	for (const [key, name] of [['theme', theme], ['darkTheme', darkTheme]]) {
+		if (!MERMAID_THEMES.has(name)) {
+			throw new Error(`[hakushi] \`mermaid.${key}\` must be one of ${[...MERMAID_THEMES].join(', ')}.`);
+		}
+	}
+	if (!isPlainObject(mermaidConfig)) throw new Error('[hakushi] `mermaid.mermaidConfig` must be an object.');
+	if (!Array.isArray(iconPacks)) throw new Error('[hakushi] `mermaid.iconPacks` must be an array.');
+	const packs = iconPacks.map((pack) => {
+		if (typeof pack?.name !== 'string' || !pack.name) {
+			throw new Error('[hakushi] Every `mermaid.iconPacks` entry needs a `name`.');
+		}
+		if (isPlainObject(pack.icons)) return { name: pack.name, icons: pack.icons };
+		if (typeof pack.url === 'string' && pack.url) return { name: pack.name, url: pack.url };
+		throw new Error(`[hakushi] Mermaid icon pack "${pack.name}" needs \`icons\` (Iconify JSON) or a \`url\`.`);
+	});
+	return { theme, darkTheme, mermaidConfig, iconPacks: packs };
+}
+
 function isExternalHref(href) {
 	return /^(https?:\/\/|mailto:|tel:)/i.test(href);
 }
@@ -220,7 +258,7 @@ function readIconSvg(icon, root, label) {
 }
 
 /** Third-party packages Hakushi's browser code imports. */
-const CLIENT_DEPENDENCIES = ['recharts', 'd3', 'abcjs', 'lucide-react'];
+const CLIENT_DEPENDENCIES = ['recharts', 'd3', 'abcjs', 'lucide-react', 'mermaid'];
 
 /**
  * Pre-bundle Hakushi's browser dependencies in dev. Installed as a package,
@@ -324,11 +362,11 @@ function coreIntegration(options = {}) {
 }
 
 /**
- * Hakushi's Astro integration. It installs the React and Mermaid renderers,
- * configures the Markdown pipeline, and injects the package's routes.
+ * Hakushi's Astro integration. It installs the React renderer, configures the
+ * Markdown pipeline, and injects the package's routes.
  */
 export default function hakushi(options = {}) {
-	return [react(), mermaid(options.mermaid), coreIntegration(options)];
+	return [react(), coreIntegration(options)];
 }
 
 export { DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_NOT_FOUND };

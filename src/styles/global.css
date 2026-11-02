@@ -651,6 +651,23 @@ body {
 	margin: 1.25rem auto;
 	max-width: 100%;
 	overflow-x: auto;
+	/* Mermaid sizes label boxes with the page's default line-height (1.5); keep
+	 * .md-body's taller paragraph line-height from overflowing them. */
+	--line-height-body: 1.5;
+	line-height: 1.5;
+}
+
+/* Hide the diagram source until src/scripts/mermaid.ts replaces it with the SVG. */
+.md-body pre.mermaid:not([data-processed]) {
+	color: transparent;
+	min-height: 200px;
+}
+
+.md-body .mermaid-error {
+	color: #dc2626;
+	padding: 1rem;
+	border: 1px solid currentColor;
+	border-radius: 0.5rem;
 }
 
 /* Mermaid renders fixed-size SVGs - scale them down to the container on

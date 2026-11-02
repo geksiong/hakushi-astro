@@ -23,9 +23,6 @@ importers:
       abcjs:
         specifier: ^6.7.2
         version: 6.7.2
-      astro-mermaid:
-        specifier: ^2.2.0
-        version: 2.2.0(astro@7.4.4(@astrojs/markdown-remark@7.3.5)(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1))(mermaid@12.2.0)
       d3:
         specifier: ^7.9.0
         version: 7.9.0
@@ -1250,16 +1247,6 @@ packages:
   astring@1.9.0:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
     hasBin: true
-
-  astro-mermaid@2.2.0:
-    resolution: {integrity: sha512-EqkDnv7BaSIW3dQicT4u8zJDfaeoIpyeRVYL0YosJU109TGlxKAUR5xF2qf0LlhJEoG+new41mHNIW7LwPuVwA==}
-    peerDependencies:
-      '@mermaid-js/layout-elk': ^0.2.0 || ^1.0.0
-      astro: '>=4'
-      mermaid: ^10.0.0 || ^11.0.0 || ^12.0.0
-    peerDependenciesMeta:
-      '@mermaid-js/layout-elk':
-        optional: true
 
   astro@7.4.4:
     resolution: {integrity: sha512-e+BzhGCaIY/H1tV/BQPTbOPZVZ8wuu6+bbpc+3oSMH2UgoB1l9peSGASk6nswtYra9PO9OoMREhldKtQkZ5TVw==}
@@ -4044,14 +4031,6 @@ snapshots:
   array-iterate@2.0.1: {}
 
   astring@1.9.0: {}
-
-  astro-mermaid@2.2.0(astro@7.4.4(@astrojs/markdown-remark@7.3.5)(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1))(mermaid@12.2.0):
-    dependencies:
-      astro: 7.4.4(@astrojs/markdown-remark@7.3.5)(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1)
-      import-meta-resolve: 4.2.0
-      mdast-util-to-string: 4.0.0
-      mermaid: 12.2.0
-      unist-util-visit: 5.2.0
 
   astro@7.4.4(@astrojs/markdown-remark@7.3.5)(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1):
     dependencies:

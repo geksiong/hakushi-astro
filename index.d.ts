@@ -188,6 +188,20 @@ export interface HakushiThemeOptions {
 	 */
 	builtIns?: boolean | Partial<Record<HakushiThemeCatalogName, boolean>>;
 }
+/** A Mermaid theme name. */
+export type HakushiMermaidTheme = 'default' | 'base' | 'dark' | 'forest' | 'neutral' | 'neo' | 'neo-dark' | 'redux' | 'redux-dark' | 'redux-color' | 'redux-dark-color' | 'null';
+/** An icon pack for Mermaid diagrams, as Iconify JSON inline (`icons`) or fetched from a `url`. */
+export type HakushiMermaidIconPack = { name: string; icons: Record<string, unknown> } | { name: string; url: string };
+export interface HakushiMermaidOptions {
+	/** Theme in light mode. Defaults to `'redux-color'`. */
+	theme?: HakushiMermaidTheme;
+	/** Theme in dark mode. Defaults to `'redux-dark-color'`. */
+	darkTheme?: HakushiMermaidTheme;
+	/** Extra options passed to `mermaid.initialize()`; `theme` and `startOnLoad` are set by Hakushi. */
+	mermaidConfig?: Record<string, unknown>;
+	/** Icon packs registered with Mermaid before rendering. */
+	iconPacks?: HakushiMermaidIconPack[];
+}
 export interface HakushiOptions {
 	title?: string;
 	description?: string;
@@ -216,7 +230,8 @@ export interface HakushiOptions {
 	customCss?: (string | URL)[];
 	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage' | 'Footer', string | URL>>;
 	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'categories' | 'about' | 'notFound', boolean>>;
-	mermaid?: Record<string, unknown>;
+	/** Mermaid diagram themes and configuration. */
+	mermaid?: HakushiMermaidOptions;
 }
 export const DEFAULT_COLLECTIONS: HakushiCollection[];
 export const DEFAULT_ABOUT: Required<HakushiAbout>;
@@ -257,6 +272,7 @@ export interface HakushiResolvedConfig {
 	/** null when the footer is off or empty. */
 	footer: Required<HakushiFooter> | null;
 	notFound: Required<HakushiNotFound>;
+	mermaid: Required<HakushiMermaidOptions>;
 	/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
 	theme: {
 		mode: 'light' | 'dark' | 'auto';

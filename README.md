@@ -360,6 +360,21 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categor
 - Math through `remark-math` and MathJax
 - Code titles such as ```` ```ts title="example.ts" ````
 
+Mermaid diagrams are rendered in the browser and follow the site's light or dark mode, using Mermaid's `redux-color` and `redux-dark-color` themes by default. Change them with the `mermaid` option:
+
+```js
+hakushi({
+  mermaid: {
+    theme: 'neutral',      // light mode (default 'redux-color')
+    darkTheme: 'dark',     // dark mode (default 'redux-dark-color')
+    mermaidConfig: { flowchart: { curve: 'basis' } }, // passed to mermaid.initialize()
+    iconPacks: [{ name: 'logos', url: 'https://unpkg.com/@iconify-json/logos/icons.json' }],
+  },
+})
+```
+
+Set `darkTheme` to the same value as `theme` to use one theme in both modes. Icon packs take Iconify JSON, either inline as `icons` or fetched from a `url`.
+
 Hakushi owns the unified Markdown processor. Take care not to replace `markdown.processor` when adding more Markdown configuration.
 
 ## Read aloud

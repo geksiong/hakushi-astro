@@ -10,7 +10,7 @@ function escapeHtml(value) {
 	})[character]);
 }
 
-/** Convert Mermaid code fences to elements consumed by astro-mermaid's client runtime. */
+/** Convert Mermaid code fences to `<pre class="mermaid">` elements, rendered client-side by src/scripts/mermaid.ts. */
 export default function remarkMermaid() {
 	return (tree) => {
 		visit(tree, 'code', (node, index, parent) => {
