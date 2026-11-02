@@ -375,6 +375,8 @@ hakushi({
 
 Set `darkTheme` to the same value as `theme` to use one theme in both modes. Icon packs take Iconify JSON, either inline as `icons` or fetched from a `url`.
 
+Clicking an article image or a rendered Mermaid diagram opens it in a full-screen viewer. Zoom with the mouse wheel, a trackpad or touch pinch, the toolbar, or `+`/`-`. Drag or use the arrow keys to pan, double-click to zoom in or back out, press `0` to fit the screen, and press `Esc` or click the backdrop to close. Images inside links keep their link behaviour.
+
 Hakushi owns the unified Markdown processor. Take care not to replace `markdown.processor` when adding more Markdown configuration.
 
 ## Read aloud

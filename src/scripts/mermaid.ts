@@ -54,6 +54,11 @@ async function renderDiagrams() {
 			const { svg } = await mermaid.render(`mermaid-${nextId++}`, diagram.dataset.diagram);
 			if (pass !== generation) return;
 			diagram.innerHTML = svg;
+			// Open the diagram in the zoomable viewer (src/scripts/lightbox.ts).
+			diagram.dataset.lightbox = '';
+			diagram.tabIndex = 0;
+			diagram.setAttribute('role', 'button');
+			diagram.setAttribute('aria-label', 'View diagram larger');
 		} catch (error) {
 			if (pass !== generation) return;
 			console.error('Failed to render Mermaid diagram:', error);
@@ -61,6 +66,10 @@ async function renderDiagrams() {
 			message.className = 'mermaid-error';
 			message.textContent = `Failed to render diagram: ${error instanceof Error ? error.message : String(error)}`;
 			diagram.replaceChildren(message);
+			delete diagram.dataset.lightbox;
+			diagram.removeAttribute('tabindex');
+			diagram.removeAttribute('role');
+			diagram.removeAttribute('aria-label');
 		}
 		diagram.dataset.processed = 'true';
 	}
