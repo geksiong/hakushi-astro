@@ -45,7 +45,7 @@ tags: [guide]
 Link to another note with [[another-note]].
 ```
 
-Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, a `/tags` index, tag/category pages, and `/404`.
+Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/docs/getting-started`, short wikilink aliases, `/graph`, `/tags`, `/terms`, tag/category pages, and `/404`.
 
 ## Frontmatter and schema
 
@@ -349,7 +349,7 @@ Disable any injected route that the consuming site supplies itself:
 hakushi({ routes: { home: false, collections: false, notFound: false } })
 ```
 
-Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categories`, `about`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
+Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `terms`, `categories`, `about`, and `notFound`. Disabling `home`, for example, lets the project keep `src/pages/index.astro`.
 
 ## Markdown features
 
@@ -357,8 +357,12 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categor
 - `:::note`, `tip`, `warning`, `danger`, `info`, `quote`, `check`, `theorem`, `definition`, `example`, and `caution` callouts
 - `:::tab` groups
 - LibroMorph-style ruby (`{漢字|かんじ}` or `[漢字]{.ruby ruby="かんじ"}`) and upright text (`{tcy:42}` or `[42]{.tcy}`)
+- `[A]{.dropcap}` initials and `::: vertical` / `::: horizontal` writing-mode sections
+- `[term]{.index}`, `[visible]{.index entry="Parent!Term"}`, and `{index: "Term"}` markers, collected on `/terms`
 - `::: quiz` knowledge checks with one `- [x]` answer, `- [ ]` alternatives, and an explanation after the list
 - Mermaid, chart, and ABC music notation fences
+- `chord` and `chords` fences for inline SVG fret diagrams (`NAME FRETS`, with optional `fingers=`, `base=`, and `barre=`)
+- `fretboard` JSON and `fretdrom` JSON5 fences for scale, position, and tab diagrams
 - Math through `remark-math` and MathJax
 - Code titles such as ```` ```ts title="example.ts" ````
 

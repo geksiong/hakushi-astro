@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import config from 'virtual:hakushi/config';
+import { BaseLayout, Header, ReaderShell } from 'virtual:hakushi/components';
+import { scanIndexMarkers } from '../lib/term-index.mjs';
+import { resolveEntryTitle } from '../lib/title';
+
+type Ref = { url: string; title: string };
+const terms = new Map<string, { name: string; refs: Ref[] }>();
+for (const collection of config.collections) {
+	const docs = await (getCollection as any)(collection.id, ({ data }: any) => !data.draft);
+	for (const doc of docs) {
+		const title = resolveEntryTitle(doc);
+		for (const marker of scanIndexMarkers(doc.body ?? '')) {
+			const key = marker.term.toLocaleLowerCase(config.lang);
+			const item = terms.get(key) ?? { name: marker.term, refs: [] as Ref[] };
+			item.refs.push({ url: `/${collection.id}/${doc.id}#${marker.anchor}`, title });
+			terms.set(key, item);
+		}
+	}
+}
+const sorted = [...terms.values()].sort((a, b) => a.name.localeCompare(b.name, config.lang));
+---
+
+<BaseLayout title={`Term Index · ${config.title}`} description="Indexed terms across the knowledge base.">
+	<Header view="reader" />
+	<ReaderShell>
+		<main class="flex-1 w-full article-container space-y-6">
+			<header class="space-y-2 pb-6 border-b border-[var(--border)]">
+				<h1 class="text-3xl font-extrabold tracking-tight text-[var(--text-main)] font-heading">Term Index</h1>
+				<p class="text-xs text-[var(--text-muted)]">{sorted.length} {sorted.length === 1 ? 'term' : 'terms'}</p>
+			</header>
+			{sorted.length === 0 ? <p class="text-sm text-[var(--text-muted)]">No indexed terms yet.</p> : (
+				<dl class="space-y-4">
+					{sorted.map(({ name, refs }) => (
+						<div class="border-b border-[var(--border)] pb-3">
+							<dt class="font-semibold text-[var(--text-main)]">{name.replaceAll('!', ' › ')}</dt>
+							<dd class="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+								{refs.map(({ url, title }) => <a href={url} class="text-[var(--primary)] hover:underline">{title}</a>)}
+							</dd>
+						</div>
+					))}
+				</dl>
+			)}
+		</main>
+	</ReaderShell>
+</BaseLayout>

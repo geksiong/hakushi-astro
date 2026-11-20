@@ -17,6 +17,7 @@ export default defineConfig({
 			graph: false,
 			tags: false,
 			categories: false,
+			terms: false,
 			notFound: false,
 		},
 	})],

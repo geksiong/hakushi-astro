@@ -13,6 +13,9 @@ import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
 import remarkLibromorphInline from './src/plugins/remark-libromorph-inline.mjs';
+import remarkChords from './src/plugins/remark-chords.mjs';
+import remarkIndexTerms from './src/plugins/remark-index-terms.mjs';
+import remarkFretboards from './src/plugins/remark-fretboards.mjs';
 import { resolveTheme } from './src/lib/theme-catalog.mjs';
 import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_FOOTER, DEFAULT_NOT_FOUND } from './src/integration/defaults.mjs';
 import { DEFAULT_FAVICON_HREF } from './src/integration/favicon.mjs';
@@ -316,7 +319,7 @@ function virtualModules(options, config, root) {
 
 function coreIntegration(options = {}) {
 	const config = normalizeOptions(options);
-	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, categories: true, about: true, notFound: true, ...options.routes };
+	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, terms: true, categories: true, about: true, notFound: true, ...options.routes };
 	return {
 		name: 'hakushi',
 		hooks: {
@@ -330,6 +333,7 @@ function coreIntegration(options = {}) {
 				add(routes.aliases, '/[...slug]', './src/routes/alias.astro');
 				add(routes.graph, '/graph', './src/routes/graph.astro');
 				add(routes.tags, '/tags', './src/routes/tags.astro');
+				add(routes.terms, '/terms', './src/routes/terms.astro');
 				add(routes.tags, '/tags/[tag]', './src/routes/tag.astro');
 				add(routes.categories, '/categories/[category]', './src/routes/category.astro');
 				add(routes.notFound, '/404', './src/routes/404.astro');
@@ -337,7 +341,7 @@ function coreIntegration(options = {}) {
 				updateConfig({
 					markdown: {
 						processor: unified({
-							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkLibromorphInline, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
+							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkIndexTerms, remarkLibromorphInline, remarkChords, remarkFretboards, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
 							rehypePlugins: [rehypeMathjax, rehypeEnhancer],
 						}),
 						shikiConfig: {

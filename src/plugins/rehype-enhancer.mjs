@@ -45,7 +45,7 @@ const CALLOUT_META = {
 // marker's text node (":::tip\nPlain text\n:::"), so neither `\s*` (it would
 // swallow the newline and take the body's first line as the title) nor a
 // `$` anchor (it would need the marker to end the whole node) is safe here.
-const OPEN_RE = /^:::[ \t]*(tab|note|tip|warning|danger|info|quote|check|theorem|definition|example|caution|quiz)\b[ \t]*([^\n]*)(?:\n|$)/i;
+const OPEN_RE = /^:::[ \t]*(tab|note|tip|warning|danger|info|quote|check|theorem|definition|example|caution|quiz|vertical|horizontal)\b[ \t]*([^\n]*)(?:\n|$)/i;
 
 /**
  * rehype-enhancer
@@ -142,6 +142,7 @@ function collectContainer(parent, openIdx, marker) {
 	const meta = CALLOUT_META[marker.token] ?? { icon: null, defaultTitle: null };
 	const isTab = marker.token === 'tab';
 	const isQuiz = marker.token === 'quiz';
+	const isWritingMode = marker.token === 'vertical' || marker.token === 'horizontal';
 	const body = [];
 
 	// The opener may still hold content after the marker line - keep it.
@@ -207,13 +208,13 @@ function collectContainer(parent, openIdx, marker) {
 		type: 'element',
 		tagName: 'div',
 		properties: {
-			className: [isQuiz ? 'quiz-source' : isTab ? 'tab-group' : 'callout', isTab || isQuiz ? '' : `callout-${marker.token}`].filter(
+			className: [isQuiz ? 'quiz-source' : isTab ? 'tab-group' : isWritingMode ? 'writing-mode-block' : 'callout', isWritingMode ? `writing-mode-${marker.token}` : isTab || isQuiz ? '' : `callout-${marker.token}`].filter(
 				Boolean
 			),
-			...(isTab || isQuiz ? {} : { 'data-callout': marker.token }),
+			...(isTab || isQuiz || isWritingMode ? {} : { 'data-callout': marker.token }),
 			...(isQuiz ? { 'data-title': marker.title } : {}),
 		},
-		children: isQuiz ? body : children,
+		children: isQuiz || isWritingMode ? body : children,
 	};
 
 	parent.children.splice(openIdx, end - openIdx + 1, container);

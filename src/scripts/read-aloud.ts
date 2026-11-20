@@ -21,7 +21,7 @@ export type ReadAloudState = 'idle' | 'playing' | 'paused';
 export type ReadAloudCommand = 'toggle' | 'stop';
 
 const BLOCKS = 'h1, h2, h3, h4, h5, h6, p, li, blockquote, dt, dd, figcaption, .callout-title';
-const SKIP = 'pre, .code-block, .chart-block, .abc-block, .mermaid, .quiz-card, mjx-container, svg, table, button, script, style, [aria-hidden="true"]';
+const SKIP = 'pre, .code-block, .chart-block, .abc-block, .chord-diagrams, .fret-diagram, .mermaid, .quiz-card, mjx-container, svg, table, button, script, style, [aria-hidden="true"]';
 // MathJax keeps no readable source, so inline math is spoken as a placeholder
 // to keep the sentence intact; display math is skipped like other figures.
 const INLINE_MATH = 'mjx-container:not([display="true"])';

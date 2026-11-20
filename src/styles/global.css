@@ -541,6 +541,21 @@ body {
 .md-body ruby { ruby-position: over; }
 .md-body rt { font-size: 0.65em; }
 .md-body .tcy { text-combine-upright: all; -webkit-text-combine: horizontal; }
+.md-body .dropcap { float: left; margin: 0.06em 0.08em 0 0; font-family: var(--font-heading); font-size: 3.2em; line-height: 0.85; }
+.md-body .writing-mode-block { margin: 1.25rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 0.5rem; overflow: auto; }
+.md-body .writing-mode-vertical { writing-mode: vertical-rl; min-height: 12rem; max-height: 24rem; }
+.md-body .writing-mode-horizontal { writing-mode: horizontal-tb; }
+.md-body .writing-mode-block > :first-child { margin-block-start: 0; }
+.md-body .writing-mode-block > :last-child { margin-block-end: 0; }
+.md-body .chord-diagrams { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.25rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-main); }
+.md-body .chord-svg { display: block; max-width: 100%; height: auto; }
+.md-body .chord-finger { fill: var(--bg-surface); font-weight: 700; }
+.md-body .chord-diagrams-error { display: block; color: var(--text-muted); }
+.md-body .chord-diagrams-error pre { overflow-x: auto; }
+.md-body .fret-diagram { margin: 1.25rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-main); overflow-x: auto; }
+.md-body .fret-diagram figcaption { margin-bottom: 0.75rem; font-weight: 600; }
+.md-body .fret-render svg, .md-body .fret-render img { display: block; max-width: 100%; height: auto; }
+.md-body .fret-render-error, .md-body .fret-error { color: var(--text-muted); }
 
 .quiz-card {
 	margin: 1.5rem 0;

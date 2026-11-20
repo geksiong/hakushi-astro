@@ -2,7 +2,7 @@ import { visit } from 'unist-util-visit';
 
 // LibroMorph's compact ruby and tate-chu-yoko notation. Work on text nodes so
 // fenced/inline code, links, and existing Markdown markup keep their meaning.
-const INLINE = /\{tcy:([^{}]+)\}|\{([^{}|]+)\|([^{}]+)\}|\[([^\]\n]+)\]\{(?:\.ruby\s+)?(?:ruby|rt)=["“]([^"”]+)["”]\}|\[([^\]\n]+)\]\{\.tcy\}/g;
+const INLINE = /\{tcy:([^{}]+)\}|\{([^{}|]+)\|([^{}]+)\}|\[([^\]\n]+)\]\{(?:\.ruby\s+)?(?:ruby|rt)=["“]([^"”]+)["”]\}|\[([^\]\n]+)\]\{\.tcy\}|\[([^\]\n]+)\]\{\.dropcap\}/g;
 
 function element(tagName, className, children) {
 	return {
@@ -31,7 +31,8 @@ export default function remarkLibromorphInline() {
 				if (match[1] !== undefined) children.push(element('span', 'tcy', [{ type: 'text', value: match[1].trim() }]));
 				else if (match[2] !== undefined) children.push(ruby(match[2], match[3]));
 				else if (match[4] !== undefined) children.push(ruby(match[4], match[5]));
-				else children.push(element('span', 'tcy', [{ type: 'text', value: match[6] }]));
+				else if (match[6] !== undefined) children.push(element('span', 'tcy', [{ type: 'text', value: match[6] }]));
+				else children.push(element('span', 'dropcap', [{ type: 'text', value: match[7] }]));
 				last = match.index + match[0].length;
 			}
 			if (!children.length) return;

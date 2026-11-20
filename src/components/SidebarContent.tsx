@@ -19,6 +19,7 @@ import {
 	Rss,
 	Share2,
 	Tag,
+	ListTree,
 	type LucideIcon,
 } from 'lucide-react';
 import type { ArticleMeta } from '../lib/articles';
@@ -140,11 +141,13 @@ export default function SidebarContent({
 	}, []);
 	const isAboutPage = aboutPageProp || currentPath === '/about';
 	const isTagsPage = currentPath === '/tags' || currentPath.startsWith('/tags/');
+	const isTermsPage = currentPath === '/terms';
 	// Any non-collection, non-graph internal link also deselects collections.
 	const noCollectionSelected =
 		isGraphPage ||
 		isAboutPage ||
 		isTagsPage ||
+		isTermsPage ||
 		links.some((l) => !l.external && normalizePath(l.href) === currentPath);
 	const isLinkActive = (link: SidebarLink) =>
 		!link.external && currentPath !== '' && normalizePath(link.href) === currentPath;
@@ -296,6 +299,10 @@ export default function SidebarContent({
 				>
 					<Tag className={ICON} />
 					Tags
+				</a>
+				<a href="/terms" onClick={() => onNavigate?.()} aria-current={isTermsPage ? 'page' : undefined} title="Browse indexed terms" className={`${ROW} gap-2 px-2 py-1.5 ${isTermsPage ? ACTIVE : IDLE}`}>
+					<ListTree className={ICON} />
+					Term Index
 				</a>
 				{links.map((link) => {
 					const isActive = isLinkActive(link);

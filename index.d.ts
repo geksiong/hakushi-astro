@@ -229,7 +229,7 @@ export interface HakushiOptions {
 	theme?: HakushiThemeOptions;
 	customCss?: (string | URL)[];
 	components?: Partial<Record<'BaseLayout' | 'Header' | 'ArticlePage' | 'AboutPage' | 'ReaderShell' | 'ArticleView' | 'CollectionPage' | 'Footer', string | URL>>;
-	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'categories' | 'about' | 'notFound', boolean>>;
+	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'terms' | 'categories' | 'about' | 'notFound', boolean>>;
 	/** Mermaid diagram themes and configuration. */
 	mermaid?: HakushiMermaidOptions;
 }
