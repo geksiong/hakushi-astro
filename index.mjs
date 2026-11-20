@@ -12,6 +12,7 @@ import remarkCharts from './src/plugins/remark-charts.mjs';
 import remarkAbc from './src/plugins/remark-abc.mjs';
 import rehypeEnhancer from './src/plugins/rehype-enhancer.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
+import remarkLibromorphInline from './src/plugins/remark-libromorph-inline.mjs';
 import { resolveTheme } from './src/lib/theme-catalog.mjs';
 import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_FOOTER, DEFAULT_NOT_FOUND } from './src/integration/defaults.mjs';
 import { DEFAULT_FAVICON_HREF } from './src/integration/favicon.mjs';
@@ -336,7 +337,7 @@ function coreIntegration(options = {}) {
 				updateConfig({
 					markdown: {
 						processor: unified({
-							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
+							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkLibromorphInline, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
 							rehypePlugins: [rehypeMathjax, rehypeEnhancer],
 						}),
 						shikiConfig: {

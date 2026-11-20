@@ -34,6 +34,10 @@ const CALLOUT_META = {
 	info: { icon: circleAlertSvg, defaultTitle: 'Info' },
 	quote: { icon: messageSquareQuoteSvg, defaultTitle: 'Quote' },
 	check: { icon: circleCheckBigSvg, defaultTitle: 'Checklist' },
+	theorem: { icon: infoSvg, defaultTitle: 'Theorem' },
+	definition: { icon: infoSvg, defaultTitle: 'Definition' },
+	example: { icon: lightbulbSvg, defaultTitle: 'Example' },
+	caution: { icon: triangleAlertSvg, defaultTitle: 'Caution' },
 	tab: { icon: null, defaultTitle: null },
 };
 
@@ -41,7 +45,7 @@ const CALLOUT_META = {
 // marker's text node (":::tip\nPlain text\n:::"), so neither `\s*` (it would
 // swallow the newline and take the body's first line as the title) nor a
 // `$` anchor (it would need the marker to end the whole node) is safe here.
-const OPEN_RE = /^:::(tab|note|tip|warning|danger|info|quote|check)\b[ \t]*([^\n]*)(?:\n|$)/i;
+const OPEN_RE = /^:::[ \t]*(tab|note|tip|warning|danger|info|quote|check|theorem|definition|example|caution|quiz)\b[ \t]*([^\n]*)(?:\n|$)/i;
 
 /**
  * rehype-enhancer
@@ -56,6 +60,7 @@ const OPEN_RE = /^:::(tab|note|tip|warning|danger|info|quote|check)\b[ \t]*([^\n
 export default function rehypeEnhancer() {
 	return (tree) => {
 		buildContainers(tree);
+		buildQuizzes(tree);
 		wrapCodeBlocks(tree);
 	};
 }
@@ -134,8 +139,9 @@ function extractOpenMarker(p) {
  * Returns how many children were consumed (the container replaces them all).
  */
 function collectContainer(parent, openIdx, marker) {
-	const meta = CALLOUT_META[marker.token] ?? CALLOUT_META.note;
+	const meta = CALLOUT_META[marker.token] ?? { icon: null, defaultTitle: null };
 	const isTab = marker.token === 'tab';
+	const isQuiz = marker.token === 'quiz';
 	const body = [];
 
 	// The opener may still hold content after the marker line - keep it.
@@ -201,12 +207,13 @@ function collectContainer(parent, openIdx, marker) {
 		type: 'element',
 		tagName: 'div',
 		properties: {
-			className: [isTab ? 'tab-group' : 'callout', isTab ? '' : `callout-${marker.token}`].filter(
+			className: [isQuiz ? 'quiz-source' : isTab ? 'tab-group' : 'callout', isTab || isQuiz ? '' : `callout-${marker.token}`].filter(
 				Boolean
 			),
-			...(isTab ? {} : { 'data-callout': marker.token }),
+			...(isTab || isQuiz ? {} : { 'data-callout': marker.token }),
+			...(isQuiz ? { 'data-title': marker.title } : {}),
 		},
-		children,
+		children: isQuiz ? body : children,
 	};
 
 	parent.children.splice(openIdx, end - openIdx + 1, container);
@@ -290,6 +297,83 @@ function pruneEmptyTail(node) {
 		pruneEmptyTail(last);
 		if ((last.children?.length ?? 0) === 0) node.children.pop();
 	}
+}
+
+/* ------------------------------------------------------------------ */
+/* LibroMorph knowledge checks                                         */
+/* ------------------------------------------------------------------ */
+
+function quizElement(tagName, className, children = [], properties = {}) {
+	return { type: 'element', tagName, properties: { ...(className ? { className: [className] } : {}), ...properties }, children };
+}
+
+function quizText(value) {
+	return { type: 'text', value };
+}
+
+function checkedOption(li) {
+	const content = li.children?.find((child) => child.type === 'element' && child.tagName === 'p') ?? li;
+	const children = [...(content.children ?? [])];
+	const checkbox = children.findIndex((child) => child.type === 'element' && child.tagName === 'input' && child.properties?.type === 'checkbox');
+	if (checkbox >= 0) {
+		const correct = Boolean(children[checkbox].properties?.checked);
+		children.splice(checkbox, 1);
+		if (children[0]?.type === 'text') children[0].value = children[0].value.replace(/^\s+/, '');
+		return { correct, children };
+	}
+	const first = children.find((child) => child.type === 'text' && child.value.trim());
+	const match = first?.value.match(/^\s*\[([ xX])\]\s*/);
+	if (!match) return null;
+	first.value = first.value.slice(match[0].length);
+	return { correct: match[1].toLowerCase() === 'x', children };
+}
+
+function buildQuizzes(tree) {
+	let count = 0;
+	const walk = (parent) => {
+		if (!parent.children) return;
+		for (let i = 0; i < parent.children.length; i++) {
+			const node = parent.children[i];
+			if (node.type !== 'element') continue;
+			if ((node.properties?.className ?? []).includes('quiz-source')) {
+				const quiz = makeQuiz(node, ++count);
+				if (quiz) parent.children[i] = quiz;
+			} else walk(node);
+		}
+	};
+	walk(tree);
+}
+
+function makeQuiz(source, number) {
+	const blocks = source.children.filter((node) => node.type === 'element');
+	const listIndex = blocks.findIndex((node) => node.tagName === 'ul');
+	if (listIndex < 0) return null;
+	const options = blocks[listIndex].children
+		.filter((node) => node.type === 'element' && node.tagName === 'li')
+		.map(checkedOption);
+	// Leave malformed quiz markup visible as authored instead of presenting a
+	// question with an answer that cannot be graded.
+	if (options.length < 2 || options.some((option) => !option) || options.filter((option) => option.correct).length !== 1) return null;
+	const questionId = `hakushi-quiz-question-${number}`;
+	const optionNodes = options.map((option, index) => quizElement('button', 'quiz-option', [
+		quizElement('span', 'quiz-option-letter', [quizText(String.fromCharCode(65 + index))], { ariaHidden: 'true' }),
+		quizElement('span', 'quiz-option-content', option.children),
+	], { type: 'button', 'data-correct': option.correct ? 'true' : 'false' }));
+	const answer = options.find((option) => option.correct);
+	return quizElement('section', 'quiz-card', [
+		quizElement('div', 'quiz-heading', [quizText(source.properties['data-title'] || `Knowledge Check ${number}`)]),
+		quizElement('div', 'quiz-question', blocks.slice(0, listIndex), { id: questionId }),
+		quizElement('div', 'quiz-options', optionNodes, { role: 'group', ariaLabelledBy: questionId }),
+		quizElement('p', 'quiz-feedback', [], { role: 'status', ariaLive: 'polite', hidden: true }),
+		quizElement('button', 'quiz-retry', [quizText('Try again')], { type: 'button', hidden: true }),
+		quizElement('details', 'quiz-answer', [
+			quizElement('summary', '', [quizText('Reveal answer and explanation')]),
+			quizElement('div', 'quiz-answer-body', [
+				quizElement('p', '', [quizText('Correct answer: '), ...answer.children]),
+				...blocks.slice(listIndex + 1),
+			]),
+		]),
+	]);
 }
 
 /* ------------------------------------------------------------------ */

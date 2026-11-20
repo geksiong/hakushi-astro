@@ -354,11 +354,27 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `categor
 ## Markdown features
 
 - `[[wikilinks]]` and `[[target|custom labels]]`
-- `:::note`, `tip`, `warning`, `danger`, `info`, `quote`, and `check` callouts
+- `:::note`, `tip`, `warning`, `danger`, `info`, `quote`, `check`, `theorem`, `definition`, `example`, and `caution` callouts
 - `:::tab` groups
+- LibroMorph-style ruby (`{漢字|かんじ}` or `[漢字]{.ruby ruby="かんじ"}`) and upright text (`{tcy:42}` or `[42]{.tcy}`)
+- `::: quiz` knowledge checks with one `- [x]` answer, `- [ ]` alternatives, and an explanation after the list
 - Mermaid, chart, and ABC music notation fences
 - Math through `remark-math` and MathJax
 - Code titles such as ```` ```ts title="example.ts" ````
+
+For a knowledge check, put the question before a task list and the explanation after it. Exactly one option must be checked:
+
+```md
+::: quiz
+**Question:** Which unit stores quantum information?
+
+- [ ] Bit
+- [x] Qubit
+- [ ] Byte
+
+*Explanation:* A qubit is a quantum information unit.
+:::
+```
 
 Mermaid diagrams are rendered in the browser and follow the site's light or dark mode, using Mermaid's `redux-color` and `redux-dark-color` themes by default. Change them with the `mermaid` option:
 
