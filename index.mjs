@@ -16,6 +16,8 @@ import remarkLibromorphInline from './src/plugins/remark-libromorph-inline.mjs';
 import remarkChords from './src/plugins/remark-chords.mjs';
 import remarkIndexTerms from './src/plugins/remark-index-terms.mjs';
 import remarkFretboards from './src/plugins/remark-fretboards.mjs';
+import remarkRhythmGrids from './src/plugins/remark-rhythm-grids.mjs';
+import remarkMdLinks from './src/plugins/remark-md-links.mjs';
 import { resolveTheme } from './src/lib/theme-catalog.mjs';
 import { DEFAULT_CONFIG, DEFAULT_COLLECTIONS, DEFAULT_ABOUT, DEFAULT_SIDEBAR_LINKS, DEFAULT_HEADER_LINKS, DEFAULT_FOOTER, DEFAULT_NOT_FOUND } from './src/integration/defaults.mjs';
 import { DEFAULT_FAVICON_HREF } from './src/integration/favicon.mjs';
@@ -317,6 +319,11 @@ function virtualModules(options, config, root) {
 	};
 }
 
+/** Absolute content folder of each collection, as `createHakushiCollections` reads it by default. */
+function collectionDirs(options, root) {
+	return (options.collections ?? DEFAULT_COLLECTIONS).map(({ id, base }) => ({ id, dir: fileURLToPath(new URL(base ?? `./src/content/${id}`, root)) }));
+}
+
 function coreIntegration(options = {}) {
 	const config = normalizeOptions(options);
 	const routes = { home: true, articles: true, collections: true, aliases: true, graph: true, tags: true, terms: true, categories: true, about: true, notFound: true, ...options.routes };
@@ -341,7 +348,7 @@ function coreIntegration(options = {}) {
 				updateConfig({
 					markdown: {
 						processor: unified({
-							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, remarkIndexTerms, remarkLibromorphInline, remarkChords, remarkFretboards, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
+							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, [remarkMdLinks, { collections: collectionDirs(options, astroConfig.root) }], remarkIndexTerms, remarkLibromorphInline, remarkChords, remarkFretboards, remarkRhythmGrids, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
 							rehypePlugins: [rehypeMathjax, rehypeEnhancer],
 						}),
 						shikiConfig: {

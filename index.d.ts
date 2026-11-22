@@ -10,7 +10,8 @@ export interface HakushiCollection {
 	articlesPerPage?: number;
 	/**
 	 * Content folder read by `createHakushiCollections`, relative to the project root.
-	 * Defaults to `src/content/<id>`. Ignored by the integration itself.
+	 * Defaults to `src/content/<id>`. The integration uses it only to turn links to
+	 * `.md` files into article URLs.
 	 */
 	base?: string | URL;
 	/** Glob pattern(s) for `createHakushiCollections`. Defaults to `'**\/*.md'`. */

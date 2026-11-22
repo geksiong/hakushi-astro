@@ -178,7 +178,7 @@ export const collections = createHakushiCollections({
 });
 ```
 
-You can pass the same array to the integration's `collections` option; it ignores `base`, `pattern` and `folderCategories` and leaves them out of the browser bundle.
+You can pass the same array to the integration's `collections` option; it leaves `base`, `pattern` and `folderCategories` out of the browser bundle. The integration reads `base` only to turn links to `.md` files into article URLs, so if you change the top-level `base` of `createHakushiCollections`, give the integration's collections their own `base` too.
 
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. In the sidebar, a `folder` collection (the default) groups its articles into one sub-folder per category, A–Z, followed by uncategorized articles. A `dated` collection groups them by year, newest first, and shows each article's date (`YYYY-MM-DD`) before its title. Within a group, articles are listed newest first.
 
@@ -354,6 +354,7 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `terms`,
 ## Markdown features
 
 - `[[wikilinks]]` and `[[target|custom labels]]`
+- Links to other Markdown files (`[setup](../guides/setup.md#install)`), resolved relative to the linking file and turned into article URLs, also across collections
 - `:::note`, `tip`, `warning`, `danger`, `info`, `quote`, `check`, `theorem`, `definition`, `example`, and `caution` callouts
 - `:::tab` groups
 - LibroMorph-style ruby (`{漢字|かんじ}` or `[漢字]{.ruby ruby="かんじ"}`) and upright text (`{tcy:42}` or `[42]{.tcy}`)
@@ -362,7 +363,8 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `terms`,
 - `::: quiz` knowledge checks with one `- [x]` answer, `- [ ]` alternatives, and an explanation after the list
 - Mermaid, chart, and ABC music notation fences (ABC scores get playback controls with note highlighting)
 - `chord` and `chords` fences for inline SVG fret diagrams (`NAME FRETS`, with optional `fingers=`, `base=`, and `barre=`)
-- `fretboard` JSON and `fretdrom` JSON5 fences for scale, position, and tab diagrams
+- `fretboard` JSON and `fretdrom` JSON5 fences for scale, position, and tab diagrams (scale dots show note names)
+- `rhythm-grid` fences for box-notation count grids, or clock-face cycles with `.circle`; grids with a `tempo` get percussion playback
 - Math through `remark-math` and MathJax
 - Code titles such as ```` ```ts title="example.ts" ````
 
@@ -379,6 +381,25 @@ For a knowledge check, put the question before a task list and the explanation a
 *Explanation:* A qubit is a quantum information unit.
 :::
 ```
+
+A rhythm grid is written the way it would line up in a monospaced font. The first line holds the counts, and every other row is matched to them by character position:
+
+~~~md
+```{.rhythm-grid title="Soleá" tempo=120 play="Map A; Map B"}
+Count:   12  1  2 | 3  4  5 | 6  7 | 8  9 |10 11
+Map A:    X  .  . | X  .  . | X  . | X  . | X  .
+Map B:    X  .  . | X  .  . | .  X | X  . | X  .
+```
+~~~
+
+Every line is `Label: cells`, and `|` in the header marks a group boundary. Cells are `X` strong, `x` light, `o` muted, `.` empty and `-` held; anything else is text, and words separated by single spaces span the columns they sit over. Text past the last column becomes a note at the end of the row. Add `.circle` to draw the cycle as a clock face, one ring per row. Every grid gets a spoken description for screen readers.
+
+With `tempo` (numbered counts per minute; `&`, `e` and `a` columns split their count), the grid gets playback controls and the sounding column is highlighted. A woodblock counts in and keeps time underneath: high on counts named like the first, low on the others.
+
+- `play`: rows to sound. Commas sound together (`"A, B"`), semicolons play in turn (`"Map A; Map B"`). By default, every row with `X`, `x` or `o`
+- `repeat`: cycles of each group (default 4)
+- `sound`: General MIDI percussion for every row (`sound=claves`) or per row (`sound="Clave=claves, Bass=low-tom"`); default `clap`. Names: clap, claves, cowbell, woodblock, low-woodblock, maracas, cabasa, tambourine, side-stick, bass-drum, low-tom, high-tom, conga, low-conga, muted-conga, bongo, low-bongo, timbale, low-timbale, agogo, low-agogo, triangle, guiro, short-guiro, hi-hat, pedal-hi-hat, ride
+- `count-in`: counts of woodblock before the first cycle (default: the second half of the cycle, or the whole cycle with four counts or fewer)
 
 Mermaid diagrams are rendered in the browser and follow the site's light or dark mode, using Mermaid's `redux-color` and `redux-dark-color` themes by default. Change them with the `mermaid` option:
 

@@ -557,6 +557,36 @@ body {
 .md-body .fret-render svg, .md-body .fret-render img { display: block; max-width: 100%; height: auto; }
 .md-body .fret-render-error, .md-body .fret-error { color: var(--text-muted); }
 
+/* Rhythm grids: box notation for counts, cycles and accent patterns (remark-rhythm-grids). */
+.md-body .rhythm-grid { margin: 1.25rem 0; padding: 1rem 1rem 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-main); writing-mode: horizontal-tb; }
+.md-body .rhythm-grid .rg-scroll { overflow-x: auto; }
+.md-body .rg-title { margin: 0 0 0.5rem; text-align: center; font-weight: 600; }
+/* Reset the article's hairline table styles: grids are boxed and centred. */
+.md-body .rhythm-grid .rg-table { display: table; width: auto; margin: 0 auto; border: none; border-collapse: collapse; font-family: var(--font-body); font-size: 0.875rem; line-height: 1.2; }
+.md-body .rg-table th, .md-body .rg-table td { min-width: 1.6em; padding: 0.3em 0.15em; border: 1px solid var(--border); background: transparent; color: var(--text-main); text-align: center; vertical-align: middle; font-size: inherit; font-weight: normal; letter-spacing: normal; text-transform: none; white-space: normal; transition: background-color 0.08s; }
+.md-body .rg-table thead th { font-weight: 600; background: color-mix(in srgb, var(--text-main) 5%, transparent); }
+.md-body .rg-table th.rg-label { padding: 0.3em 0.5em 0.3em 0; border-left: none; background: transparent; font-weight: 600; text-align: left; white-space: nowrap; }
+.md-body .rg-table thead th.rg-label { border-top: none; }
+.md-body .rg-table tbody tr:hover td { background: transparent; }
+.md-body .rg-table .rg-group-start { border-left: 2px solid currentColor; }
+.md-body .rg-strong { font-size: 1.25em; line-height: 1; }
+.md-body .rg-light { font-size: 0.85em; line-height: 1; }
+.md-body .rg-table td.rg-text { font-weight: 600; }
+.md-body .rg-table td.rg-phrase { font-weight: normal; font-style: italic; text-align: left; }
+.md-body .rg-hold-bar { display: block; height: 0; margin: 0 -0.15em; border-top: 3px solid currentColor; }
+.md-body .rg-table .rg-note { border: none; font-style: italic; text-align: left; white-space: nowrap; color: var(--text-muted); }
+.md-body .rg-legend { margin: 0.5rem 0 0; text-align: center; font-size: 0.8125rem; color: var(--text-muted); }
+.md-body .rg-hold-sample { display: inline-block; width: 1.4em; border-top: 3px solid currentColor; vertical-align: middle; }
+.md-body .rhythm-grid-circle { text-align: center; }
+.md-body .rg-circle-svg { display: inline-block; width: 100%; max-width: 320px; height: auto; }
+.md-body .rg-error { margin: 0 0 0.5rem; color: var(--text-muted); font-style: italic; }
+.md-body .rg-source { margin: 0; overflow-x: auto; white-space: pre; }
+/* Column under the playback cursor. */
+.md-body .rg-table .rg-playing { background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); }
+.md-body .rg-circle-svg .rg-playing { fill: var(--primary); stroke: var(--primary); }
+.md-body .rg-circle-svg .rg-playing[fill='none'] { fill: none; }
+.md-body .rhythm-grid .abc-audio { margin: 0.75rem -1rem -0.75rem; }
+
 .quiz-card {
 	margin: 1.5rem 0;
 	padding: 1rem;

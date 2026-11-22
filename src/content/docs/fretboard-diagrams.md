@@ -11,6 +11,8 @@ Use a `fretboard` fence with JSON to draw either a named scale or specific notes
 
 ## Named scale
 
+Scale dots show their note names, with the root in red. The thicker 12th fret marks the octave.
+
 ```fretboard
 {"title":"A minor pentatonic","fretCount":12,
  "scale":{"root":"A","type":"minor pentatonic"}}

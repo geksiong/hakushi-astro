@@ -26,6 +26,9 @@ importers:
       d3:
         specifier: ^7.9.0
         version: 7.9.0
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       lucide-react:
         specifier: ^1.66.0
         version: 1.66.0(@types/react@19.3.0)(react@19.3.1)

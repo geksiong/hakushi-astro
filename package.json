@@ -48,6 +48,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "abcjs": "^6.7.2",
     "d3": "^7.9.0",
+    "github-slugger": "^2.0.0",
     "lucide-react": "^1.66.0",
     "lucide-static": "^1.66.0",
     "mermaid": "^12.2.0",
