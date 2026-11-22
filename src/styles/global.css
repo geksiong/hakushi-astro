@@ -988,7 +988,7 @@ html.lightbox-open {
 }
 
 /* ---------------------------------------------------------------------------
- * ABC music notation (```abc blocks hydrated with abcjs)
+ * ABC music notation (```abc blocks hydrated with abcjs, ```abc2svg with abc2svg)
  * ------------------------------------------------------------------------- */
 .abc-block {
 	margin: 1.25rem 0;
@@ -1041,14 +1041,27 @@ html.lightbox-open {
 }
 
 /* Ink the score with the active theme color (overrides abcjs' hardcoded black). */
-.abc-body svg [stroke]:not([stroke='none']) {
+.abc-body:not(.abc2svg-body) svg [stroke]:not([stroke='none']) {
 	stroke: currentColor;
 }
-.abc-body svg [fill]:not([fill='none']) {
+.abc-body:not(.abc2svg-body) svg [fill]:not([fill='none']) {
 	fill: currentColor;
 }
-.abc-body svg text {
+.abc-body:not(.abc2svg-body) svg text {
 	font-family: var(--font-code);
+}
+
+/*
+ * abc2svg (```abc2svg blocks) inks with currentColor already and draws glyphs
+ * with its own embedded music font, so only its fixed page width is adapted:
+ * each music line is a separate <svg> of the same width, scaled to fit.
+ */
+.abc2svg-body svg {
+	display: block;
+	width: 100%;
+	max-width: 48rem;
+	height: auto;
+	margin: 0 auto;
 }
 
 .abc-invalid {

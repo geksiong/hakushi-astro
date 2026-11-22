@@ -361,7 +361,7 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `terms`,
 - `[A]{.dropcap}` initials and `::: vertical` / `::: horizontal` writing-mode sections
 - `[term]{.index}`, `[visible]{.index entry="Parent!Term"}`, and `{index: "Term"}` markers, collected on `/terms`
 - `::: quiz` knowledge checks with one `- [x]` answer, `- [ ]` alternatives, and an explanation after the list
-- Mermaid, chart, and ABC music notation fences (ABC scores get playback controls with note highlighting)
+- Mermaid, chart, and ABC music notation fences (`abc` scores are engraved with abcjs and get playback controls with note highlighting; `abc2svg` scores are engraved with abc2svg, for features abcjs lacks such as jianpu, tablature and Clairnote)
 - `chord` and `chords` fences for inline SVG fret diagrams (`NAME FRETS`, with optional `fingers=`, `base=`, and `barre=`)
 - `fretboard` JSON and `fretdrom` JSON5 fences for scale, position, and tab diagrams (scale dots show note names)
 - `rhythm-grid` fences for box-notation count grids, or clock-face cycles with `.circle`; grids with a `tempo` get percussion playback

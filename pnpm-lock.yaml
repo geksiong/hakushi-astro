@@ -20,6 +20,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.3.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1))
+      abc2svg:
+        specifier: ^1.22.1
+        version: 1.22.1
       abcjs:
         specifier: ^6.7.2
         version: 6.7.2
@@ -1194,6 +1197,11 @@ packages:
   '@xmldom/xmldom@0.9.12':
     resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
     engines: {node: '>=14.6'}
+
+  abc2svg@1.22.1:
+    resolution: {integrity: sha512-Ec2GAjd1gUFJiSCFapMYD9ZcTuhGEeslsIOW53z9P09B3OMz2FqldoPebOLYd3aUlQyVll/oDbtw3ZX8WbjLrg==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+    hasBin: true
 
   abcjs@6.7.2:
     resolution: {integrity: sha512-cHCyf8j0hAcxTuwZ9l2QznaSlLK1TD2s5oVw6Ig8Kfss6VfJKoNJ1kAzMBwa6DDWeyNl2JH7mN/U+MJ8MYbC5g==}
@@ -3992,6 +4000,8 @@ snapshots:
   '@vscode/l10n@0.0.18': {}
 
   '@xmldom/xmldom@0.9.12': {}
+
+  abc2svg@1.22.1: {}
 
   abcjs@6.7.2: {}
 
