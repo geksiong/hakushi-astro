@@ -49,7 +49,7 @@ Run `npm run dev`. Hakushi creates `/`, `/about`, collection routes such as `/do
 
 ## Frontmatter and schema
 
-No field is required. The built-in schema accepts `title`, `summary`, `category`, `mainImage`, `tags`, `date`, `author`, and `draft`. Draft entries are excluded.
+No field is required. The built-in schema accepts `title`, `summary`, `category`, `mainImage`, `tags`, `date`, `author`, `draft`, and `published`. Draft entries are excluded. `draft: true` and `published: false` mean the same thing; if both are set, `draft` wins. An entry that sets neither is published unless its collection sets `autoPublish: false` (see below).
 
 Every collection, category, and tag listing lets readers switch between grid and list layouts. The choice is saved for each listing. The default `portfolio` collection contains sample projects, artwork, and visual studies; it needs no special collection type. Add an optional `mainImage` to each article to show it in listings and above the article body. Use a path from `public/` (for example `/images/studio.jpg`) or an absolute image URL. Articles without an image display as text cards.
 
@@ -183,6 +183,18 @@ You can pass the same array to the integration's `collections` option; it leaves
 Navigation supports `BookOpen`, `Calendar`, `Microscope`, `FileText`, and `Share2` icons. In the sidebar, a `folder` collection (the default) groups its articles into one sub-folder per category, A–Z, followed by uncategorized articles. A `dated` collection groups them by year, newest first, and shows each article's date (`YYYY-MM-DD`) before its title. Within a group, articles are listed newest first.
 
 In a `dated` collection, an article without a frontmatter `date` takes it from the start of its filename: `2026-09-01-release-notes.md`, `2026_09_01`, `2026.09.01` and `20260901` all mean 1 September 2026. Impossible dates such as `2026-02-30` are ignored. The loader learns which collections are dated from the array passed to `createHakushiCollections`, so include `type: 'dated'` there too (the defaults already do). Set `filenameDates: false` on a collection to turn this off, or `true` to use it for a `folder` collection.
+
+By default an article whose frontmatter sets neither `draft` nor `published` is published. Set `autoPublish: false` to make such articles drafts instead, so that only those with `published: true` (or `draft: false`) appear. Set it for every collection or for a single one; frontmatter always wins:
+
+```ts
+export const collections = createHakushiCollections({
+  autoPublish: false, // every collection: opt in with `published: true`
+  collections: [
+    { id: 'notes', base: '../vault' },
+    { id: 'blog', type: 'dated', autoPublish: true }, // except this one
+  ],
+});
+```
 
 ## Custom themes
 

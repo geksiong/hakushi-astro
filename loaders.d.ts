@@ -9,6 +9,11 @@ export function hakushiLoader(options: {
 	 * (`2026-09-01-title.md`, `2026_09_01`, `2026.09.01`, `20260901`). Defaults to `false`.
 	 */
 	filenameDates?: boolean;
+	/**
+	 * Publish notes whose frontmatter sets neither `draft` nor `published`. Defaults to `true`;
+	 * with `false`, notes need `published: true` (or `draft: false`) to appear.
+	 */
+	autoPublish?: boolean;
 }): unknown;
 export interface HakushiCollectionSource {
 	id: string;
@@ -22,6 +27,8 @@ export interface HakushiCollectionSource {
 	type?: 'folder' | 'dated';
 	/** Take missing dates from filenames. Defaults to `true` for `type: 'dated'`, otherwise `false`. */
 	filenameDates?: boolean;
+	/** Overrides the top-level `autoPublish` for this collection. */
+	autoPublish?: boolean;
 }
 export function createHakushiCollections(options?: {
 	/** Parent folder of collections without their own `base`. Defaults to `'./src/content'`. */
@@ -33,4 +40,9 @@ export function createHakushiCollections(options?: {
 	 * as its category when frontmatter sets none. Defaults to `true`.
 	 */
 	folderCategories?: boolean;
+	/**
+	 * Publish notes whose frontmatter sets neither `draft` nor `published`. Defaults to `true`.
+	 * Frontmatter always wins; collections can override this with their own `autoPublish`.
+	 */
+	autoPublish?: boolean;
 }): Record<string, unknown>;

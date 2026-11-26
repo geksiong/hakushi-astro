@@ -16,6 +16,7 @@ export function hakushiSchema({ extend = {} } = {}) {
 		author: z.string().optional(),
 		summary: z.string().optional(),
 		draft: z.boolean().default(false),
+		published: z.boolean().optional(),
 		...extend,
 	});
 }
@@ -26,11 +27,13 @@ export function hakushiSchema({ extend = {} } = {}) {
  * - unless `folderCategories` is false, a note in a subfolder of `base` gets
  *   the name of its top-level subfolder as its `category`;
  * - with `filenameDates`, a note whose filename starts with a date
- *   (`2026-09-01-title.md`, `2026_09_01`, `2026.09.01` or `20260901`) gets it as its `date`.
+ *   (`2026-09-01-title.md`, `2026_09_01`, `2026.09.01` or `20260901`) gets it as its `date`;
+ * - `draft` comes from frontmatter `draft`, else the opposite of frontmatter
+ *   `published`, else `!autoPublish` (so with `autoPublish: false` a note is
+ *   only published when its frontmatter says `published: true` or `draft: false`).
  */
-export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = true, filenameDates = false }) {
+export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = true, filenameDates = false, autoPublish = true }) {
 	const loader = glob({ base, pattern });
-	if (!folderCategories && !filenameDates) return loader;
 	return {
 		...loader,
 		load: (context) => {
@@ -39,6 +42,7 @@ export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = tr
 				...context,
 				parseData: (props) => {
 					const data = { ...props.data };
+					data.draft = resolveDraft(data, autoPublish);
 					if (props.filePath) {
 						if (folderCategories && data.category == null) data.category = folderCategory(baseDir, props.filePath);
 						if (filenameDates && data.date == null) data.date = filenameDate(props.filePath);
@@ -49,6 +53,13 @@ export function hakushiLoader({ base, pattern = '**/*.md', folderCategories = tr
 			});
 		},
 	};
+}
+
+/** Whether a note is a draft: frontmatter `draft` wins, then `published`, then the collection default. */
+function resolveDraft({ draft, published }, autoPublish) {
+	if (typeof draft === 'boolean') return draft;
+	if (typeof published === 'boolean') return !published;
+	return !autoPublish;
 }
 
 /** Top-level folder of `filePath` below `baseDir`, or undefined for files directly in it. */
@@ -75,11 +86,13 @@ function filenameDate(filePath) {
  * `${base}/${id}` unless it sets its own `base` folder (and optionally a
  * `pattern`). `folderCategories` applies to every collection unless one sets
  * its own. Collections with `type: 'dated'` take missing dates from their
- * filenames unless they set `filenameDates: false`. Individual definitions
+ * filenames unless they set `filenameDates: false`. `autoPublish` (default
+ * `true`) decides whether notes whose frontmatter sets neither `draft` nor
+ * `published` are published; a collection may set its own. Individual definitions
  * can be replaced by spreading this result in `src/content.config.ts`.
  */
-export function createHakushiCollections({ base = './src/content', schema = hakushiSchema(), collections = DEFAULT_COLLECTIONS, folderCategories = true } = {}) {
-	return Object.fromEntries(collections.map(({ id, type, base: folder, pattern, folderCategories: own, filenameDates }) => [
+export function createHakushiCollections({ base = './src/content', schema = hakushiSchema(), collections = DEFAULT_COLLECTIONS, folderCategories = true, autoPublish = true } = {}) {
+	return Object.fromEntries(collections.map(({ id, type, base: folder, pattern, folderCategories: own, filenameDates, autoPublish: ownAutoPublish }) => [
 		id,
 		defineCollection({
 			loader: hakushiLoader({
@@ -87,6 +100,7 @@ export function createHakushiCollections({ base = './src/content', schema = haku
 				...(pattern ? { pattern } : {}),
 				folderCategories: own ?? folderCategories,
 				filenameDates: filenameDates ?? type === 'dated',
+				autoPublish: ownAutoPublish ?? autoPublish,
 			}),
 			schema,
 		}),

@@ -23,6 +23,8 @@ export interface HakushiCollection {
 	 * `createHakushiCollections`. Defaults to `true` for `type: 'dated'`. Ignored by the integration itself.
 	 */
 	filenameDates?: boolean;
+	/** Per-collection override of `createHakushiCollections({ autoPublish })`. Ignored by the integration itself. */
+	autoPublish?: boolean;
 }
 export interface HakushiSidebarLink {
 	/** Link text shown in the sidebar. */
@@ -242,7 +244,7 @@ export const DEFAULT_NOT_FOUND: Required<HakushiNotFound>;
 export default function hakushi(options?: HakushiOptions): AstroIntegration[];
 
 /** A collection as the site sees it: loader-only options removed, defaults filled in. */
-export type HakushiResolvedCollection = Omit<HakushiCollection, 'base' | 'pattern' | 'folderCategories' | 'filenameDates'> &
+export type HakushiResolvedCollection = Omit<HakushiCollection, 'base' | 'pattern' | 'folderCategories' | 'filenameDates' | 'autoPublish'> &
 	Required<Pick<HakushiCollection, 'description' | 'iconName' | 'type'>>;
 /** A sidebar link with its defaults filled in. */
 export type HakushiResolvedSidebarLink = HakushiSidebarLink & Required<Pick<HakushiSidebarLink, 'description' | 'iconName' | 'external'>>;
