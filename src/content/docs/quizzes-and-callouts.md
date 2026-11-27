@@ -53,6 +53,8 @@ Choose an answer in each knowledge check. Hakushi shows feedback and keeps an an
 
 Inside a list item, indent the fences to the item's content column: three spaces after `1. `, four after `10. `.
 
+For hints and solutions paired with hidden-notation listening questions, see [[ear-training|Ear Training and Swing]].
+
 ~~~md
 ::: hint
 Save `next` before redirecting the link.
@@ -84,6 +86,28 @@ Use `{漢字|かんじ}` to annotate a word without writing HTML.
 ::: caution
 Mark exactly one quiz option with `[x]`. A quiz with no checked answer or multiple checked answers stays visible as its original Markdown content.
 :::
+
+## Attribute form
+
+Any container also takes LibroMorph's attribute form, `::: {.type #id title="…"}`, so the same Markdown works in LibroMorph books. The `#id` becomes an anchor: [jump to this note](#attribute-note).
+
+::: {.note #attribute-note title="Written with attributes"}
+This note was opened with `::: {.note #attribute-note title="Written with attributes"}`.
+:::
+
+Containers work inside list items too, indented to the item's content column:
+
+1. Install the dependencies.
+
+   ::: {.tip title="Faster installs"}
+   `pnpm install --frozen-lockfile` skips resolving and fails if the lockfile is stale.
+   :::
+
+2. Start the dev server.
+
+   ::: warning
+   Stop it with `astro dev stop` when you're done, or the port stays taken.
+   :::
 
 ## Copy this pattern
 

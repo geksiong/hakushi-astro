@@ -142,3 +142,4 @@ K:C
 
 - Use `abc` when readers should hear the tune: abcjs adds playback controls and highlights notes as they sound.
 - Use `abc2svg` when you need something abcjs doesn't draw, such as jianpu, Clairnote, tablature from `%%strtab`, chord diagrams, or other abcm2ps formatting directives.
+- Only `abc` scores can be listening items (```` ```{.abc .listen} ````) or swing in playback, because both need the player. See [[ear-training|Ear Training and Swing]].

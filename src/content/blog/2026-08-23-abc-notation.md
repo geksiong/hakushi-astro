@@ -58,7 +58,7 @@ K:F
 
 ## Listening Items
 
-Mark a fence `{.abc .listen}` for an ear-training question whose notation would give the answer away. It keeps its title and player, but the score is not shown.
+Mark a fence `{.abc .listen}` for an ear-training question whose notation would give the answer away. It keeps its title and player, but the score is not shown. A full set of exercises is on [[ear-training|Ear Training and Swing]].
 
 ```{.abc .listen}
 X:1
