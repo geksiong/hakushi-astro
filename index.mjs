@@ -75,6 +75,7 @@ function normalizeOptions(options) {
 		footer: normalizeFooter(options.footer),
 		notFound: normalizeNotFound(options.notFound),
 		mermaid: normalizeMermaid(options.mermaid),
+		abc: normalizeAbc(options.abc),
 	};
 	config.favicons = normalizeFavicons(options.favicon);
 	config.favicon = config.favicons[0]?.href ?? null;
@@ -189,6 +190,23 @@ function normalizeMermaid(value = {}) {
 		throw new Error(`[hakushi] Mermaid icon pack "${pack.name}" needs \`icons\` (Iconify JSON) or a \`url\`.`);
 	});
 	return { theme, darkTheme, mermaidConfig, iconPacks: packs };
+}
+
+/**
+ * `abc.swing` swings offbeat eighths when ```abc scores play: a percentage of
+ * the beat given to the first eighth (66 is 2:1, 60 a lighter 3:2, 50 or less
+ * straight). A score overrides it with `%%MIDI swing N`. Only X/4 meters swing.
+ */
+function normalizeAbc(value = {}) {
+	if (!isPlainObject(value)) throw new Error('[hakushi] `abc` must be an object.');
+	for (const key of Object.keys(value)) {
+		if (key !== 'swing') throw new Error(`[hakushi] Unknown \`abc.${key}\` option. Use \`swing\`.`);
+	}
+	const { swing = 0 } = value;
+	if (typeof swing !== 'number' || !Number.isFinite(swing) || swing < 0 || swing >= 100) {
+		throw new Error('[hakushi] `abc.swing` must be a percentage from 0 to 99, such as 66 for 2:1 swing.');
+	}
+	return { swing };
 }
 
 function isExternalHref(href) {
@@ -348,7 +366,7 @@ function coreIntegration(options = {}) {
 				updateConfig({
 					markdown: {
 						processor: unified({
-							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, [remarkMdLinks, { collections: collectionDirs(options, astroConfig.root) }], remarkIndexTerms, remarkLibromorphInline, remarkChords, remarkFretboards, remarkRhythmGrids, remarkCharts, remarkAbc, remarkMath, remarkMermaid],
+							remarkPlugins: [remarkFirstH1Title, remarkWikilinks, [remarkMdLinks, { collections: collectionDirs(options, astroConfig.root) }], remarkIndexTerms, remarkLibromorphInline, remarkChords, remarkFretboards, remarkRhythmGrids, remarkCharts, [remarkAbc, { swing: config.abc.swing }], remarkMath, remarkMermaid],
 							rehypePlugins: [rehypeMathjax, rehypeEnhancer],
 						}),
 						shikiConfig: {

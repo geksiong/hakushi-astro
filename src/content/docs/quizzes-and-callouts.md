@@ -4,7 +4,7 @@ collection: docs
 category: Markdown Demos
 tags: [markdown, demo, quizzes, callouts]
 author: Hakushi
-summary: Try an interactive knowledge check and the additional LibroMorph-style callout types.
+summary: Try an interactive knowledge check, collapsible hints and solutions, and the additional LibroMorph-style callout types.
 ---
 
 Choose an answer in each knowledge check. Hakushi shows feedback and keeps an answer reveal available beneath the choices.
@@ -30,6 +30,42 @@ Choose an answer in each knowledge check. Hakushi shows feedback and keeps an an
 
 *Explanation:* The text before the bar is the base word; the text after it is the pronunciation. See [[ruby-and-upright-text|Ruby Text and Upright Numbers]] for a rendered example.
 :::
+
+## Hints and solutions
+
+`::: hint` and `::: solution` stay folded until the reader opens them, so an exercise can be tried before looking. Everything inside is ordinary Markdown, including code and math. Give a custom label after the marker, or use the attribute form for a `title`, an `#id` or `open` to start expanded.
+
+1. Reverse a singly linked list in place.
+
+   ::: hint
+   Save `next` before redirecting the link.
+   :::
+
+   ::: {.solution title="Solution and analysis"}
+   Walk the list once with three references: `prev`, `current` and `next`. Point each node back at `prev`, then step forward. $O(n)$ time, $O(1)$ space.
+   :::
+
+2. What is $\sum_{k=1}^{n} k$?
+
+   ::: hint Pair the terms
+   Add the first and last terms, then the second and second-to-last.
+   :::
+
+Inside a list item, indent the fences to the item's content column: three spaces after `1. `, four after `10. `.
+
+~~~md
+::: hint
+Save `next` before redirecting the link.
+:::
+
+::: hint Pair the terms
+A custom label.
+:::
+
+::: {.solution #reverse-answer title="Solution and analysis" open}
+Starts expanded, with an anchor.
+:::
+~~~
 
 ## Callout types
 

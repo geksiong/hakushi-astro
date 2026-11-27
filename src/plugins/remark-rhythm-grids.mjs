@@ -1,4 +1,5 @@
 import { visit } from 'unist-util-visit';
+import { parseFenceAttributes } from './fence-attributes.mjs';
 
 /**
  * remark-rhythm-grids
@@ -30,23 +31,7 @@ const SYMBOLS = {
 	o: { className: 'rg-muted', mark: '○', name: 'muted' },
 };
 
-/** `{.rhythm-grid .circle #id key=value key="a b"}` or `rhythm-grid .circle key=value`. */
-export function parseFenceAttributes(lang = '', meta = '') {
-	const source = `${lang ?? ''} ${meta ?? ''}`.trim().replace(/^\{/, '').replace(/\}$/, '');
-	const classes = [];
-	const attrs = {};
-	let id = '';
-	for (const match of source.matchAll(/([^\s=]+)=(?:"([^"]*)"|“([^”]*)”|'([^']*)'|(\S+))|(\S+)/g)) {
-		if (match[6] !== undefined) {
-			const word = match[6];
-			if (word.startsWith('#')) id = word.slice(1);
-			else classes.push(word.replace(/^\./, ''));
-		} else {
-			attrs[match[1]] = match[2] ?? match[3] ?? match[4] ?? match[5];
-		}
-	}
-	return { classes, id, attrs };
-}
+export { parseFenceAttributes };
 
 // Split chars[from..] into tokens {text, s, e} at spaces; "|" positions are returned separately.
 function tokenize(chars, from) {

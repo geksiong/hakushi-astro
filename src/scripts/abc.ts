@@ -35,8 +35,11 @@ function createCursor(highlight: Highlighter, controller: () => abcjs.SynthObjec
 	};
 }
 
-/** Attach play / loop / restart / progress / tempo controls to a block. */
-function mountPlayback(block: HTMLElement, highlight: Highlighter, tune: abcjs.TuneObject) {
+/**
+ * Attach play / loop / restart / progress / tempo controls to a block.
+ * `swing` (above 50, e.g. 66 for 2:1) swings offbeat eighths with abcjs' own option.
+ */
+function mountPlayback(block: HTMLElement, highlight: Highlighter, tune: abcjs.TuneObject, swing = 0) {
 	const audio = document.createElement('div');
 	audio.className = 'abc-audio';
 	block.appendChild(audio);
@@ -51,7 +54,7 @@ function mountPlayback(block: HTMLElement, highlight: Highlighter, tune: abcjs.T
 		displayProgress: true,
 		displayWarp: true,
 	});
-	controller.setTune(tune, false).catch((err) => {
+	controller.setTune(tune, false, swing > 50 ? { swing } : undefined).catch((err) => {
 		console.error('Failed to prepare ABC playback:', err);
 		audio.remove();
 	});
@@ -107,7 +110,7 @@ function mountAbcBlocks() {
 		try {
 			const [tune] = abcjs.renderAbc(el, el.dataset.abc!, { responsive: 'resize', add_classes: true });
 			const block = el.closest<HTMLElement>('.abc-block');
-			if (canPlay && tune && block && tune.lines.length > 0) mountPlayback(block, noteHighlighter(el), tune);
+			if (canPlay && tune && block && tune.lines.length > 0) mountPlayback(block, noteHighlighter(el), tune, Number(el.dataset.swing) || 0);
 		} catch (err) {
 			console.error('Failed to render ABC notation:', err);
 			const fallback = document.createElement('p');

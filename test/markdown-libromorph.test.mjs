@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { scanIndexMarkers } from '../src/lib/term-index.mjs';
 import rehypeEnhancer from '../src/plugins/rehype-enhancer.mjs';
+import remarkAbc from '../src/plugins/remark-abc.mjs';
 
 const processor = await createMarkdownProcessor({
 	remarkPlugins: [remarkIndexTerms, remarkInline, remarkChords, remarkFretboards, remarkRhythmGrids],
@@ -180,4 +181,62 @@ test('links to Markdown files become article URLs', async () => {
 	assert.match(code, /href="https:\/\/x.test\/a.md"/);
 	assert.match(code, /href="notes.txt"/);
 	assert.match(code, /href="\/blog\/post#top"/);
+});
+
+test('hint and solution blocks become collapsed reveals, also inside list items', async () => {
+	const { code } = await processor.render(`::: hint
+Save \`next\` first.
+:::
+
+1. Reverse a linked list.
+
+   ::: hint Think about pointers
+   Three references.
+   :::
+
+   ::: {.solution #reverse title="Solution & analysis" open}
+   Walk once: $O(n)$.
+
+   - in place
+   :::
+`);
+	assert.match(code, /<details class="reveal reveal-hint"><summary class="reveal-summary">[^]*?<svg[^]*?<span>Hint<\/span><\/summary><div class="reveal-content"><p>Save <code>next<\/code> first.<\/p><\/div><\/details>/);
+	assert.match(code, /<li>\s*<p>Reverse a linked list.<\/p>\s*<details class="reveal reveal-hint">[^]*?<span>Think about pointers<\/span>/);
+	assert.match(code, /<details class="reveal reveal-solution" id="reverse" open><summary[^]*?<span>Solution &#x26; analysis<\/span>[^]*?<li>in place<\/li>\s*<\/ul><\/div><\/details>/);
+	assert.doesNotMatch(code, /:::/);
+});
+
+test('callouts accept the attribute form and keep an id', async () => {
+	const { code } = await processor.render('::: {.note #setup title="Before you start"}\nBody\n:::');
+	assert.match(code, /<div class="callout callout-note" data-callout="note" id="setup">[^]*?<span>Before you start<\/span>[^]*?<p>Body<\/p>/);
+});
+
+const abcProcessor = await createMarkdownProcessor({ remarkPlugins: [[remarkAbc, { swing: 66 }]], syntaxHighlight: false });
+
+test('ABC fences take LibroMorph attributes: ids, listening items and swing', async () => {
+	const { code } = await abcProcessor.render(`\`\`\`{#q1 .abc .listen}
+X:1
+T:Interval 1
+K:C
+CG|
+\`\`\`
+
+\`\`\`{#straight .abc}
+X:1
+%%MIDI swing 50
+K:C
+C|
+\`\`\`
+
+\`\`\`abc
+X:1
+%%MIDI swing 60
+K:C
+C|
+\`\`\`
+`);
+	assert.match(code, /<figure class="abc-block abc-listen" id="q1">[^]*?<span class="abc-header-title">Interval 1<\/span><span class="abc-header-type">Listen<\/span><\/figcaption><div class="abc-listen-notation" aria-hidden="true"><div class="abc-body" data-abc="X:1\nT:Interval 1[^"]*" data-swing="66"><\/div><\/div><\/figure>/);
+	assert.match(code, /<figure class="abc-block" id="straight">[^]*?<div class="abc-body" data-abc="[^"]*"><\/div>/);
+	assert.match(code, /data-swing="60"/);
+	assert.doesNotMatch(code, /language-|code-block/);
 });

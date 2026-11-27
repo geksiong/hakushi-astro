@@ -373,7 +373,10 @@ Keys are `home`, `articles`, `collections`, `aliases`, `graph`, `tags`, `terms`,
 - `[A]{.dropcap}` initials and `::: vertical` / `::: horizontal` writing-mode sections
 - `[term]{.index}`, `[visible]{.index entry="Parent!Term"}`, and `{index: "Term"}` markers, collected on `/terms`
 - `::: quiz` knowledge checks with one `- [x]` answer, `- [ ]` alternatives, and an explanation after the list
+- `::: hint` and `::: solution` blocks, folded until the reader opens them (`::: hint Custom label`, or `::: {.solution #id title="…" open}`). Containers also work inside list items when indented to the item's content column
+- The attribute form `::: {.note #id title="…"}` for any container
 - Mermaid, chart, and ABC music notation fences (`abc` scores are engraved with abcjs and get playback controls with note highlighting; `abc2svg` scores are engraved with abc2svg, for features abcjs lacks such as jianpu, tablature and Clairnote)
+- LibroMorph's ABC fence attributes: ```` ```{#id .abc} ```` sets the score's anchor, and ```` ```{.abc .listen} ```` makes a listening item that keeps its title and player but hides the notation. `%%MIDI swing N` swings a score's offbeat eighths in playback (see the `abc` option below)
 - `chord` and `chords` fences for inline SVG fret diagrams (`NAME FRETS`, with optional `fingers=`, `base=`, and `barre=`)
 - `fretboard` JSON and `fretdrom` JSON5 fences for scale, position, and tab diagrams (scale dots show note names)
 - `rhythm-grid` fences for box-notation count grids, or clock-face cycles with `.circle`; grids with a `tempo` get percussion playback
@@ -412,6 +415,12 @@ With `tempo` (numbered counts per minute; `&`, `e` and `a` columns split their c
 - `repeat`: cycles of each group (default 4)
 - `sound`: General MIDI percussion for every row (`sound=claves`) or per row (`sound="Clave=claves, Bass=low-tom"`); default `clap`. Names: clap, claves, cowbell, woodblock, low-woodblock, maracas, cabasa, tambourine, side-stick, bass-drum, low-tom, high-tom, conga, low-conga, muted-conga, bongo, low-bongo, timbale, low-timbale, agogo, low-agogo, triangle, guiro, short-guiro, hi-hat, pedal-hi-hat, ride
 - `count-in`: counts of woodblock before the first cycle (default: the second half of the cycle, or the whole cycle with four counts or fewer)
+
+To swing offbeat eighths in every ```` ```abc ```` score's playback, set `abc.swing` to the percentage of the beat the first eighth takes: `66` is 2:1, `60` a lighter 3:2, and `50` or less straight. A score overrides it with `%%MIDI swing N`, for example `%%MIDI swing 50` for an example that must stay straight. Only X/4 meters swing, and only where a beat holds two eighths, so sixteenths and triplets are left alone.
+
+```js
+hakushi({ abc: { swing: 66 } })
+```
 
 Mermaid diagrams are rendered in the browser and follow the site's light or dark mode, using Mermaid's `redux-color` and `redux-dark-color` themes by default. Change them with the `mermaid` option:
 

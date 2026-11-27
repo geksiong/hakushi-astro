@@ -12,6 +12,7 @@ import {
 	circleCheckBigSvg,
 	calloutIcon,
 } from './callout-icons.mjs';
+import { parseAttributes } from './fence-attributes.mjs';
 
 const COPY_ICON = copySvg
 	.replace('width="24"', 'width="14"')
@@ -39,13 +40,22 @@ const CALLOUT_META = {
 	example: { icon: lightbulbSvg, defaultTitle: 'Example' },
 	caution: { icon: triangleAlertSvg, defaultTitle: 'Caution' },
 	tab: { icon: null, defaultTitle: null },
+	// Collapsible reveals, rendered as <details> (see revealElement)
+	hint: { icon: lightbulbSvg, defaultTitle: 'Hint' },
+	solution: { icon: circleCheckBigSvg, defaultTitle: 'Solution' },
 };
+
+const CONTAINER_TOKENS = 'tab|note|tip|warning|danger|info|quote|check|theorem|definition|example|caution|quiz|vertical|horizontal|hint|solution';
+const REVEAL_TOKENS = new Set(['hint', 'solution']);
 
 // The title is the rest of the marker line only. The body can share the
 // marker's text node (":::tip\nPlain text\n:::"), so neither `\s*` (it would
 // swallow the newline and take the body's first line as the title) nor a
 // `$` anchor (it would need the marker to end the whole node) is safe here.
-const OPEN_RE = /^:::[ \t]*(tab|note|tip|warning|danger|info|quote|check|theorem|definition|example|caution|quiz|vertical|horizontal)\b[ \t]*([^\n]*)(?:\n|$)/i;
+const OPEN_RE = new RegExp(`^:::[ \\t]*(${CONTAINER_TOKENS})\\b[ \\t]*([^\\n]*)(?:\\n|$)`, 'i');
+// LibroMorph/Pandoc attribute form: ::: {.solution #id title="Worked answer" open}
+const BRACE_OPEN_RE = /^:::[ \t]*\{([^}\n]*)\}[ \t]*(?:\n|$)/;
+const TOKEN_SET = new Set(CONTAINER_TOKENS.split('|'));
 
 /**
  * rehype-enhancer
@@ -81,7 +91,8 @@ function buildContainers(tree) {
 			if (
 				child.type === 'element' &&
 				child.children &&
-				(child.tagName === 'blockquote' || child.tagName === 'li')
+				// Lists are walked so containers work inside list items (indented to the item's content column)
+				['blockquote', 'ol', 'ul', 'li'].includes(child.tagName)
 			) {
 				stack.push(child);
 			}
@@ -111,17 +122,32 @@ function processParent(parent) {
 	}
 }
 
-/** If `p` opens a container, return {token, title}; the marker line is stripped. */
+/**
+ * If `p` opens a container, return {token, title, id, open}; the marker line
+ * is stripped. Openers are `::: note Custom title` or the attribute form
+ * `::: {.note #id title="Custom title"}`; `open` only matters to reveals.
+ */
 function extractOpenMarker(p) {
 	const first = p.children?.[0];
 	if (!first || first.type !== 'text') return null;
-	const match = first.value.match(OPEN_RE);
-	if (!match) return null;
 
-	const token = match[1].toLowerCase();
-	const customTitle = (match[2] || '').trim();
+	let marker;
+	let length;
+	const plain = first.value.match(OPEN_RE);
+	if (plain) {
+		marker = { token: plain[1].toLowerCase(), title: (plain[2] || '').trim(), id: '', open: false };
+		length = plain[0].length;
+	} else {
+		const brace = first.value.match(BRACE_OPEN_RE);
+		if (!brace) return null;
+		const { classes, id, attrs } = parseAttributes(brace[1]);
+		const token = classes.map((name) => name.toLowerCase()).find((name) => TOKEN_SET.has(name));
+		if (!token) return null;
+		marker = { token, title: (attrs.title ?? '').trim(), id, open: classes.includes('open') || 'open' in attrs };
+		length = brace[0].length;
+	}
 
-	let rest = first.value.slice(match[0].length);
+	let rest = first.value.slice(length);
 	if (rest.startsWith('\r')) rest = rest.slice(1);
 	if (rest.startsWith('\n')) rest = rest.slice(1);
 
@@ -131,7 +157,7 @@ function extractOpenMarker(p) {
 		p.children.shift();
 	}
 
-	return { token, title: customTitle };
+	return marker;
 }
 
 /**
@@ -175,6 +201,11 @@ function collectContainer(parent, openIdx, marker) {
 
 	const titleText = marker.title || meta.defaultTitle;
 
+	if (REVEAL_TOKENS.has(marker.token)) {
+		parent.children.splice(openIdx, end - openIdx + 1, revealElement(marker, meta, titleText, body));
+		return 1;
+	}
+
 	const titleChildren = [];
 	if (meta.icon) titleChildren.push({ type: 'raw', value: calloutIcon(meta.icon) });
 	if (titleText && !isTab) {
@@ -213,12 +244,46 @@ function collectContainer(parent, openIdx, marker) {
 			),
 			...(isTab || isQuiz || isWritingMode ? {} : { 'data-callout': marker.token }),
 			...(isQuiz ? { 'data-title': marker.title } : {}),
+			...(marker.id ? { id: marker.id } : {}),
 		},
 		children: isQuiz || isWritingMode ? body : children,
 	};
 
 	parent.children.splice(openIdx, end - openIdx + 1, container);
 	return 1; // continue scanning right after the container
+}
+
+/**
+ * ::: hint / ::: solution: a collapsed <details class="reveal reveal-hint">,
+ * as LibroMorph renders them, so readers can try an exercise before looking.
+ */
+function revealElement(marker, meta, titleText, body) {
+	return {
+		type: 'element',
+		tagName: 'details',
+		properties: {
+			className: ['reveal', `reveal-${marker.token}`],
+			...(marker.id ? { id: marker.id } : {}),
+			...(marker.open ? { open: true } : {}),
+		},
+		children: [
+			{
+				type: 'element',
+				tagName: 'summary',
+				properties: { className: ['reveal-summary'] },
+				children: [
+					{ type: 'raw', value: calloutIcon(meta.icon) },
+					{ type: 'element', tagName: 'span', properties: {}, children: [{ type: 'text', value: titleText }] },
+				],
+			},
+			{
+				type: 'element',
+				tagName: 'div',
+				properties: { className: ['reveal-content'] },
+				children: body.filter((node) => !node.children || node.children.length > 0),
+			},
+		],
+	};
 }
 
 /**

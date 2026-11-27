@@ -41,6 +41,43 @@ A |: "Am" c2 d e>fe | "G" d2 B G>AB | "Am" c2 A A>^GA | "E" B2 ^G E2 A |
 "Am" c2 d e>fe | "G" d2 B G>AB | "Am" c>BA "E" ^G>^F^G | "Am" A3- A2 :|
 ```
 
+## Swing
+
+`%%MIDI swing 66` swings a score's offbeat eighths 2:1 when it plays; `60` is a lighter 3:2 and `50` keeps it straight. Only X/4 meters swing, and only where a beat holds two eighths. Set a default for every score with the integration's `abc: { swing: 66 }` option.
+
+```abc
+X:1
+T:Swung Eighths
+M:4/4
+L:1/8
+Q:1/4=120
+%%MIDI swing 66
+K:F
+"F7" FGAc d2 cA | "Bb7" BAGF D2 F2 | "F7" FGAc d2 cA | "C7" GFED C4 |]
+```
+
+## Listening Items
+
+Mark a fence `{.abc .listen}` for an ear-training question whose notation would give the answer away. It keeps its title and player, but the score is not shown.
+
+```{.abc .listen}
+X:1
+T:Ear Test: Which Interval?
+M:4/4
+L:1/4
+Q:1/4=72
+K:C
+C2 G2 | [CG]4 |]
+```
+
+::: hint
+Count the letter names from the lower note to the upper one.
+:::
+
+::: solution
+A perfect fifth: C up to G.
+:::
+
 ## Plain Code Blocks Still Work
 
 Any other language tag renders as a normal highlighted code block:

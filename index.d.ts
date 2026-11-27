@@ -205,6 +205,11 @@ export interface HakushiMermaidOptions {
 	/** Icon packs registered with Mermaid before rendering. */
 	iconPacks?: HakushiMermaidIconPack[];
 }
+/** Playback of ```abc scores. */
+export interface HakushiAbcOptions {
+	/** Swing for offbeat eighths, as a percentage of the beat: 66 is 2:1, 60 a lighter 3:2, 50 or less straight. A score overrides it with `%%MIDI swing N`; only X/4 meters swing. Defaults to `0`. */
+	swing?: number;
+}
 export interface HakushiOptions {
 	title?: string;
 	description?: string;
@@ -235,6 +240,8 @@ export interface HakushiOptions {
 	routes?: Partial<Record<'home' | 'articles' | 'collections' | 'aliases' | 'graph' | 'tags' | 'terms' | 'categories' | 'about' | 'notFound', boolean>>;
 	/** Mermaid diagram themes and configuration. */
 	mermaid?: HakushiMermaidOptions;
+	/** ABC score playback. */
+	abc?: HakushiAbcOptions;
 }
 export const DEFAULT_COLLECTIONS: HakushiCollection[];
 export const DEFAULT_ABOUT: Required<HakushiAbout>;
@@ -276,6 +283,7 @@ export interface HakushiResolvedConfig {
 	footer: Required<HakushiFooter> | null;
 	notFound: Required<HakushiNotFound>;
 	mermaid: Required<HakushiMermaidOptions>;
+	abc: Required<HakushiAbcOptions>;
 	/** Default selection plus the resolved catalogs (built-ins merged with configuration), keyed by id in picker order. */
 	theme: {
 		mode: 'light' | 'dark' | 'auto';
